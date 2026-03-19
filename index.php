@@ -1,65 +1,329 @@
-<?php
-// index.php - REFACTORED TO PDO
-include 'includes/db_connect.php';
-include 'includes/functions.php';
-
-// Fetch active courses via PDO
-$stmt = $pdo->query("SELECT c.*, p.organization_name FROM courses c JOIN providers p ON c.provider_id = p.id WHERE c.status = 'ACTIVE' ORDER BY c.created_at DESC");
-$courses = $stmt->fetchAll();
-
-include 'includes/header.php';
-?>
+<?php include 'includes/header.php'; ?>
 
 <!-- Hero Section -->
-<div class="row align-items-center py-5">
-    <div class="col-lg-6">
-        <h1 class="display-4 fw-bold mb-3" style="color: var(--secondary-color);">Professional Skills For The Next Generation.</h1>
-        <p class="lead text-muted mb-4">Access premium training from Ministry-vetted providers. Start your learning journey today with the EduSkill Marketplace.</p>
-        <div class="d-flex gap-3">
-            <a href="register.php" class="btn btn-primary-custom px-4 py-2 text-white shadow">Get Started</a>
-            <a href="#courses" class="btn btn-outline-secondary px-4 py-2 border-2">Browse Courses</a>
+<section class="py-5">
+    <div class="container py-lg-5">
+        <div class="row align-items-center">
+            <div class="col-lg-6">
+                <h1 class="display-3 fw-bold mb-4" style="font-family: 'Outfit';">
+                    <?php echo __('hero_title'); ?>
+                </h1>
+                <p class="lead text-muted mb-4">
+                    <?php echo __('hero_subtitle'); ?>
+                </p>
+                <div class="d-flex gap-3">
+                    <a href="#" class="btn btn-red btn-lg px-5"><?php echo __('btn_explore'); ?></a>
+                    <a href="#" class="btn btn-outline-dark btn-lg px-5"><?php echo __('btn_teach'); ?></a>
+                </div>
+            </div>
+            <div class="col-lg-6 mt-5 mt-lg-0">
+                <!-- Placeholder for Image -->
+                <div class="glass-panel overflow-hidden shadow-2xl" style="height: 480px; border-radius: 30px;">
+                    <img src="https://images.unsplash.com/photo-1542744173-8e7e53415bb0?auto=format&fit=crop&w=1000&q=60" alt="SkillStack Hero" class="w-100 h-100 object-fit-cover">
+                </div>
+            </div>
         </div>
     </div>
-    <div class="col-lg-6 d-none d-lg-block">
-        <img src="https://images.unsplash.com/photo-1522202176988-66273c2fd55f?auto=format&fit=crop&w=800&q=80" class="img-fluid rounded-4 shadow-lg" alt="Learning Themes">
+</section>
+
+<!-- Trusted By Section (Infinite Loop) -->
+<div class="logo-slider border-top border-bottom">
+    <div class="text-center mb-3 small text-muted">Trusted by over 17,000 companies and millions of learners around the world</div>
+    <div class="logo-track">
+        <!-- Loop Item 1 -->
+        <div class="logo-item"><img src="assets/images/slider/RandG.png" alt="RandG" height="40" loading="lazy"></div>
+        <div class="logo-item"><img src="assets/images/slider/samsung.png" alt="Samsung" height="40" loading="lazy"></div>
+        <div class="logo-item"><img src="assets/images/slider/cisco.png" alt="Cisco" height="40" loading="lazy"></div>
+        <div class="logo-item"><img src="assets/images/slider/vimeo.png" alt="Vimeo" height="40" loading="lazy"></div>
+        <div class="logo-item"><img src="assets/images/slider/aura.png" alt="Aura" height="40" loading="lazy"></div>
+        <div class="logo-item"><img src="assets/images/slider/hp.png" alt="HP" height="40" loading="lazy"></div>
+        <div class="logo-item"><img src="assets/images/slider/ericsson.png" alt="Ericsson" height="40" loading="lazy"></div>
+        <!-- Duplicate for Seamless Loop -->
+        <div class="logo-item"><img src="assets/images/slider/RandG.png" alt="RandG" height="40" loading="lazy"></div>
+        <div class="logo-item"><img src="assets/images/slider/samsung.png" alt="Samsung" height="40" loading="lazy"></div>
+        <div class="logo-item"><img src="assets/images/slider/cisco.png" alt="Cisco" height="40" loading="lazy"></div>
+        <div class="logo-item"><img src="assets/images/slider/vimeo.png" alt="Vimeo" height="40" loading="lazy"></div>
+        <div class="logo-item"><img src="assets/images/slider/aura.png" alt="Aura" height="40" loading="lazy"></div>
+        <div class="logo-item"><img src="assets/images/slider/hp.png" alt="HP" height="40" loading="lazy"></div>
+        <div class="logo-item"><img src="assets/images/slider/ericsson.png" alt="Ericsson" height="40" loading="lazy"></div>
     </div>
 </div>
 
-<!-- Course List -->
-<div id="courses" class="mt-5 pt-4">
-    <div class="d-flex justify-content-between align-items-end mb-4">
-        <div>
-            <h2 class="fw-bold text-dark">Vetted Courses</h2>
-            <p class="text-muted">Quality Education from Trusted Providers</p>
-        </div>
-    </div>
+<!-- Skills Showcase Section -->
+<section class="py-5 bg-white">
+    <div class="container">
+        <h2 class="fw-bold mb-2">Skills to transform your career and life</h2>
+        <p class="text-muted mb-4">From critical skills to technical topics, SkillStack supports your professional development.</p>
+        
+        <!-- Tabs -->
+        <ul class="nav nav-tabs nav-tabs-eduskill mb-4 border-0">
+            <li class="nav-item">
+                <a class="nav-link active" href="#" data-target="#cat-ai">Artificial Intelligence (AI)</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="#" data-target="#cat-python">Python</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="#" data-target="#cat-excel">Microsoft Excel</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="#" data-target="#cat-marketing">Digital Marketing</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="#" data-target="#cat-aws">Amazon AWS</a>
+            </li>
+        </ul>
 
-    <div class="row g-4">
-        <?php foreach ($courses as $row): ?>
-            <div class="col-md-4">
-                <div class="card ems-card border-0 h-100 shadow-sm overflow-hidden text-dark">
-                    <img src="assets/uploads/<?php echo $row['thumbnail'] ?: 'default_course.jpg'; ?>" class="card-img-top" style="height: 180px; object-fit: cover;" onerror="this.src='https://placehold.co/600x400?text=Course+Thumbnail'">
-                    <div class="card-body">
-                        <span class="badge border text-dark mb-2" style="border-color: var(--primary-color) !important;"><?php echo $row['category']; ?></span>
-                        <h5 class="card-title fw-bold"><?php echo $row['title']; ?></h5>
-                        <p class="text-muted small">By <?php echo $row['organization_name']; ?></p>
-                        <div class="d-flex justify-content-between align-items-center mt-3">
-                            <span class="fw-bold fs-5" style="color: var(--secondary-color);"><?php echo format_price($row['price']); ?></span>
-                            <a href="course_details.php?id=<?php echo $row['id']; ?>" class="btn btn-sm btn-outline-primary border-2 px-3">Details</a>
+        <!-- Course Grids for each Category -->
+        <?php
+$categories = [
+    "cat-ai" => [
+        ["title" => "The AI Engineer Course 2026: Complete Bootcamp", "inst" => "365 Careers", "price" => "$59.99", "badge" => "Bestseller"],
+        ["title" => "The Complete AI Coding Course (2025) - Cursor", "inst" => "Brendan AI", "price" => "$19.99", "badge" => "Bestseller"],
+        ["title" => "2026 Bootcamp: Generative AI, LLM Apps", "inst" => "Julio Colomer", "price" => "$54.99", "badge" => "Premium"],
+        ["title" => "AI for Business Analysts - The Complete Course", "inst" => "George Smarts", "price" => "$27.99", "badge" => "Bestseller"],
+    ],
+    "cat-python" => [
+        ["title" => "Python for Data Science & Machine Learning", "inst" => "Jose Portilla", "price" => "$89.99", "badge" => "Bestseller"],
+        ["title" => "Learn Python Programming from Scratch", "inst" => "Colt Steele", "price" => "$14.99", "badge" => "Classic"],
+        ["title" => "Automate the Boring Stuff with Python", "inst" => "Al Sweigart", "price" => "$19.99", "badge" => "Bestseller"],
+        ["title" => "Advanced Python: Deep Dive", "inst" => "Fred Baptiste", "price" => "$49.99", "badge" => "Expert"],
+    ],
+    "cat-excel" => [
+        ["title" => "Microsoft Excel: Zero to Hero in 10 Days", "inst" => "Kyle Pew", "price" => "$12.99", "badge" => "Bestseller"],
+        ["title" => "Data Analysis with Excel Pivot Tables", "inst" => "Chris Dutton", "price" => "$19.99", "badge" => "Popular"],
+        ["title" => "Advanced Excel Formulas & Functions", "inst" => "Leila Gharani", "price" => "$24.99", "badge" => "Expert"],
+        ["title" => "Excel VBA & Macros Bootcamp", "inst" => "John Michaloudis", "price" => "$29.99", "badge" => "Premium"],
+    ],
+    "cat-marketing" => [
+        ["title" => "The Ultimate Google Ads Training", "inst" => "Isaac Rudansky", "price" => "$19.99", "badge" => "Bestseller"],
+        ["title" => "Social Media Marketing Mastery", "inst" => "COURSENVY", "price" => "$14.99", "badge" => "Bestseller"],
+        ["title" => "SEO 2026: Complete SEO Training", "inst" => "Arun Nagarathanam", "price" => "$12.99", "badge" => "Classic"],
+        ["title" => "Digital Marketing Strategy with AI", "inst" => "Anton Voroniuk", "price" => "$24.99", "badge" => "Popular"],
+    ],
+    "cat-aws" => [
+        ["title" => "AWS Certified Solutions Architect Associate", "inst" => "Stephane Maarek", "price" => "$18.99", "badge" => "Bestseller"],
+        ["title" => "Ultimate AWS Certified Developer Associate", "inst" => "Stephane Maarek", "price" => "$17.99", "badge" => "Premium"],
+        ["title" => "AWS Certified Cloud Practitioner", "inst" => "Neal Davis", "price" => "$12.99", "badge" => "Bestseller"],
+        ["title" => "Amazon AWS: Serverless Architecture", "inst" => "Ryan Kroonenburg", "price" => "$29.99", "badge" => "Expert"],
+    ],
+];
+
+foreach ($categories as $id => $courses):
+    $hiddenClass = ($id === "cat-ai") ? "" : "d-none";
+?>
+        <div id="<?php echo $id; ?>" class="course-category-grid row row-cols-1 row-cols-md-2 row-cols-lg-4 g-4 mb-4 <?php echo $hiddenClass; ?>">
+            <?php foreach ($courses as $c): ?>
+            <div class="col">
+                <div class="card h-100 course-card p-0 border shadow-sm">
+                    <div class="course-thumb overflow-hidden" style="height: 160px;">
+                        <?php
+        // Using local content assets as requested
+        $contents_pool = ['1.jpg', '2.jpg', '3.jpg', '4.jpg', '5.jpg', '6.jpg', 'f.jpg', 'g.jpg', 'ht.jpg', '45.jpg'];
+        static $thumb_idx = 0;
+        $c_img = $contents_pool[$thumb_idx % count($contents_pool)];
+        $thumb_idx++;
+?>
+                        <img src="assets/images/contents/<?php echo $c_img; ?>" class="w-100 h-100 object-fit-cover" loading="lazy">
+                    </div>
+                    <div class="card-body p-3">
+                        <h6 class="fw-bold mb-1 text-truncate-2" style="height: 2.8rem; overflow: hidden;"><?php echo $c['title']; ?></h6>
+                        <p class="x-small text-muted mb-2"><?php echo $c['inst']; ?></p>
+                        <div class="d-flex align-items-center gap-2 mb-2">
+                            <span class="badge badge-bestseller"><?php echo $c['badge']; ?></span>
+                            <span class="fw-bold x-small text-dark">4.8</span>
+                            <div class="text-warning x-small">
+                                <i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-half"></i>
+                            </div>
+                        </div>
+                        <div class="d-flex align-items-baseline gap-2">
+                            <span class="fw-bold text-dark"><?php echo $c['price']; ?></span>
+                            <span class="text-muted x-small text-decoration-line-through">$84.99</span>
                         </div>
                     </div>
                 </div>
             </div>
+            <?php
+    endforeach; ?>
+        </div>
         <?php
 endforeach; ?>
         
-        <?php if (empty($courses)): ?>
-            <div class="col-12 text-center py-5">
-                <div class="h4 text-muted">No courses available at the moment.</div>
-            </div>
-        <?php
-endif; ?>
+        <a href="#" class="text-red text-decoration-none fw-bold small">Show all <span id="current-category-name">Artificial Intelligence (AI)</span> courses &rarr;</a>
     </div>
-</div>
+</section>
+
+<!-- Featured Topic Section (Learn AI) -->
+<section class="py-5">
+    <div class="container">
+        <h3 class="fw-bold mb-4">Learn AI with <span class="text-red">SkillStack</span></h3>
+        <div class="featured-banner p-4 p-lg-5 text-white" style="background: #1a1a1a; border-radius: 20px;">
+            <div class="row align-items-center g-4">
+                <!-- Main Certificate Card -->
+                <div class="col-lg-4">
+                    <div class="card p-4 h-100 text-dark border-0 shadow-lg" style="border-radius: 15px;">
+                        <div class="mb-3 px-1">
+                            <h4 class="fw-bold"><span class="text-red">SkillStack</span> AI Professional <br>Certificate</h4>
+                            <p class="small text-muted">Build your AI fluency and get more done, faster with our professional track.</p>
+                        </div>
+                        <div class="d-flex flex-wrap gap-2 mb-4">
+                            <span class="badge border text-dark fw-normal">★ 4.8</span>
+                            <span class="badge border text-dark fw-normal">1,200 ratings</span>
+                            <span class="badge border text-dark fw-normal">15 total hours</span>
+                        </div>
+                        <a href="#" class="btn btn-outline-dark rounded-pill py-2 fw-bold">Learn more</a>
+                    </div>
+                </div>
+                
+                <!-- Side Courses Slider -->
+                <div class="col-lg-8">
+                    <div class="slider-container-wrapper">
+                        <button class="slider-nav prev" onclick="scrollSlider('ai-slider', -1)"><i class="bi bi-chevron-left"></i></button>
+                        
+                        <div id="ai-slider" class="d-flex gap-3 overflow-auto pb-3 no-scrollbar scroll-smooth">
+                            <?php
+$ai_courses = ["AI Fundamentals", "Generative AI for Business", "AI Research & Insights", "Prompt Engineering"];
+foreach ($ai_courses as $idx => $title):
+?>
+                            <div class="card bg-white text-dark border-0" style="min-width: 240px; border-radius: 12px; transition: transform 0.3s;">
+                                <div class="p-3">
+                                    <div class="course-banner-small" style="height: 140px; border-radius: 8px; margin-bottom: 15px; overflow: hidden;">
+                                    <?php
+    if ($idx === 0) {
+        $final_src = 'assets/images/ai.png';
+    }
+    elseif ($idx === 1) {
+        $final_src = 'assets/images/ai2.png';
+    }
+    elseif ($idx === 2) {
+        $final_src = 'assets/images/ai3.png';
+    }
+    elseif ($idx === 3) {
+        $final_src = 'assets/images/promptenginnering.png';
+    }
+    else {
+        // Optimized AI Slider CDN (q=40)
+        $ai_img_pool = ['L7en7Lb-Ovc', 'q_9_o3wUMG8', '3vV_VpS2V4k', 'XJXWAsD_4o8'];
+        $c_id = $ai_img_pool[$idx % count($ai_img_pool)];
+        $final_src = 'https://images.unsplash.com/photo-' . $c_id . '?auto=format&fit=crop&w=500&q=40';
+    }
+?>
+                                    <img src="<?php echo $final_src; ?>" class="w-100 h-100 object-fit-cover" loading="lazy">
+                                    </div>
+                                    <h6 class="fw-bold mb-1" style="font-size: 0.95rem;"><?php echo $title; ?></h6>
+                                    <div class="mt-3 pt-2 border-top d-flex justify-content-between x-small text-muted">
+                                        <span>Course <?php echo $idx + 1; ?> of 4</span>
+                                        <span>2.5 hours</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <?php
+endforeach; ?>
+                        </div>
+
+                        <button class="slider-nav next" onclick="scrollSlider('ai-slider', 1)"><i class="bi bi-chevron-right"></i></button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Featured Courses Section -->
+<section class="py-5 bg-white">
+    <div class="container">
+        <div class="d-flex justify-content-between align-items-end mb-4">
+            <div>
+                <h2 class="fw-bold">Most Popular Courses</h2>
+                <p class="text-muted">Top picks based on student satisfaction.</p>
+            </div>
+            <a href="#" class="text-red text-decoration-none fw-bold">View More &rarr;</a>
+        </div>
+        
+        <div class="row row-cols-1 row-cols-md-2 row-cols-lg-4 g-4">
+            <!-- Sample Course Card -->
+            <?php for ($i = 0; $i < 4; $i++): ?>
+            <div class="col">
+                <div class="card h-100 course-card">
+                    <div style="height: 160px; overflow: hidden;">
+                         <img src="assets/images/js.png" class="w-100 h-100 object-fit-cover" loading="lazy">
+                    </div>
+                    <div class="card-body">
+                        <h6 class="fw-bold mb-1">Web Development Bootcamp 2026</h6>
+                        <p class="small text-muted mb-2">Nikhil Rana</p>
+                        <div class="d-flex align-items-center mb-2">
+                            <span class="text-warning small">★★★★★</span>
+                            <span class="ms-2 small text-muted">(4.8)</span>
+                        </div>
+                        <div class="d-flex align-items-center gap-2">
+                            <span class="price-final">$19.99</span>
+                            <span class="price-original">$49.99</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <?php
+endfor; ?>
+        </div>
+    </div>
+</section>
+
+<!-- Plan Promotion Section -->
+<section class="py-5 bg-white">
+    <div class="container">
+        <div class="featured-banner p-4 p-lg-5 text-white" style="background: #1a1a1a; border-radius: 20px;">
+            <div class="row align-items-center g-5">
+                <!-- Text Content -->
+                <div class="col-lg-5">
+                    <h2 class="display-5 fw-bold mb-3">Reimagine your career in the <span class="text-red">AI era</span></h2>
+                    <p class="text-white-50 mb-4">Future-proof your skills with Personal Plan. Get access to a variety of fresh content from real-world experts.</p>
+                    
+                    <div class="row g-3 mb-4">
+                        <div class="col-6">
+                            <i class="bi bi-stars text-red me-2"></i> Learn AI and more
+                        </div>
+                        <div class="col-6">
+                            <i class="bi bi-trophy text-red me-2"></i> Prep for certification
+                        </div>
+                        <div class="col-6">
+                            <i class="bi bi-laptop text-red me-2"></i> Practice with AI
+                        </div>
+                        <div class="col-6">
+                            <i class="bi bi-graph-up-arrow text-red me-2"></i> Advance your career
+                        </div>
+                    </div>
+                    
+                    <a href="#" class="btn btn-red btn-lg rounded-pill px-5 mb-3">Learn more</a>
+                    <div class="small text-white-50">Starting at $10.00/month</div>
+                </div>
+                
+                <!-- Image Grid Placeholder -->
+                <div class="col-lg-7">
+                    <div class="row g-2">
+                        <div class="col-6">
+                            <div class="glass-panel overflow-hidden" style="height: 300px; border: 1px solid rgba(255,255,255,0.1);">
+                                <img src="https://images.unsplash.com/photo-1522202176988-66273c2fd55f?auto=format&fit=crop&w=600&q=40" class="w-100 h-100 object-fit-cover" loading="lazy">
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="row g-2">
+                                <div class="col-12">
+                                    <div class="glass-panel overflow-hidden" style="height: 146px; border: 1px solid rgba(255,255,255,0.1);">
+                                        <img src="https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?auto=format&fit=crop&w=600&q=40" class="w-100 h-100 object-fit-cover" loading="lazy">
+                                    </div>
+                                </div>
+                                <div class="col-12">
+                                    <div class="glass-panel overflow-hidden" style="height: 146px; border: 1px solid rgba(255,255,255,0.1);">
+                                        <img src="https://images.unsplash.com/photo-1531482615713-2afd69097998?auto=format&fit=crop&w=600&q=40" class="w-100 h-100 object-fit-cover" loading="lazy">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
 
 <?php include 'includes/footer.php'; ?>

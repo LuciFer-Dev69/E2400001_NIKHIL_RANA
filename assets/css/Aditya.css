@@ -1,0 +1,98 @@
+/* 
+    Course Cards & Marketplace UI
+    Developer: Aditya Kumar Jaiwal
+*/
+
+.course-card {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    border: none;
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+.course-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(255, 0, 0, 0.15);
+}
+
+.badge-discount {
+    background-color: #FF0000;
+    font-size: 0.8rem;
+    padding: 0.3rem 0.6rem;
+}
+
+/* Featured Topic Section Styles */
+.no-scrollbar::-webkit-scrollbar {
+    display: none;
+}
+
+.no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+}
+
+.featured-banner {
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+}
+
+.x-small {
+    font-size: 0.75rem;
+}
+
+/* Tab Styles */
+.nav-tabs-eduskill {
+    border-bottom: 2px solid #eee;
+}
+
+.nav-tabs-eduskill .nav-link {
+    border: none;
+    color: #666;
+    font-weight: 600;
+    padding: 1rem 1.5rem;
+    position: relative;
+}
+
+.nav-tabs-eduskill .nav-link.active {
+    color: var(--primary-red) !important;
+    background: none;
+}
+
+.nav-tabs-eduskill .nav-link.active::after {
+    content: "";
+    position: absolute;
+    bottom: -2px;
+    left: 0;
+    width: 100%;
+    height: 2px;
+    background: var(--primary-red);
+}
+
+.badge-bestseller {
+    background-color: #fcecd8;
+    color: #3d3c0a;
+    font-weight: bold;
+    font-size: 0.7rem;
+}
+
+.course-thumb {
+    height: 150px;
+    background: #f0f0f0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #ccc;
+}
+
+.price-original {
+    text-decoration: line-through;
+    color: #999;
+    font-size: 0.9rem;
+}
+
+.price-final {
+    font-weight: bold;
+    color: var(--gray-dark);
+    font-size: 1.1rem;
+}

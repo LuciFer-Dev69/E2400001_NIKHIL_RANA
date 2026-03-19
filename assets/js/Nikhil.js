@@ -1,7 +1,7 @@
-/* assets/js/Nikhil.js - PROFESSIONAL ENHANCEMENTS */
+/* assets/js/Nikhil.js - PROFESSIONAL ENHANCEMENTS & CORE LOGIC */
 
 document.addEventListener('DOMContentLoaded', function () {
-    // 1. Initialize Toast System (SweetAlert2)
+    // --- 1. PROFESSIONAL TOAST SYSTEM (SweetAlert2) ---
     const Toast = Swal.mixin({
         toast: true,
         position: 'top-end',
@@ -15,10 +15,14 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 
     window.showToast = function (icon, title) {
-        Toast.fire({ icon, title });
+        if (typeof Swal !== 'undefined') {
+            Toast.fire({ icon, title });
+        } else {
+            console.log(`Toast: ${icon} - ${title}`);
+        }
     };
 
-    // 2. Loading Bar Simulation (Professional feel)
+    // --- 2. LOADING BAR SIMULATION ---
     const loadingBar = document.createElement('div');
     loadingBar.id = 'loading-bar';
     document.body.appendChild(loadingBar);
@@ -27,7 +31,7 @@ document.addEventListener('DOMContentLoaded', function () {
         loadingBar.style.width = '100%';
     });
 
-    // 3. Bootstrap Validation
+    // --- 3. BOOTSTRAP FORM VALIDATION ---
     var forms = document.querySelectorAll('.needs-validation')
     Array.prototype.slice.call(forms).forEach(function (form) {
         form.addEventListener('submit', function (event) {
@@ -36,14 +40,13 @@ document.addEventListener('DOMContentLoaded', function () {
                 event.stopPropagation()
                 window.showToast('error', 'Please fill all required fields');
             } else {
-                // Show loading on valid submit
                 loadingBar.style.width = '100%';
             }
             form.classList.add('was-validated')
         }, false)
     });
 
-    // 4. URL Message Handler (Success/Error from PHP)
+    // --- 4. URL MESSAGE HANDLER (Success/Error from PHP) ---
     const urlParams = new URLSearchParams(window.location.search);
     if (urlParams.has('msg')) {
         const msg = urlParams.get('msg');
@@ -53,4 +56,80 @@ document.addEventListener('DOMContentLoaded', function () {
             window.showToast('error', 'An error occurred');
         }
     }
+
+    // --- 5. CORE UI LOGIC (SkillStack) ---
+    const exploreBtn = document.querySelector('.mega-menu-trigger > a');
+    const megaMenu = document.querySelector('.mega-menu');
+
+    if (exploreBtn) {
+        exploreBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            megaMenu.classList.toggle('show-menu');
+        });
+    }
+
+    // Dynamic Mega Menu Category Switching
+    const menuCats = document.querySelectorAll('.menu-cat');
+    const subContents = document.querySelectorAll('.sub-menu-content');
+
+    menuCats.forEach(cat => {
+        cat.addEventListener('mouseenter', () => {
+            menuCats.forEach(c => c.classList.remove('active'));
+            cat.classList.add('active');
+
+            subContents.forEach(sub => sub.classList.add('d-none'));
+
+            const targetId = cat.getAttribute('data-target');
+            const targetSub = document.querySelector(targetId);
+            if (targetSub) {
+                targetSub.classList.remove('d-none');
+            }
+        });
+    });
+
+    // Close menu when clicking outside
+    document.addEventListener('click', (e) => {
+        if (megaMenu && megaMenu.classList.contains('show-menu')) {
+            if (!megaMenu.contains(e.target) && !exploreBtn.contains(e.target)) {
+                megaMenu.classList.remove('show-menu');
+            }
+        }
+    });
+
+    // Courses Showcase Tab Switching
+    const courseTabs = document.querySelectorAll('.nav-tabs-eduskill .nav-link');
+    const courseGrids = document.querySelectorAll('.course-category-grid');
+    const categoryNameSpan = document.getElementById('current-category-name');
+
+    courseTabs.forEach(tab => {
+        tab.addEventListener('click', (e) => {
+            e.preventDefault();
+
+            courseTabs.forEach(t => t.classList.remove('active'));
+            tab.classList.add('active');
+
+            const targetId = tab.getAttribute('data-target');
+            courseGrids.forEach(grid => {
+                grid.classList.add('d-none');
+                if (grid.id === targetId.replace('#', '')) {
+                    grid.classList.remove('d-none');
+                }
+            });
+
+            if (categoryNameSpan) {
+                categoryNameSpan.textContent = tab.textContent;
+            }
+        });
+    });
 });
+
+// Slider Scroll Logic
+function scrollSlider(id, direction) {
+    const slider = document.getElementById(id);
+    const scrollAmount = 300;
+    slider.scrollBy({
+        left: direction * scrollAmount,
+        behavior: 'smooth'
+    });
+}
