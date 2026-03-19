@@ -1,0 +1,80 @@
+/* assets/css/Nikhil.css */
+
+/* Core Brand Colors (Human touch: tailored palette) */
+:root {
+    --primary-color: #10B981;
+    /* Emerald Green */
+    --secondary-color: #047857;
+    /* Dark Green */
+    --accent-color: #3B82F6;
+    /* Blue */
+    --bg-light: #F0FDF4;
+    /* Fresh Greenish White */
+    --text-dark: #1F2937;
+}
+
+body {
+    background-color: var(--bg-light);
+    color: var(--text-dark);
+    font-family: 'Inter', sans-serif;
+    /* Modern typography */
+}
+
+/* Global Override: Remove white backgrounds from Bootstrap utilities */
+.bg-light {
+    background-color: var(--bg-light) !important;
+}
+
+.bg-white {
+    background-color: var(--bg-light) !important;
+}
+
+/* Professional Top Loading Bar */
+#loading-bar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 3px;
+    width: 0;
+    background: var(--accent-color);
+    z-index: 9999;
+    transition: width 0.4s ease;
+}
+
+.bg-theme-header {
+    background-color: #dcfce7 !important;
+    /* Slightly darker green for headers */
+}
+
+/* Card layout: Remove white, use transparent themed background */
+.ems-card {
+    background: rgba(16, 185, 129, 0.05);
+    /* Very light tinted emerald */
+    border: 1px solid rgba(16, 185, 129, 0.2);
+    border-radius: 12px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.03);
+    transition: transform 0.3s ease;
+}
+
+.ems-card:hover {
+    transform: translateY(-5px);
+}
+
+.btn-primary-custom {
+    background-color: var(--primary-color);
+    border: none;
+    padding: 10px 20px;
+}
+
+.btn-primary-custom:hover {
+    background-color: var(--secondary-color);
+}
+
+/* Dynamic footer */
+footer {
+    padding: 40px 0;
+    margin-top: 50px;
+    background: #e6f7eb;
+    /* Deep green pastel */
+    border-top: 2px solid rgba(16, 185, 129, 0.1);
+}

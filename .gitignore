@@ -1,0 +1,11 @@
+# Uploads
+assets/uploads/*
+!assets/uploads/default_course.jpg
+
+# OS files
+Thumbs.db
+.DS_Store
+
+# IDEs
+.vscode/
+.idea/
