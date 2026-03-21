@@ -71,18 +71,27 @@
                 <div class="col-lg-8">
                     <h5 class="fw-bold mb-4">Recommended for You</h5>
                     <div class="row g-3">
-                        <?php for ($i = 0; $i < 2; $i++): ?>
-                        <div class="col-md-6">
-                            <div class="card h-100 course-card p-3">
-                                <h6 class="fw-bold mb-1 small text-truncate">Web Design Systems with Figma</h6>
-                                <p class="small text-muted mb-2">Aditya Jaiwal</p>
-                                <div class="progress mt-auto" style="height: 4px;">
-                                    <div class="progress-bar bg-red" role="progressbar" style="width: 75%;"></div>
+                        <?php
+$bootcamps = [
+    ["title" => "Python for Data Science Bootcamp", "inst" => "Nikhil Rana", "progress" => "0%", "color" => "#640D2B"],
+    ["title" => "C++ Systems Programming Masterclass", "inst" => "Aditya Jaiwal", "progress" => "0%", "color" => "#880E4F"],
+    ["title" => "Go Lang: Scalable Backend Services", "inst" => "Manav Rawal", "progress" => "0%", "color" => "#4A148C"]
+];
+foreach ($bootcamps as $bc): ?>
+                        <div class="col-md-4">
+                            <div class="card h-100 course-card p-3 border-0 shadow-sm" style="background: <?php echo $bc['color']; ?>; color: #ffffff;">
+                                <div class="rose-placeholder mb-3 rounded d-flex align-items-center justify-content-center" style="height: 100px; background: rgba(255,255,255,0.1) !important;">
+                                    <i class="bi bi-rocket-takeoff display-6 opacity-50"></i>
+                                </div>
+                                <h6 class="fw-bold mb-1 small text-truncate"><?php echo $bc['title']; ?></h6>
+                                <p class="x-small opacity-75 mb-2"><?php echo $bc['inst']; ?></p>
+                                <div class="progress mt-auto" style="height: 4px; background: rgba(255,255,255,0.2);">
+                                    <div class="progress-bar bg-white" role="progressbar" style="width: <?php echo $bc['progress']; ?>;"></div>
                                 </div>
                             </div>
                         </div>
                         <?php
-endfor; ?>
+endforeach; ?>
                     </div>
                 </div>
                 <div class="col-lg-4">

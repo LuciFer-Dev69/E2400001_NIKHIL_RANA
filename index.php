@@ -59,6 +59,9 @@
             <li class="nav-item">
                 <a class="nav-link" href="#" data-target="#cat-aws">Amazon AWS</a>
             </li>
+            <li class="nav-item">
+                <a class="nav-link" href="#" data-target="#cat-bootcamp">Bootcamps</a>
+            </li>
         </ul>
 
         <!-- Course Grids for each Category -->
@@ -93,6 +96,12 @@ $categories = [
         ["title" => "Ultimate AWS Certified Developer Associate", "inst" => "Stephane Maarek", "price" => "$17.99", "badge" => "Premium"],
         ["title" => "AWS Certified Cloud Practitioner", "inst" => "Neal Davis", "price" => "$12.99", "badge" => "Bestseller"],
         ["title" => "Amazon AWS: Serverless Architecture", "inst" => "Ryan Kroonenburg", "price" => "$29.99", "badge" => "Expert"],
+    ],
+    "cat-bootcamp" => [
+        ["title" => "Python for Data Science Bootcamp 2026", "inst" => "Nikhil Rana", "price" => "$99.99", "badge" => "Featured"],
+        ["title" => "C++ Systems Programming Masterclass", "inst" => "Aditya Jaiwal", "price" => "$89.99", "badge" => "Expert"],
+        ["title" => "Go Lang: Scalable Backend Services", "inst" => "Manav Rawal", "price" => "$79.99", "badge" => "New"],
+        ["title" => "The Full Stack Web Bootcamp (MERN)", "inst" => "Colt Steele", "price" => "$19.99", "badge" => "Bestseller"],
     ],
 ];
 

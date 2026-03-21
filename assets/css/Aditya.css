@@ -108,6 +108,16 @@
     font-size: 0.7rem;
 }
 
+.badge-bootcamp {
+    background-color: #640D2B;
+    color: #ffffff;
+    font-weight: bold;
+    font-size: 0.7rem;
+    letter-spacing: 0.05em;
+    padding: 2px 8px;
+    border-radius: 4px;
+}
+
 .course-thumb {
     height: 150px;
     background: var(--pink-mid);
