@@ -44,7 +44,9 @@ include '../includes/header.php';
             <h4 class="fw-bold mb-4">Finalize Enrollment</h4>
             
             <div class="d-flex align-items-center mb-4 p-3 bg-light rounded shadow-sm">
-                <img src="../assets/uploads/<?php echo $course['thumbnail'] ?: 'default_course.jpg'; ?>" width="80" class="rounded" onerror="this.src='https://placehold.co/100x100?text=C'">
+                <div class="bg-white rounded d-flex align-items-center justify-content-center border" style="width: 80px; height: 50px;">
+                    <i class="bi bi-cart-check display-6 opacity-25"></i>
+                </div>
                 <div class="ms-3">
                     <h5 class="mb-1 fw-bold"><?php echo $course['title']; ?></h5>
                     <p class="mb-0 fw-bold" style="color: var(--secondary-color);"><?php echo format_price($course['price']); ?></p>

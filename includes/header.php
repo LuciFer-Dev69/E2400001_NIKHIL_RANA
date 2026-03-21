@@ -23,11 +23,11 @@ if (strpos($current_path, '/views/auth/') !== false) {
     <!-- Bootstrap Icons -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
     <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&family=Outfit:wght@600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;700&family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
     <!-- Custom CSS (Member Specific) -->
-    <link rel="stylesheet" href="<?php echo $base_path; ?>assets/css/Nikhil.css">
-    <link rel="stylesheet" href="<?php echo $base_path; ?>assets/css/Aditya.css">
-    <link rel="stylesheet" href="<?php echo $base_path; ?>assets/css/Manav.css">
+    <link rel="stylesheet" href="<?php echo $base_path; ?>assets/css/Nikhil.css?v=1.1">
+    <link rel="stylesheet" href="<?php echo $base_path; ?>assets/css/Aditya.css?v=1.1">
+    <link rel="stylesheet" href="<?php echo $base_path; ?>assets/css/Manav.css?v=1.1">
 </head>
 <body>
 

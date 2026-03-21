@@ -25,8 +25,9 @@ include 'includes/header.php';
 
 <div class="row">
     <div class="col-lg-8">
-        <div class="card ems-card border-0 shadow-sm overflow-hidden mb-4 text-dark">
-            <img src="assets/uploads/<?php echo $course['thumbnail'] ?: 'default_course.jpg'; ?>" class="img-fluid" style="width: 100%; height: 400px; object-fit: cover;" onerror="this.src='https://placehold.co/800x400?text=Course+Thumbnail'">
+        <div class="card ems-card border-0 shadow-sm overflow-hidden mb-4 text-dark bg-light d-flex align-items-center justify-content-center" style="height: 400px;">
+            <i class="bi bi-book display-1 opacity-10"></i>
+            <!-- Image Removed -->
             <div class="card-body p-4">
                 <span class="badge mb-3" style="background-color: var(--primary-color);"><?php echo $course['category']; ?></span>
                 <h1 class="fw-bold"><?php echo $course['title']; ?></h1>

@@ -1,14 +1,14 @@
 <?php include 'includes/header.php'; ?>
 
 <!-- Hero Section -->
-<section class="py-5">
+<section class="py-5 reveal-on-scroll">
     <div class="container py-lg-5">
         <div class="row align-items-center">
             <div class="col-lg-6">
                 <h1 class="display-3 fw-bold mb-4" style="font-family: 'Outfit';">
                     <?php echo __('hero_title'); ?>
                 </h1>
-                <p class="lead text-muted mb-4">
+                <p class="lead  mb-4">
                     <?php echo __('hero_subtitle'); ?>
                 </p>
                 <div class="d-flex gap-3">
@@ -17,43 +17,30 @@
                 </div>
             </div>
             <div class="col-lg-6 mt-5 mt-lg-0">
-                <!-- Placeholder for Image -->
-                <div class="glass-panel overflow-hidden shadow-2xl" style="height: 480px; border-radius: 30px;">
-                    <img src="https://images.unsplash.com/photo-1542744173-8e7e53415bb0?auto=format&fit=crop&w=1000&q=60" alt="SkillStack Hero" class="w-100 h-100 object-fit-cover">
+                <!-- Image Removed -->
+                <div class="glass-panel rose-placeholder shadow-2xl d-flex align-items-center justify-content-center" style="height: 480px; border-radius: 30px;">
+                    <span class="text-muted fw-bold opacity-25">SKILLSTACK</span>
                 </div>
             </div>
         </div>
     </div>
 </section>
 
-<!-- Trusted By Section (Infinite Loop) -->
-<div class="logo-slider border-top border-bottom">
-    <div class="text-center mb-3 small text-muted">Trusted by over 17,000 companies and millions of learners around the world</div>
-    <div class="logo-track">
-        <!-- Loop Item 1 -->
-        <div class="logo-item"><img src="assets/images/slider/RandG.png" alt="RandG" height="40" loading="lazy"></div>
-        <div class="logo-item"><img src="assets/images/slider/samsung.png" alt="Samsung" height="40" loading="lazy"></div>
-        <div class="logo-item"><img src="assets/images/slider/cisco.png" alt="Cisco" height="40" loading="lazy"></div>
-        <div class="logo-item"><img src="assets/images/slider/vimeo.png" alt="Vimeo" height="40" loading="lazy"></div>
-        <div class="logo-item"><img src="assets/images/slider/aura.png" alt="Aura" height="40" loading="lazy"></div>
-        <div class="logo-item"><img src="assets/images/slider/hp.png" alt="HP" height="40" loading="lazy"></div>
-        <div class="logo-item"><img src="assets/images/slider/ericsson.png" alt="Ericsson" height="40" loading="lazy"></div>
-        <!-- Duplicate for Seamless Loop -->
-        <div class="logo-item"><img src="assets/images/slider/RandG.png" alt="RandG" height="40" loading="lazy"></div>
-        <div class="logo-item"><img src="assets/images/slider/samsung.png" alt="Samsung" height="40" loading="lazy"></div>
-        <div class="logo-item"><img src="assets/images/slider/cisco.png" alt="Cisco" height="40" loading="lazy"></div>
-        <div class="logo-item"><img src="assets/images/slider/vimeo.png" alt="Vimeo" height="40" loading="lazy"></div>
-        <div class="logo-item"><img src="assets/images/slider/aura.png" alt="Aura" height="40" loading="lazy"></div>
-        <div class="logo-item"><img src="assets/images/slider/hp.png" alt="HP" height="40" loading="lazy"></div>
-        <div class="logo-item"><img src="assets/images/slider/ericsson.png" alt="Ericsson" height="40" loading="lazy"></div>
+<!-- Trusted By Section (Text Only) -->
+<div class="logo-slider border-top border-bottom py-4">
+    <div class="container text-center">
+        <div class=" mb-3 small ">Trusted by over 17,000 companies and millions of learners around the world</div>
+        <div class="d-flex flex-wrap justify-content-center gap-4 fw-bold opacity-50">
+            <span>SAMSUNG</span> <span>CISCO</span> <span>VIMEO</span> <span>HP</span> <span>ERICSSON</span>
+        </div>
     </div>
 </div>
 
 <!-- Skills Showcase Section -->
-<section class="py-5 bg-white">
+<section class="py-5 bg-transparent reveal-on-scroll">
     <div class="container">
         <h2 class="fw-bold mb-2">Skills to transform your career and life</h2>
-        <p class="text-muted mb-4">From critical skills to technical topics, SkillStack supports your professional development.</p>
+        <p class=" mb-4">From critical skills to technical topics, SkillStack supports your professional development.</p>
         
         <!-- Tabs -->
         <ul class="nav nav-tabs nav-tabs-eduskill mb-4 border-0">
@@ -115,20 +102,13 @@ foreach ($categories as $id => $courses):
         <div id="<?php echo $id; ?>" class="course-category-grid row row-cols-1 row-cols-md-2 row-cols-lg-4 g-4 mb-4 <?php echo $hiddenClass; ?>">
             <?php foreach ($courses as $c): ?>
             <div class="col">
-                <div class="card h-100 course-card p-0 border shadow-sm">
-                    <div class="course-thumb overflow-hidden" style="height: 160px;">
-                        <?php
-        // Using local content assets as requested
-        $contents_pool = ['1.jpg', '2.jpg', '3.jpg', '4.jpg', '5.jpg', '6.jpg', 'f.jpg', 'g.jpg', 'ht.jpg', '45.jpg'];
-        static $thumb_idx = 0;
-        $c_img = $contents_pool[$thumb_idx % count($contents_pool)];
-        $thumb_idx++;
-?>
-                        <img src="assets/images/contents/<?php echo $c_img; ?>" class="w-100 h-100 object-fit-cover" loading="lazy">
+                <div class="card h-100 course-card p-0 border shadow-sm glass-panel">
+                    <div class="course-thumb rose-placeholder d-flex align-items-center justify-content-center" style="height: 160px;">
+                        <i class="bi bi-journal-text display-6 opacity-25"></i>
                     </div>
                     <div class="card-body p-3">
                         <h6 class="fw-bold mb-1 text-truncate-2" style="height: 2.8rem; overflow: hidden;"><?php echo $c['title']; ?></h6>
-                        <p class="x-small text-muted mb-2"><?php echo $c['inst']; ?></p>
+                        <p class="x-small  mb-2"><?php echo $c['inst']; ?></p>
                         <div class="d-flex align-items-center gap-2 mb-2">
                             <span class="badge badge-bestseller"><?php echo $c['badge']; ?></span>
                             <span class="fw-bold x-small text-dark">4.8</span>
@@ -138,7 +118,7 @@ foreach ($categories as $id => $courses):
                         </div>
                         <div class="d-flex align-items-baseline gap-2">
                             <span class="fw-bold text-dark"><?php echo $c['price']; ?></span>
-                            <span class="text-muted x-small text-decoration-line-through">$84.99</span>
+                            <span class=" x-small text-decoration-line-through">$84.99</span>
                         </div>
                     </div>
                 </div>
@@ -154,17 +134,17 @@ endforeach; ?>
 </section>
 
 <!-- Featured Topic Section (Learn AI) -->
-<section class="py-5">
+<section class="py-5 reveal-on-scroll">
     <div class="container">
         <h3 class="fw-bold mb-4">Learn AI with <span class="text-red">SkillStack</span></h3>
-        <div class="featured-banner p-4 p-lg-5 text-white" style="background: #1a1a1a; border-radius: 20px;">
+        <div class="featured-banner p-4 p-lg-5 text-white" style="border-radius: 20px;">
             <div class="row align-items-center g-4">
                 <!-- Main Certificate Card -->
                 <div class="col-lg-4">
-                    <div class="card p-4 h-100 text-dark border-0 shadow-lg" style="border-radius: 15px;">
+                    <div class="card p-4 h-100 text-dark border-0 shadow-lg glass-panel" style="border-radius: 15px;">
                         <div class="mb-3 px-1">
                             <h4 class="fw-bold"><span class="text-red">SkillStack</span> AI Professional <br>Certificate</h4>
-                            <p class="small text-muted">Build your AI fluency and get more done, faster with our professional track.</p>
+                            <p class="small ">Build your AI fluency and get more done, faster with our professional track.</p>
                         </div>
                         <div class="d-flex flex-wrap gap-2 mb-4">
                             <span class="badge border text-dark fw-normal">★ 4.8</span>
@@ -185,33 +165,13 @@ endforeach; ?>
 $ai_courses = ["AI Fundamentals", "Generative AI for Business", "AI Research & Insights", "Prompt Engineering"];
 foreach ($ai_courses as $idx => $title):
 ?>
-                            <div class="card bg-white text-dark border-0" style="min-width: 240px; border-radius: 12px; transition: transform 0.3s;">
+                            <div class="card bg-transparent text-dark border-0 glass-panel" style="min-width: 240px; border-radius: 12px; transition: transform 0.3s;">
                                 <div class="p-3">
-                                    <div class="course-banner-small" style="height: 140px; border-radius: 8px; margin-bottom: 15px; overflow: hidden;">
-                                    <?php
-    if ($idx === 0) {
-        $final_src = 'assets/images/ai.png';
-    }
-    elseif ($idx === 1) {
-        $final_src = 'assets/images/ai2.png';
-    }
-    elseif ($idx === 2) {
-        $final_src = 'assets/images/ai3.png';
-    }
-    elseif ($idx === 3) {
-        $final_src = 'assets/images/promptenginnering.png';
-    }
-    else {
-        // Optimized AI Slider CDN (q=40)
-        $ai_img_pool = ['L7en7Lb-Ovc', 'q_9_o3wUMG8', '3vV_VpS2V4k', 'XJXWAsD_4o8'];
-        $c_id = $ai_img_pool[$idx % count($ai_img_pool)];
-        $final_src = 'https://images.unsplash.com/photo-' . $c_id . '?auto=format&fit=crop&w=500&q=40';
-    }
-?>
-                                    <img src="<?php echo $final_src; ?>" class="w-100 h-100 object-fit-cover" loading="lazy">
+                                    <div class="course-banner-small d-flex align-items-center justify-content-center bg-dark" style="height: 140px; border-radius: 8px; margin-bottom: 15px; overflow: hidden;">
+                                        <i class="bi bi-cpu text-white opacity-25 display-6"></i>
                                     </div>
                                     <h6 class="fw-bold mb-1" style="font-size: 0.95rem;"><?php echo $title; ?></h6>
-                                    <div class="mt-3 pt-2 border-top d-flex justify-content-between x-small text-muted">
+                                    <div class="mt-3 pt-2 border-top d-flex justify-content-between x-small ">
                                         <span>Course <?php echo $idx + 1; ?> of 4</span>
                                         <span>2.5 hours</span>
                                     </div>
@@ -230,30 +190,29 @@ endforeach; ?>
 </section>
 
 <!-- Featured Courses Section -->
-<section class="py-5 bg-white">
+<section class="py-5 bg-transparent reveal-on-scroll">
     <div class="container">
         <div class="d-flex justify-content-between align-items-end mb-4">
             <div>
                 <h2 class="fw-bold">Most Popular Courses</h2>
-                <p class="text-muted">Top picks based on student satisfaction.</p>
+                <p class="">Top picks based on student satisfaction.</p>
             </div>
             <a href="#" class="text-red text-decoration-none fw-bold">View More &rarr;</a>
         </div>
         
         <div class="row row-cols-1 row-cols-md-2 row-cols-lg-4 g-4">
             <!-- Sample Course Card -->
-            <?php for ($i = 0; $i < 4; $i++): ?>
             <div class="col">
-                <div class="card h-100 course-card">
-                    <div style="height: 160px; overflow: hidden;">
-                         <img src="assets/images/js.png" class="w-100 h-100 object-fit-cover" loading="lazy">
+                <div class="card h-100 course-card glass-panel">
+                    <div class="rose-placeholder d-flex align-items-center justify-content-center" style="height: 160px; overflow: hidden;">
+                         <i class="bi bi-star-fill text-warning opacity-25 display-6"></i>
                     </div>
                     <div class="card-body">
                         <h6 class="fw-bold mb-1">Web Development Bootcamp 2026</h6>
-                        <p class="small text-muted mb-2">Nikhil Rana</p>
+                        <p class="small  mb-2">Nikhil Rana</p>
                         <div class="d-flex align-items-center mb-2">
                             <span class="text-warning small">★★★★★</span>
-                            <span class="ms-2 small text-muted">(4.8)</span>
+                            <span class="ms-2 small ">(4.8)</span>
                         </div>
                         <div class="d-flex align-items-center gap-2">
                             <span class="price-final">$19.99</span>
@@ -262,21 +221,19 @@ endforeach; ?>
                     </div>
                 </div>
             </div>
-            <?php
-endfor; ?>
         </div>
     </div>
 </section>
 
 <!-- Plan Promotion Section -->
-<section class="py-5 bg-white">
+<section class="py-5 bg-transparent reveal-on-scroll">
     <div class="container">
-        <div class="featured-banner p-4 p-lg-5 text-white" style="background: #1a1a1a; border-radius: 20px;">
+        <div class="featured-banner p-4 p-lg-5" style=" border-radius: 20px;">
             <div class="row align-items-center g-5">
                 <!-- Text Content -->
                 <div class="col-lg-5">
                     <h2 class="display-5 fw-bold mb-3">Reimagine your career in the <span class="text-red">AI era</span></h2>
-                    <p class="text-white-50 mb-4">Future-proof your skills with Personal Plan. Get access to a variety of fresh content from real-world experts.</p>
+                    <p class="mb-4">Future-proof your skills with Personal Plan. Get access to a variety of fresh content from real-world experts.</p>
                     
                     <div class="row g-3 mb-4">
                         <div class="col-6">
@@ -294,27 +251,27 @@ endfor; ?>
                     </div>
                     
                     <a href="#" class="btn btn-red btn-lg rounded-pill px-5 mb-3">Learn more</a>
-                    <div class="small text-white-50">Starting at $10.00/month</div>
+                    <div class="small ">Starting at $10.00/month</div>
                 </div>
                 
                 <!-- Image Grid Placeholder -->
                 <div class="col-lg-7">
                     <div class="row g-2">
                         <div class="col-6">
-                            <div class="glass-panel overflow-hidden" style="height: 300px; border: 1px solid rgba(255,255,255,0.1);">
-                                <img src="https://images.unsplash.com/photo-1522202176988-66273c2fd55f?auto=format&fit=crop&w=600&q=40" class="w-100 h-100 object-fit-cover" loading="lazy">
+                            <div class="rose-placeholder d-flex align-items-center justify-content-center" style="height: 300px; border: 1px solid rgba(255,255,255,0.1);">
+                                <span class="small opacity-50 fw-bold">CONTENT</span>
                             </div>
                         </div>
                         <div class="col-6">
                             <div class="row g-2">
                                 <div class="col-12">
-                                    <div class="glass-panel overflow-hidden" style="height: 146px; border: 1px solid rgba(255,255,255,0.1);">
-                                        <img src="https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?auto=format&fit=crop&w=600&q=40" class="w-100 h-100 object-fit-cover" loading="lazy">
+                                    <div class="rose-placeholder d-flex align-items-center justify-content-center" style="height: 146px; border: 1px solid rgba(255,255,255,0.1);">
+                                        <span class="small opacity-50 fw-bold">MODULE</span>
                                     </div>
                                 </div>
                                 <div class="col-12">
-                                    <div class="glass-panel overflow-hidden" style="height: 146px; border: 1px solid rgba(255,255,255,0.1);">
-                                        <img src="https://images.unsplash.com/photo-1531482615713-2afd69097998?auto=format&fit=crop&w=600&q=40" class="w-100 h-100 object-fit-cover" loading="lazy">
+                                    <div class="rose-placeholder d-flex align-items-center justify-content-center" style="height: 146px; border: 1px solid rgba(255,255,255,0.1);">
+                                        <span class="small opacity-50 fw-bold">CERTIFICATE</span>
                                     </div>
                                 </div>
                             </div>

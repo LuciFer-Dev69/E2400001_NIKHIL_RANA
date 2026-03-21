@@ -16,8 +16,8 @@
                     <p class="x-small text-muted mt-4 opacity-75">20% off first year of Personal Plan yearly access. Discount offer only valid on March 16 – 22, 2026. <br>Exiting Personal Plan subscribers do not qualify. Country restrictions apply.</p>
                 </div>
                 <div class="col-lg-6 position-relative text-center mt-5 mt-lg-0">
-                    <div class="hero-img-container shadow-2xl rounded-4 overflow-hidden border-8 border-white">
-                        <img src="https://images.pexels.com/photos/3184360/pexels-photo-3184360.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1" class="img-fluid w-100" style="height: 500px; object-fit: cover;" alt="Personal Plan Hero">
+                    <div class="hero-img-container rose-placeholder shadow-2xl rounded-4 overflow-hidden border-8 border-white d-flex align-items-center justify-content-center" style="height: 500px;">
+                        <i class="bi bi-gift display-1 opacity-25 text-red"></i>
                     </div>
                 </div>
             </div>
@@ -26,7 +26,7 @@
     </section>
 
     <!-- Stats Bar -->
-    <section class="stats-bar py-5 border-top border-bottom bg-white">
+    <section class="stats-bar py-5 border-top border-bottom bg-transparent">
         <div class="container text-center">
             <div class="row g-4">
                 <div class="col-6 col-md-3">
@@ -50,15 +50,15 @@
     </section>
 
     <!-- Trust Bar -->
-    <section class="trust-bar py-5 bg-light-subtle">
+    <section class="trust-bar py-5 bg-transparent">
         <div class="container text-center">
             <p class="small text-muted mb-4">Trusted by over 17,000 companies and millions of learners around the world</p>
-            <div class="d-flex flex-wrap justify-content-center align-items-center gap-4 filter-grayscale opacity-50">
-                <img src="../assets/images/slider/samsung.png" height="30" alt="Samsung">
-                <img src="../assets/images/slider/cisco.png" height="30" alt="Cisco">
-                <img src="../assets/images/slider/vimeo.png" height="30" alt="Vimeo">
-                <img src="../assets/images/slider/ericsson.png" height="30" alt="Ericsson">
-                <img src="../assets/images/slider/hp.png" height="30" alt="HP">
+            <div class="d-flex flex-wrap justify-content-center align-items-center gap-4 opacity-50 fw-bold x-small uppercase">
+                <span>SAMSUNG</span>
+                <span>CISCO</span>
+                <span>VIMEO</span>
+                <span>ERICSSON</span>
+                <span>HP</span>
             </div>
         </div>
     </section>
@@ -68,7 +68,9 @@
         <div class="container py-lg-5">
             <div class="row align-items-center mb-5">
                 <div class="col-lg-5">
-                    <img src="https://images.unsplash.com/photo-1522202176988-66273c2fd55f?q=80&w=1471&auto=format&fit=crop" class="img-fluid rounded-4 shadow" alt="Skills">
+                    <div class="rounded-4 shadow bg-light d-flex align-items-center justify-content-center" style="height: 300px;">
+                        <i class="bi bi-graph-up-arrow display-4 opacity-25"></i>
+                    </div>
                 </div>
                 <div class="col-lg-6 offset-lg-1 py-4">
                     <span class="text-red fw-bold small text-uppercase">Current</span>
@@ -78,7 +80,9 @@
             </div>
             <div class="row align-items-center flex-row-reverse">
                 <div class="col-lg-5">
-                    <img src="https://images.unsplash.com/photo-1516321318423-f06f85e504b3?q=80&w=1470&auto=format&fit=crop" class="img-fluid rounded-4 shadow" alt="Discovery">
+                    <div class="rounded-4 shadow bg-light d-flex align-items-center justify-content-center" style="height: 300px;">
+                        <i class="bi bi-compass display-4 opacity-25"></i>
+                    </div>
                 </div>
                 <div class="col-lg-6 py-4">
                     <span class="text-red fw-bold small text-uppercase">Flexible</span>
@@ -90,7 +94,7 @@
     </section>
 
     <!-- Plan Comparison -->
-    <section id="plans" class="plans-compare py-5 bg-light-subtle">
+    <section id="plans" class="plans-compare py-5 bg-transparent">
         <div class="container py-4 text-center">
             <h2 class="fw-bold mb-5">Choose a plan that works for you</h2>
             <div class="row justify-content-center g-4">

@@ -1,6 +1,6 @@
 <?php include '../includes/header.php'; ?>
 
-<!-- Business Hero -->
+<main class="business-page">
 <section class="business-hero py-5 text-white" style="background: #1c1d1f; min-height: 600px; display: flex; align-items: center;">
     <div class="container">
         <div class="row align-items-center">
@@ -18,9 +18,9 @@
                 </div>
             </div>
             <div class="col-lg-6 mt-5 mt-lg-0">
-                <div class="glass-panel text-center p-5" style="background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 30px;">
-                    <div class="overflow-hidden mb-4" style="height: 250px; border-radius: 15px;">
-                        <img src="https://images.unsplash.com/photo-1542744173-8e7e53415bb0?auto=format&fit=crop&w=800&q=40" class="w-100 h-100 object-fit-cover">
+                <div class="glass-panel rose-placeholder text-center p-5" style="border-radius: 30px;">
+                    <div class="d-flex align-items-center justify-content-center mb-4" style="height: 250px;">
+                        <i class="bi bi-building display-1 opacity-25"></i>
                     </div>
                     <h3 class="fw-bold mb-3">SkillStack Business</h3>
                     <p class="small text-white-50">Used by 8,000+ organizations and 80% of Fortune 500 companies.</p>
@@ -31,7 +31,7 @@
 </section>
 
 <!-- Stats Section -->
-<section class="py-5 bg-white shadow-sm" style="position: relative; z-index: 2; margin-top: -50px;">
+<section class="py-5 bg-transparent shadow-sm" style="position: relative; z-index: 2; margin-top: -50px;">
     <div class="container">
         <div class="row text-center g-4">
             <div class="col-6 col-lg-3">
@@ -72,8 +72,8 @@
             </div>
             <div class="col-md-4">
                 <div class="card h-100 border-0 shadow-sm p-4 text-center hover-up">
-                         <div class="overflow-hidden mb-3" style="height: 200px; border-radius: 12px;">
-                            <img src="https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?auto=format&fit=crop&w=600&q=40" class="w-100 h-100 object-fit-cover" loading="lazy">
+                         <div class="d-flex align-items-center justify-content-center mb-3 bg-light" style="height: 200px; border-radius: 12px;">
+                            <i class="bi bi-shield-lock display-4 opacity-25"></i>
                          </div>
                     <h5 class="fw-bold">Enterprise Security</h5>
                     <p class="text-muted small">SSO integration, SCIM provisioning, and data encryption out of the box.</p>
@@ -91,11 +91,11 @@
 </section>
 
 <!-- Demo Form Section -->
-<section id="demo-form" class="py-5 bg-light-danger">
+<section id="demo-form" class="py-5 bg-transparent reveal-on-scroll">
     <div class="container py-lg-5">
         <div class="row justify-content-center">
             <div class="col-lg-10">
-                <div class="card border-0 shadow-2xl p-4 p-lg-5 rounded-4 bg-white">
+                <div class="card border-0 shadow-2xl p-4 p-lg-5 rounded-4 glass-panel">
                     <div class="row g-5">
                         <div class="col-lg-6">
                             <h2 class="fw-bold mb-4">Request a Demo</h2>
@@ -144,5 +144,7 @@
         </div>
     </div>
 </section>
+
+</main>
 
 <?php include '../includes/footer.php'; ?>

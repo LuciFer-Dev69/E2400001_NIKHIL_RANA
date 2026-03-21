@@ -5,15 +5,16 @@
 */
 
 :root {
-    --primary-red: #FF0000;
-    /* Radiant Red */
-    --soft-red: #FFCCCC;
-    --light-red: #FFF5F5;
+    --primary-red: #E91E63;
+    /* Rose Color Red */
     --white: #FFFFFF;
-    --gray-dark: #333333;
+    --gray-dark: #000000;
     --gray-light: #F8F9FA;
-    --gradient-main: linear-gradient(135deg, var(--white) 0%, #FFF5F5 100%);
-    --radiant-glow: 0 4px 12px rgba(255, 0, 0, 0.2);
+    --pink-light: #FFFBFC;
+    --pink-mid: #FCE4EC;
+    --pink-deep: #F06292;
+    --gradient-main: linear-gradient(135deg, #FFFFFF 0%, #FFF5F7 30%, #FCE4EC 65%, #F06292 100%);
+    --radiant-glow: 0 4px 25px rgba(233, 30, 99, 0.15);
     /* Colors from EMS Conflict if needed */
     --primary-color: #10B981;
     /* Emerald Green */
@@ -28,10 +29,24 @@
 }
 
 body {
-    background: var(--gradient-main);
+    background: var(--gradient-main) fixed;
     min-height: 100vh;
     font-family: 'Inter', sans-serif;
-    color: var(--gray-dark);
+    color: #000000 !important;
+    /* Force Black Font */
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+.navbar-brand {
+    font-family: 'Plus Jakarta Sans', sans-serif !important;
+    letter-spacing: -0.02em;
 }
 
 /* Professional Top Loading Bar */
@@ -48,11 +63,19 @@ body {
 
 /* Glassmorphism Classes - Optimized for performance */
 .glass-panel {
-    background: rgba(255, 255, 255, 0.95);
-    border: 1px solid rgba(255, 255, 255, 0.3);
+    background: rgba(255, 255, 255, 0.6);
+    /* Semi-transparent white */
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(0, 0, 0, 0.2);
+    /* Vibrant pink border */
     border-radius: 15px;
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.05);
+    box-shadow: 0 10px 40px rgba(255, 105, 180, 0.15);
     will-change: transform, opacity;
+    transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.4s ease;
+}
+
+.text-muted {
+    color: #6c757d !important;
 }
 
 /* Apply expensive effects only on Desktop */
@@ -66,9 +89,20 @@ body {
 
 /* Custom Red Navbar */
 .navbar-skillstack {
-    background: white;
-    padding: 0.5rem 0;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.5) 0%, rgba(255, 105, 180, 0.2) 100%) !important;
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    padding: 0.6rem 0;
+    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+    border-bottom: 2px solid #000000;
+    /* Sharp Black Border */
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.navbar-brand {
+    font-size: 1.4rem;
+    font-weight: 800 !important;
+    letter-spacing: -1px;
 }
 
 /* Mega Menu Styles */
@@ -210,11 +244,15 @@ body {
 .nav-link {
     color: var(--gray-dark) !important;
     font-weight: 500;
+    font-size: 0.92rem;
+    /* Slightly smaller for elegance */
+    padding: 0.5rem 1rem !important;
+    transition: all 0.3s ease;
 }
 
-.navbar-skillstack .nav-link:hover,
-.navbar-skillstack .nav-link.active {
+.navbar-skillstack .nav-link:hover {
     color: var(--primary-red) !important;
+    transform: translateY(-1px);
 }
 
 .navbar-skillstack .nav-link.active {
@@ -240,14 +278,25 @@ body {
 
 .navbar-skillstack .btn-dark {
     background-color: #1c1d1f !important;
-    border: 1px solid #1c1d1f !important;
+    border: none !important;
     color: #fff !important;
-    transition: all 0.2s ease;
+    padding: 0.5rem 1.5rem;
+    font-weight: 600;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
 .navbar-skillstack .btn-dark:hover {
     background-color: #000 !important;
-    transform: translateY(-1px);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+}
+
+.navbar-skillstack .btn-outline-dark {
+    border: 1px solid #1c1d1f !important;
+    padding: 0.5rem 1.5rem;
+    font-weight: 600;
+    transition: all 0.3s ease;
 }
 
 .navbar-skillstack .btn-dark:focus,
@@ -293,7 +342,44 @@ body {
 }
 
 .bg-red-subtle {
-    background-color: #FFE4E1 !important;
+    background-color: #FFEBEE !important;
+    /* Soft Red */
+    border: 1px solid #FFCDD2;
+}
+
+.bg-light {
+    background-color: var(--pink-light) !important;
+}
+
+.rose-gradient-bg {
+    background: var(--gradient-main) !important;
+}
+
+.rose-placeholder {
+    background: linear-gradient(135deg, #FFFFFF 0%, #FFF5F7 30%, #FCE4EC 65%, #F06292 100%) !important;
+    position: relative;
+    overflow: hidden;
+}
+
+.rose-placeholder::after {
+    content: "";
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle, rgba(255, 255, 255, 0.4) 0%, transparent 70%);
+    animation: placeholder-glow 8s infinite alternate;
+}
+
+@keyframes placeholder-glow {
+    0% {
+        transform: translate(-10%, -10%);
+    }
+
+    100% {
+        transform: translate(10%, 10%);
+    }
 }
 
 .text-red {
@@ -315,7 +401,7 @@ body {
 .logo-slider {
     overflow: hidden;
     padding: 30px 0;
-    background: white;
+    background: transparent;
     white-space: nowrap;
     position: relative;
 }
@@ -332,12 +418,12 @@ body {
 
 .logo-slider::before {
     left: 0;
-    background: linear-gradient(to right, white, transparent);
+    background: linear-gradient(to right, #FFFFFF, transparent);
 }
 
 .logo-slider::after {
     right: 0;
-    background: linear-gradient(to left, white, transparent);
+    background: linear-gradient(to left, #FFD1DC, transparent);
 }
 
 .logo-track {
@@ -439,8 +525,15 @@ body {
     transition: color 0.2s;
 }
 
+.sub-hero,
+.subscription-page,
+.business-hero,
+.teach-hero {
+    background: transparent !important;
+}
+
 .sub-hero {
-    background: linear-gradient(135deg, #fff 0%, #f8f9fa 100%);
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.2) 0%, rgba(255, 240, 245, 0.4) 100%) !important;
 }
 
 .hero-bg-accent {
@@ -563,4 +656,51 @@ body {
 .course-thumb {
     aspect-ratio: 16/9;
     background: #f0f0f0;
+}
+
+/* --- Advanced Immersive Effects --- */
+.reveal-on-scroll {
+    opacity: 0;
+    transform: translateY(30px);
+    transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+    will-change: transform, opacity;
+}
+
+.reveal-on-scroll.revealed {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.footer-dark {
+    background: #000000 !important;
+    color: #ffffff !important;
+    border-top: 2px solid #000000;
+}
+
+.footer-dark .border-secondary {
+    border-color: rgba(255, 255, 255, 0.1) !important;
+}
+
+.footer-glass a {
+    color: var(--gray-dark);
+    opacity: 0.7;
+    transition: all 0.2s ease;
+}
+
+.footer-glass a:hover {
+    color: var(--primary-red);
+    opacity: 1;
+    transform: translateX(3px);
+    display: inline-block;
+}
+
+.footer-dark a {
+    color: rgba(255, 255, 255, 0.8) !important;
+    transition: all 0.2s ease;
+    text-decoration: none;
+}
+
+.footer-dark a:hover {
+    color: #ffffff !important;
+    opacity: 1;
 }

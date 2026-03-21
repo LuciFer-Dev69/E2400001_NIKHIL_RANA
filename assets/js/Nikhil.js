@@ -122,14 +122,45 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         });
     });
-});
 
-// Slider Scroll Logic
-function scrollSlider(id, direction) {
-    const slider = document.getElementById(id);
-    const scrollAmount = 300;
-    slider.scrollBy({
-        left: direction * scrollAmount,
-        behavior: 'smooth'
+    // --- 6. NAV-SCROLL EFFECT ---
+    const nav = document.querySelector('.navbar');
+    window.addEventListener('scroll', () => {
+        if (window.scrollY > 50) {
+            nav.classList.add('scrolled');
+        } else {
+            nav.classList.remove('scrolled');
+        }
     });
-}
+
+    // --- 7. SCROLL REVEAL SYSTEM ---
+    const revealOptions = {
+        threshold: 0.15,
+        rootMargin: "0px 0px -50px 0px"
+    };
+
+    const revealObserver = new IntersectionObserver((entries, observer) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.classList.add('revealed');
+                observer.unobserve(entry.target);
+            }
+        });
+    }, revealOptions);
+
+    document.querySelectorAll('.reveal-on-scroll').forEach(el => {
+        revealObserver.observe(el);
+    });
+
+    // Slider Scroll Logic (Global)
+    window.scrollSlider = function (id, direction) {
+        const slider = document.getElementById(id);
+        const scrollAmount = 300;
+        if (slider) {
+            slider.scrollBy({
+                left: direction * scrollAmount,
+                behavior: 'smooth'
+            });
+        }
+    }
+});

@@ -1,4 +1,4 @@
-<footer class="footer-dark text-white pt-5 pb-4 mt-5">
+<footer class="footer-dark py-5 mt-5">
     <div class="container">
         <!-- Top Footer Bar: Companies -->
         <div class="row align-items-center border-bottom border-secondary pb-4 mb-5">
@@ -6,11 +6,11 @@
                 <h5 class="fw-bold mb-0">Top companies choose <span class="text-red">SkillStack Business</span> to build in-demand career skills.</h5>
             </div>
             <div class="col-lg-5 text-lg-end mt-3 mt-lg-0">
-                <div class="d-flex justify-content-lg-end gap-4 align-items-center opacity-75 grayscale-filter">
-                    <img src="<?php echo $base_path; ?>assets/images/slider/samsung.png" alt="Samsung" height="25">
-                    <img src="<?php echo $base_path; ?>assets/images/slider/cisco.png" alt="Cisco" height="25">
-                    <img src="<?php echo $base_path; ?>assets/images/slider/vimeo.png" alt="Vimeo" height="25">
-                    <img src="<?php echo $base_path; ?>assets/images/slider/ericsson.png" alt="Ericsson" height="25">
+                <div class="d-flex justify-content-lg-end gap-3 align-items-center opacity-50 fw-bold x-small uppercase">
+                    <span>SAMSUNG</span>
+                    <span>CISCO</span>
+                    <span>VIMEO</span>
+                    <span>ERICSSON</span>
                 </div>
             </div>
         </div>
@@ -89,7 +89,7 @@
                 <h4 class="fw-bold mb-0"><span class="text-red">Skill</span>Stack</h4>
             </div>
             <div class="col-md-6 text-md-end mt-3 mt-md-0">
-                <span class="x-small text-white-50">&copy; 2026 SkillStack, Inc. All rights reserved.</span>
+                <span class="x-small">&copy; 2026 SkillStack, Inc. All rights reserved.</span>
             </div>
         </div>
     </div>
@@ -101,9 +101,9 @@
 <!-- Bootstrap JS -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <!-- Custom JS -->
-<script src="<?php echo $base_path; ?>assets/js/Nikhil.js"></script>
-<script src="<?php echo $base_path; ?>assets/js/Aditya.js"></script>
-<script src="<?php echo $base_path; ?>assets/js/Manav.js"></script>
+<script src="<?php echo $base_path; ?>assets/js/Nikhil.js?v=1.1"></script>
+<script src="<?php echo $base_path; ?>assets/js/Aditya.js?v=1.1"></script>
+<script src="<?php echo $base_path; ?>assets/js/Manav.js?v=1.1"></script>
 
 </body>
 </html>

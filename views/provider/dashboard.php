@@ -125,6 +125,9 @@
                     <tr>
                         <td class="ps-4">
                             <div class="d-flex align-items-center gap-3">
+                                <div class="rose-placeholder rounded d-flex align-items-center justify-content-center" style="width: 40px; height: 30px;">
+                                    <i class="bi bi-cpu x-small opacity-25"></i>
+                                </div>
                                 <div>
                                     <p class="mb-0 small fw-bold">AI Engineering 2026</p>
                                     <p class="mb-0 x-small text-muted">Published Jan 12, 2026</p>
@@ -142,6 +145,9 @@
                     <tr>
                         <td class="ps-4">
                             <div class="d-flex align-items-center gap-3">
+                                <div class="rose-placeholder rounded d-flex align-items-center justify-content-center" style="width: 40px; height: 30px;">
+                                    <i class="bi bi-code-square x-small opacity-25"></i>
+                                </div>
                                 <div>
                                     <p class="mb-0 small fw-bold">Python Bootcamp: Zero to Hero</p>
                                     <p class="mb-0 x-small text-muted">Published Dec 01, 2025</p>

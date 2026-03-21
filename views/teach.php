@@ -1,7 +1,7 @@
 <?php include '../includes/header.php'; ?>
 
 <!-- Instructor Hero -->
-<section class="teach-hero py-5" style="background: var(--gradient-main); min-height: 500px; display: flex; align-items: center;">
+<section class="teach-hero py-5 reveal-on-scroll" style="background: var(--gradient-main); min-height: 500px; display: flex; align-items: center;">
     <div class="container">
         <div class="row align-items-center">
             <div class="col-lg-6">
@@ -15,9 +15,9 @@
             </div>
             <div class="col-lg-6 mt-5 mt-lg-0">
                 <div class="position-relative">
-                    <div class="glass-panel text-center p-4 bg-white border shadow-lg" style="border-radius: 20px;">
-                         <div class="overflow-hidden mb-3" style="height: 200px; border-radius: 12px;">
-                            <img src="https://images.unsplash.com/photo-1524178232363-1fb2b075b655?auto=format&fit=crop&w=600&q=40" class="w-100 h-100 object-fit-cover">
+                    <div class="glass-panel rose-placeholder text-center p-4" style="border-radius: 20px;">
+                         <div class="d-flex align-items-center justify-content-center mb-3" style="height: 200px;">
+                            <i class="bi bi-person-video3 display-4 opacity-25 text-red"></i>
                          </div>
                          <h4 class="fw-bold">Your Classroom Awaits</h4>
                          <p class="text-muted small">We provide the tools and platform; you provide the expertise.</p>
@@ -31,7 +31,7 @@
 </section>
 
 <!-- Why Teach Section -->
-<section class="py-5 bg-white">
+<section class="py-5 bg-transparent">
     <div class="container py-lg-5">
         <div class="text-center mb-5">
             <h2 class="fw-bold">So many reasons to <span class="text-red">start</span></h2>
@@ -84,7 +84,7 @@
 </section>
 
 <!-- Roadmap Section -->
-<section class="py-5 bg-light">
+<section class="py-5 bg-transparent">
     <div class="container py-lg-5">
         <h2 class="fw-bold text-center mb-5">How to <span class="text-red">begin</span></h2>
         
@@ -116,7 +116,7 @@
 </section>
 
 <!-- CTA Section -->
-<section class="py-5 text-center">
+<section class="py-5 text-center reveal-on-scroll">
     <div class="container py-lg-5">
         <h2 class="fw-bold mb-4">You have the knowledge. We have the platform.</h2>
         <a href="<?php echo (string)($base_path ?? ''); ?>views/auth/register.php" class="btn btn-red btn-lg px-5 py-3 fw-bold">Sign up as an Instructor</a>

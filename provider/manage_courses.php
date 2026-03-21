@@ -58,7 +58,9 @@ endif; ?>
                     <?php foreach ($courses as $row): ?>
                         <tr>
                             <td>
-                                <img src="../assets/uploads/<?php echo $row['thumbnail'] ?: 'default_course.jpg'; ?>" width="60" class="rounded shadow-sm" onerror="this.src='https://placehold.co/100x100?text=C'">
+                                <div class="bg-light rounded shadow-sm d-flex align-items-center justify-content-center" style="width: 60px; height: 40px; border: 1px solid rgba(0,0,0,0.05);">
+                                    <i class="bi bi-file-earmark-code opacity-25"></i>
+                                </div>
                             </td>
                             <td class="fw-bold"><?php echo $row['title']; ?></td>
                             <td class="text-secondary fw-bold"><?php echo format_price($row['price']); ?></td>

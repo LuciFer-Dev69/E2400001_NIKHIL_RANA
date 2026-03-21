@@ -12,11 +12,11 @@
 
 .course-card:hover {
     transform: translateY(-5px);
-    box-shadow: 0 10px 20px rgba(255, 0, 0, 0.15);
+    box-shadow: 0 10px 20px rgba(233, 30, 99, 0.15);
 }
 
 .badge-discount {
-    background-color: #FF0000;
+    background-color: var(--primary-red);
     font-size: 0.8rem;
     padding: 0.3rem 0.6rem;
 }
@@ -32,9 +32,41 @@
 }
 
 .featured-banner {
+    background: #000000 !important;
+    color: #ffffff !important;
+    /* Pure Black for maximum impact */
     position: relative;
     overflow: hidden;
-    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 40px 100px rgba(0, 0, 0, 0.6), 0 0 30px rgba(255, 105, 180, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+.featured-banner .glass-panel {
+    background: rgba(0, 0, 0, 0.75) !important;
+    /* High-Density Dark Glass */
+    backdrop-filter: blur(30px);
+    border: 2px solid rgba(255, 255, 255, 0.35) !important;
+    /* Heavy White Border */
+    color: #ffffff !important;
+}
+
+.featured-banner .glass-panel * {
+    color: #ffffff !important;
+}
+
+.featured-banner .text-muted,
+.featured-banner .text-white-50 {
+    color: rgba(255, 255, 255, 0.8) !important;
+}
+
+.featured-banner .btn-outline-dark {
+    border-color: rgba(255, 255, 255, 0.5) !important;
+    color: white !important;
+}
+
+.featured-banner .btn-outline-dark:hover {
+    background: white !important;
+    color: #2D0B16 !important;
 }
 
 .x-small {
@@ -43,7 +75,7 @@
 
 /* Tab Styles */
 .nav-tabs-eduskill {
-    border-bottom: 2px solid #eee;
+    border-bottom: 2px solid rgba(255, 105, 180, 0.2);
 }
 
 .nav-tabs-eduskill .nav-link {
@@ -78,11 +110,11 @@
 
 .course-thumb {
     height: 150px;
-    background: #f0f0f0;
+    background: var(--pink-mid);
     display: flex;
     align-items: center;
     justify-content: center;
-    color: #ccc;
+    color: var(--pink-deep);
 }
 
 .price-original {

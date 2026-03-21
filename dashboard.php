@@ -13,7 +13,7 @@
             <div class="d-flex justify-content-between align-items-center mb-4">
                 <div>
                     <h2 class="fw-bold mb-1">Welcome back, <span class="text-red">Nikhil!</span></h2>
-                    <p class="text-muted">You've completed 45% of your goal this week. Keep it up!</p>
+                    <p class="text-muted fw-bold">You've completed 45% of your goal this week. Keep it up!</p>
                 </div>
                 <div class="d-none d-md-block">
                     <span class="text-muted small me-2">March 19, 2026</span>
@@ -46,8 +46,8 @@
             <!-- Continue Learning Large Widget -->
             <div class="glass-panel p-0 overflow-hidden mb-5 border-0">
                 <div class="row g-0">
-                    <div class="col-md-4 bg-light d-none d-md-flex align-items-center justify-content-center border-end" style="min-height: 200px;">
-                        <span class="text-muted fw-bold small text-uppercase ls-1">Course Preview</span>
+                    <div class="col-md-4 rose-placeholder d-none d-md-flex align-items-center justify-content-center border-end" style="min-height: 200px;">
+                        <span class="text-muted fw-bold small text-uppercase ls-1 opacity-25">Course Preview</span>
                     </div>
                     <div class="col-md-8 p-4">
                         <div class="badge bg-red-subtle text-red mb-2 px-3">Last Viewed</div>

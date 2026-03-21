@@ -30,7 +30,9 @@ include '../includes/header.php';
         <?php foreach ($my_courses as $course): ?>
             <div class="col-md-6 col-lg-4">
                 <div class="card ems-card border-0 shadow-sm h-100 overflow-hidden">
-                    <img src="../assets/uploads/<?php echo $course['thumbnail'] ?: 'default_course.jpg'; ?>" class="card-img-top" style="height: 160px; object-fit: cover;" onerror="this.src='https://placehold.co/400x200?text=C'">
+                    <div class="d-flex align-items-center justify-content-center bg-light" style="height: 160px; border-bottom: 1px solid rgba(0,0,0,0.05);">
+                        <i class="bi bi-play-circle-fill display-5 opacity-25"></i>
+                    </div>
                     <div class="card-body">
                         <p class="text-muted small mb-1"><?php echo $course['organization_name']; ?></p>
                         <h5 class="fw-bold mb-3"><?php echo $course['title']; ?></h5>
