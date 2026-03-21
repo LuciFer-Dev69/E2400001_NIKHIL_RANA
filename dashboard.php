@@ -75,7 +75,8 @@
 $bootcamps = [
     ["title" => "Python for Data Science Bootcamp", "inst" => "Nikhil Rana", "progress" => "0%", "color" => "#640D2B"],
     ["title" => "C++ Systems Programming Masterclass", "inst" => "Aditya Jaiwal", "progress" => "0%", "color" => "#880E4F"],
-    ["title" => "Go Lang: Scalable Backend Services", "inst" => "Manav Rawal", "progress" => "0%", "color" => "#4A148C"]
+    ["title" => "Go Lang: Scalable Backend Services", "inst" => "Manav Rawal", "progress" => "0%", "color" => "#4A148C"],
+    ["title" => "Full Stack Web Mastery (MERN Stack)", "inst" => "Nikhil Rana", "progress" => "0%", "color" => "#C2185B"]
 ];
 foreach ($bootcamps as $bc): ?>
                         <div class="col-md-4">

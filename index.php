@@ -215,7 +215,8 @@ endforeach; ?>
 $popular = [
     ["title" => "Python for Data Science Bootcamp 2026", "inst" => "Nikhil Rana", "price" => "$99.99", "orig" => "$199.99", "icon" => "bi-rocket-takeoff"],
     ["title" => "C++ Systems Programming Masterclass", "inst" => "Aditya Jaiwal", "price" => "$89.99", "orig" => "$179.99", "icon" => "bi-cpu"],
-    ["title" => "Go Lang: Scalable Backend Services", "inst" => "Manav Rawal", "price" => "$79.99", "orig" => "$159.99", "icon" => "bi-code-square"]
+    ["title" => "Go Lang: Scalable Backend Services", "inst" => "Manav Rawal", "price" => "$79.99", "orig" => "$159.99", "icon" => "bi-code-square"],
+    ["title" => "Full Stack Web Mastery (MERN Stack)", "inst" => "Nikhil Rana", "price" => "$109.99", "orig" => "$219.99", "icon" => "bi-globe"]
 ];
 foreach ($popular as $p): ?>
             <div class="col">
