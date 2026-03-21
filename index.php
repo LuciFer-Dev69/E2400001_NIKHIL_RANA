@@ -211,25 +211,34 @@ endforeach; ?>
         
         <div class="row row-cols-1 row-cols-md-2 row-cols-lg-4 g-4">
             <!-- Sample Course Card -->
+            <?php
+$popular = [
+    ["title" => "Python for Data Science Bootcamp 2026", "inst" => "Nikhil Rana", "price" => "$99.99", "orig" => "$199.99", "icon" => "bi-rocket-takeoff"],
+    ["title" => "C++ Systems Programming Masterclass", "inst" => "Aditya Jaiwal", "price" => "$89.99", "orig" => "$179.99", "icon" => "bi-cpu"],
+    ["title" => "Go Lang: Scalable Backend Services", "inst" => "Manav Rawal", "price" => "$79.99", "orig" => "$159.99", "icon" => "bi-code-square"]
+];
+foreach ($popular as $p): ?>
             <div class="col">
                 <div class="card h-100 course-card glass-panel">
                     <div class="rose-placeholder d-flex align-items-center justify-content-center" style="height: 160px; overflow: hidden;">
-                         <i class="bi bi-star-fill text-warning opacity-25 display-6"></i>
+                         <i class="bi <?php echo $p['icon']; ?> opacity-25 display-6"></i>
                     </div>
                     <div class="card-body">
-                        <h6 class="fw-bold mb-1">Web Development Bootcamp 2026</h6>
-                        <p class="small  mb-2">Nikhil Rana</p>
+                        <h6 class="fw-bold mb-1 text-truncate"><?php echo $p['title']; ?></h6>
+                        <p class="x-small mb-2"><?php echo $p['inst']; ?></p>
                         <div class="d-flex align-items-center mb-2">
                             <span class="text-warning small">★★★★★</span>
-                            <span class="ms-2 small ">(4.8)</span>
+                            <span class="ms-2 small ">(4.9)</span>
                         </div>
                         <div class="d-flex align-items-center gap-2">
-                            <span class="price-final">$19.99</span>
-                            <span class="price-original">$49.99</span>
+                            <span class="price-final"><?php echo $p['price']; ?></span>
+                            <span class="price-original small text-decoration-line-through"><?php echo $p['orig']; ?></span>
                         </div>
                     </div>
                 </div>
             </div>
+            <?php
+endforeach; ?>
         </div>
     </div>
 </section>
