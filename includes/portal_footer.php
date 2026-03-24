@@ -1,5 +1,5 @@
             </div> <!-- portal-content end -->
         </main>
-    </div> <!-- portal-wrapper end -->
+    </div> <!-- portal-shell end -->
 </body>
 </html>

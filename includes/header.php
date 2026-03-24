@@ -1,4 +1,7 @@
 <?php
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
 
 $base_url = isset($base_url) ? $base_url : "";
 
@@ -14,7 +17,15 @@ $base_url = isset($base_url) ? $base_url : "";
     <link rel="stylesheet" href="<?php echo $base_url; ?>assets/css/portal.css">
     <?php
 endif; ?>
+    <link rel="stylesheet" href="<?php echo $base_url; ?>assets/css/dark-mode.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="<?php echo $base_url; ?>assets/js/responsive.js" defer></script>
+    <script>
+        // Check local storage for dark mode preference before rendering to prevent flash
+        if (localStorage.getItem('skilledu_theme') === 'dark') {
+            document.documentElement.setAttribute('data-theme', 'dark');
+        }
+    </script>
 </head>
 <body class="<?php echo isset($portal_context) ? 'portal-active' : ''; ?>">
     <header>
@@ -31,6 +42,9 @@ if (isset($portal_context)) {
         $logo_link = $base_url . "portals/admin/index.php";
 }
 ?>
+            <button id="mobile-menu-toggle" style="background: none; border: none; font-size: 22px; color: #1c1d1f; cursor: pointer; display: none; margin-right: 15px;">
+                <i class="fa fa-bars"></i>
+            </button>
             <a href="<?php echo $logo_link; ?>" class="logo">Skill<span>Edu</span></a>
             
             <div class="nav-item-dropdown">
@@ -73,9 +87,6 @@ if (isset($portal_context)) {
 
             <nav class="nav-links">
                 <?php
-if (session_status() === PHP_SESSION_NONE) {
-    session_start();
-}
 if (isset($_SESSION['user_id'])):
     $portal_link = $base_url . 'portals/student/index.php';
     if ($_SESSION['user_role'] === 'instructor')
@@ -99,6 +110,11 @@ if (isset($_SESSION['user_id'])):
                     
                     <div class="auth-icons">
                         <div style="position: relative;">
+                            <a href="#" class="icon-btn" title="Toggle Dark Mode" id="theme-toggle" onclick="toggleTheme(event)">
+                                <i class="far fa-moon" id="theme-icon"></i>
+                            </a>
+                        </div>
+                        <div style="position: relative;">
                             <a href="#" class="icon-btn" title="Wishlist" id="wishlist-toggle"><i class="far fa-heart"></i></a>
                             <div class="nav-popover" id="wishlist-popover">
                                 <h4 style="margin-bottom: 15px; font-size: 16px;">Wishlist</h4>
@@ -117,17 +133,17 @@ if (isset($_SESSION['user_id'])):
                         </div>
 
                         <div style="position: relative;">
-                            <a href="#" class="icon-btn" title="Notifications" id="bell-toggle"><i class="far fa-bell"></i></a>
+                            <a href="#" class="icon-btn" title="Notifications" id="bell-toggle">
+                                <i class="far fa-bell"></i>
+                                <span id="notification-badge" style="display: none; position: absolute; top: 5px; right: 5px; background: #e74c3c; width: 10px; height: 10px; border-radius: 50%; border: 2px solid white;"></span>
+                            </a>
                             <div class="nav-popover" id="notifications-popover">
-                                <h4 style="margin-bottom: 15px; font-size: 16px;">Notifications</h4>
-                                <div style="display: flex; gap: 12px; padding: 10px 0; border-bottom: 1px solid #f7f9fa;">
-                                    <div style="width: 40px; height: 40px; background: #ebf6ff; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #0a84ff;">
-                                        <i class="fa fa-info-circle"></i>
-                                    </div>
-                                    <div>
-                                        <div style="font-size: 13px; font-weight: 700;">Welcome to SkillEdu!</div>
-                                        <div style="font-size: 12px; color: #6a6f73;">Start your first lesson today.</div>
-                                    </div>
+                                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                                    <h4 style="font-size: 16px; margin: 0;">Notifications</h4>
+                                    <button id="mark-read-btn" style="background: none; border: none; font-size: 12px; color: var(--primary-color); cursor: pointer; font-weight: 700; display: none;">Mark all as read</button>
+                                </div>
+                                <div id="notifications-list">
+                                    <div style="text-align: center; padding: 20px 0; color: #6a6f73; font-style: italic; font-size: 13px;">Loading...</div>
                                 </div>
                             </div>
                         </div>
@@ -217,35 +233,135 @@ endif; ?>
 
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        const toggles = [
-            { btn: 'wishlist-toggle', pop: 'wishlist-popover' },
-            { btn: 'cart-toggle', pop: 'cart-popover' },
-            { btn: 'bell-toggle', pop: 'notifications-popover' },
-            { btn: 'user-menu-toggle', pop: 'user-menu-popover' }
-        ];
+        // Dropdown toggles
+        const wishlistToggle = document.getElementById('wishlist-toggle');
+        const wishlistPopover = document.getElementById('wishlist-popover');
 
-        toggles.forEach(t => {
-            const btn = document.getElementById(t.btn);
-            const pop = document.getElementById(t.pop);
-            if (btn && pop) {
-                btn.addEventListener('click', function(e) {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    // Close others
-                    toggles.forEach(other => {
-                        const otherPop = document.getElementById(other.pop);
-                        if (other.pop !== t.pop && otherPop) otherPop.style.display = 'none';
-                    });
-                    pop.style.display = pop.style.display === 'block' ? 'none' : 'block';
-                });
+        if (wishlistToggle && wishlistPopover) {
+            wishlistToggle.addEventListener('click', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                // Close other popovers if open
+                closeAllPopovers();
+                wishlistPopover.style.display = wishlistPopover.style.display === 'block' ? 'none' : 'block';
+            });
+        }
+
+        // Let's implement global dropdown toggle logic:
+        const userMenuToggle = document.getElementById('user-menu-toggle');
+        const userMenuPopover = document.getElementById('user-menu-popover');
+        const bellToggle = document.getElementById('bell-toggle');
+        const notifPopover = document.getElementById('notifications-popover');
+        const cartToggle = document.getElementById('cart-toggle');
+        const cartPopover = document.getElementById('cart-popover');
+
+        function closeAllPopovers() {
+            if(userMenuPopover) { userMenuPopover.style.opacity = '0'; userMenuPopover.style.visibility = 'hidden'; }
+            if(notifPopover) { notifPopover.style.opacity = '0'; notifPopover.style.visibility = 'hidden'; }
+            if(cartPopover) { cartPopover.style.opacity = '0'; cartPopover.style.visibility = 'hidden'; }
+            if(wishlistPopover) { wishlistPopover.style.display = 'none'; } // Keep wishlist using display for now
+        }
+
+        if (userMenuToggle) {
+            userMenuToggle.addEventListener('click', (e) => {
+                e.stopPropagation();
+                const v = userMenuPopover.style.visibility;
+                closeAllPopovers();
+                if (v !== 'visible') {
+                    userMenuPopover.style.visibility = 'visible';
+                    userMenuPopover.style.opacity = '1';
+                }
+            });
+        }
+        
+        if (cartToggle) {
+            cartToggle.addEventListener('click', (e) => {
+                e.preventDefault(); e.stopPropagation();
+                const v = cartPopover.style.visibility;
+                closeAllPopovers();
+                if (v !== 'visible') {
+                    cartPopover.style.visibility = 'visible';
+                    cartPopover.style.opacity = '1';
+                }
+            });
+        }
+
+        if (bellToggle) {
+            bellToggle.addEventListener('click', (e) => {
+                e.preventDefault(); e.stopPropagation();
+                const v = notifPopover.style.visibility;
+                closeAllPopovers();
+                if (v !== 'visible') {
+                    notifPopover.style.visibility = 'visible';
+                    notifPopover.style.opacity = '1';
+                    
+                    // Mark as read when opened (optional, or rely on btn)
+                }
+            });
+        }
+
+        document.addEventListener('click', (e) => {
+            if (!e.target.closest('.nav-popover') && !e.target.closest('.icon-btn') && !e.target.closest('.user-avatar')) {
+                closeAllPopovers();
             }
         });
 
-        document.addEventListener('click', function() {
-            toggles.forEach(t => {
-                const pop = document.getElementById(t.pop);
-                if (pop) pop.style.display = 'none';
+        // Notifications API Logic
+        const baseUrlGlobal = '<?php echo $base_url; ?>';
+        
+        function loadNotifications() {
+            fetch(baseUrlGlobal + 'api/notifications.php?action=get')
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    const badge = document.getElementById('notification-badge');
+                    if (data.unread_count > 0) {
+                        badge.style.display = 'block';
+                        document.getElementById('mark-read-btn').style.display = 'block';
+                    } else {
+                        badge.style.display = 'none';
+                        document.getElementById('mark-read-btn').style.display = 'none';
+                    }
+
+                    const list = document.getElementById('notifications-list');
+                    if (data.notifications.length === 0) {
+                        list.innerHTML = '<div style="text-align: center; padding: 20px 0; color: #6a6f73; font-size: 13px;">No notifications.</div>';
+                    } else {
+                        list.innerHTML = data.notifications.map(n => `
+                            <div style="display: flex; gap: 12px; padding: 12px 0; border-bottom: 1px solid #f7f9fa; ${n.is_read ? 'opacity: 0.6;' : ''}">
+                                <div style="width: 32px; height: 32px; background: #ebf6ff; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #0a84ff; flex-shrink: 0;">
+                                    <i class="fa fa-bell"></i>
+                                </div>
+                                <div>
+                                    <div style="font-size: 13px; font-weight: 700; color: #1c1d1f; margin-bottom: 3px;">${n.title}</div>
+                                    <div style="font-size: 12px; color: #6a6f73; line-height: 1.4;">${n.message}</div>
+                                </div>
+                            </div>
+                        `).join('');
+                    }
+                }
+            })
+            .catch(err => console.error('Error fetching notifications:', err));
+        }
+
+        // Load notifications if user is logged in
+        <?php if (isset($_SESSION['user_id'])): ?>
+            loadNotifications();
+            // Poll every 60 seconds
+            setInterval(loadNotifications, 60000);
+            
+            document.getElementById('mark-read-btn')?.addEventListener('click', (e) => {
+                e.stopPropagation();
+                fetch(baseUrlGlobal + 'api/notifications.php?action=mark_read')
+                .then(res => res.json())
+                .then(data => {
+                    if(data.success) {
+                        loadNotifications();
+                    }
+                })
+                .catch(err => console.error('Error marking notifications as read:', err));
             });
-        });
+        <?php
+endif; ?>
     });
 </script>

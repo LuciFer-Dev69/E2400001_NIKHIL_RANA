@@ -6,7 +6,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     let currentIndex = 0;
     const slideCount = slides.length;
-    const slideInterval = 5000; // 5 seconds
+    const slideInterval = 3000; // 3 seconds
 
     function moveSlider() {
         sliderContainer.style.transform = `translateX(-${currentIndex * 100}%)`;
@@ -39,6 +39,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Auto Slide
     let autoSlide = setInterval(nextSlide, slideInterval);
+
+    function resetInterval() {
+        clearInterval(autoSlide);
+        autoSlide = setInterval(nextSlide, slideInterval);
+    }
 
     // Tab Switching for Skills Section
     const tabItems = document.querySelectorAll('.tab-item');

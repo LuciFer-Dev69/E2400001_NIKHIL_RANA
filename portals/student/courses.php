@@ -80,16 +80,14 @@ catch (PDOException $e) {
     die("Database error: " . $e->getMessage());
 }
 
-$base_url = "../../";
-$portal_context = 'student';
-include '../../includes/header.php';
+$root = "../../";
+$page_title = 'My Enrolled Courses';
+include '../../includes/portal_header.php';
 ?>
 
-<div class="portal-shell">
-    <?php include '../../includes/portal_header_sidebar.php'; ?>
-    <div class="portal-content">
 
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 35px; background: #fff; padding: 25px; border-radius: 12px; border: 1px solid var(--border-color);">
+
+        <div class="portal-inner-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 35px; padding: 25px; border-radius: 12px; border: 1px solid var(--border-color);">
             <div class="header-section">
                 <h1 style="font-size: 28px; font-weight: 800; color: #1c1d1f; margin-bottom: 5px;">Learning</h1>
                 <p style="color: #6a6f73; font-size: 14px;">Browse and continue your enrolled courses.</p>
@@ -238,6 +236,5 @@ endif; ?>
 endif; ?>
 
     </div>
-</div>
 
-<?php include '../../includes/footer.php'; ?>
+<?php include '../../includes/portal_footer.php'; ?>

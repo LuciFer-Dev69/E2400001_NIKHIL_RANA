@@ -17,6 +17,16 @@ $current_page = basename($_SERVER['PHP_SELF']);
                     </a>
                 </li>
                 <li style="margin-bottom: 5px;">
+                    <a href="planner.php" class="sidebar-link <?php echo basename($_SERVER['PHP_SELF']) == 'planner.php' ? 'active' : ''; ?>">
+                        <i class="fa fa-calendar-alt"></i> Learning Planner
+                    </a>
+                </li>
+                <li style="margin-bottom: 5px;">
+                    <a href="leaderboard.php" class="sidebar-link <?php echo basename($_SERVER['PHP_SELF']) == 'leaderboard.php' ? 'active' : ''; ?>">
+                        <i class="fa fa-trophy"></i> Leaderboard
+                    </a>
+                </li>
+                <li style="margin-bottom: 5px;">
                     <a href="#" class="sidebar-link">
                         <i class="fa fa-heart"></i> Wishlist
                     </a>

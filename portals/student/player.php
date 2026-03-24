@@ -48,9 +48,15 @@ try {
     }
 
     // 5. Fetch Progress
-    $stmt = $pdo->prepare("SELECT lesson_id, status FROM user_lesson_progress WHERE user_id = ? AND course_id = ?");
+    $stmt = $pdo->prepare("SELECT lesson_id, status, last_watched_time FROM user_lesson_progress WHERE user_id = ? AND course_id = ?");
     $stmt->execute([$user_id, $course_id]);
-    $progress_data = $stmt->fetchAll(PDO::FETCH_KEY_PAIR);
+    $progress_data_raw = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    $progress_data = [];
+    $timestamps = [];
+    foreach ($progress_data_raw as $row) {
+        $progress_data[$row['lesson_id']] = $row['status'];
+        $timestamps[$row['lesson_id']] = $row['last_watched_time'];
+    }
 
     // 6. Identify Current Lesson
     $current_lesson_id = isset($_GET['lesson_id']) ? (int)$_GET['lesson_id'] : $lessons[0]['id'];
@@ -74,19 +80,14 @@ catch (PDOException $e) {
     die("Database error: " . $e->getMessage());
 }
 
-$base_url = "../../";
-$portal_context = 'student';
-include '../../includes/header.php';
+$root = "../../";
+$page_title = 'Learning Player';
+include '../../includes/portal_header.php';
+?>
 
 ?>
-<style>
-    /* Course Player Specific Focus Mode */
-    .player-container {
-        height: calc(100vh - 60px);
-        display: flex;
-        overflow: hidden;
-    }
-</style>
+ </style>
+
 
 <div class="player-container">
         <!-- Main Content Area -->
@@ -94,15 +95,22 @@ include '../../includes/header.php';
             <div class="video-section">
                 <!-- If it's a video lesson -->
                 <?php if ($current_lesson['video_url']): ?>
-                    <div style="text-align: center;">
-                        <i class="fa fa-play-circle" style="font-size: 80px; margin-bottom: 20px; opacity: 0.5;"></i>
-                        <h2 style="font-size: 24px;">Lecture Video Loading...</h2>
-                        <p style="color: #6a6f73;"><?php echo $current_lesson['video_url']; ?></p>
+                    <div style="background: #000; width: 100%; aspect-ratio: 16/9; position: relative;">
+                        <!-- Assuming the URL is a filename we serve, or an external link -->
+                        <?php if (strpos($current_lesson['video_url'], 'http') === 0): ?>
+                            <!-- External video/iframe fallback. E.g YouTube. -->
+                            <iframe id="course-iframe" src="<?php echo $current_lesson['video_url']; ?>" style="width: 100%; height: 100%; border: none;" allowfullscreen></iframe>
+                        <?php
+    else: ?>
+                            <!-- Better to use HTML5 video for local files so we can track timestamp -->
+                            <video id="course-video" src="../../assets/videos/<?php echo $current_lesson['video_url']; ?>" controls style="width: 100%; height: 100%;" preload="metadata"></video>
+                        <?php
+    endif; ?>
                     </div>
                 <!-- Placeholder for non-video content -->
                 <?php
 else: ?>
-                    <div style="padding: 60px; color: #1c1d1f; background: white; width: 100%; height: 100%; overflow-y: auto;">
+                    <div style="padding: 60px; color: var(--dark-color); background: var(--bg-card); width: 100%; height: 100%; overflow-y: auto;">
                         <h1><?php echo $current_lesson['title']; ?></h1>
                         <p>This is a text-based lesson content.</p>
                     </div>
@@ -120,17 +128,17 @@ endif; ?>
                 </div>
                 
                 <div class="tab-content" id="tab-overview" style="padding-top: 25px;">
-                    <h2 style="font-size: 24px; margin-bottom: 15px;">About this lecture</h2>
-                    <p style="color: #2d2f31; line-height: 1.6;">
+                    <h2 style="font-size: 24px; margin-bottom: 15px; color: var(--dark-color);">About this lecture</h2>
+                    <p style="color: var(--dark-color); line-height: 1.6; opacity: 0.9;">
                         This lecture covers the fundamental concepts of <?php echo $current_lesson['title']; ?>. 
                     </p>
                 </div>
 
                 <div class="tab-content" id="tab-notes" style="padding-top: 25px; display: none;">
-                    <h2 style="font-size: 24px; margin-bottom: 15px;">Create a new note</h2>
+                    <h2 style="font-size: 24px; margin-bottom: 15px; color: var(--dark-color);">Create a new note</h2>
                     <div style="margin-bottom: 20px;">
-                        <textarea id="note-input" style="width: 100%; height: 100px; padding: 15px; border: 1px solid #d1d7dc; border-radius: 4px; font-family: inherit;" placeholder="Type your note here..."></textarea>
-                        <button id="save-note-btn" class="btn btn-secondary" style="margin-top: 10px; background: #1c1d1f; color: white;">Save note</button>
+                        <textarea id="note-input" style="width: 100%; height: 100px; padding: 15px; border: 1px solid var(--border-color); border-radius: 4px; font-family: inherit; background: var(--light-gray); color: var(--dark-color);" placeholder="Type your note here..."></textarea>
+                        <button id="save-note-btn" class="btn btn-secondary" style="margin-top: 10px; background: var(--dark-color); color: var(--white);">Save note</button>
                     </div>
                     <div id="notes-list">
                         <h4 style="margin-bottom: 15px;">Your notes</h4>
@@ -139,15 +147,15 @@ endif; ?>
                         <?php
 else: ?>
                             <?php foreach ($notes as $note): ?>
-                                <div class="note-item" style="padding: 15px; background: #f8f9fa; border-radius: 4px; margin-bottom: 10px; border-left: 4px solid var(--primary-color);">
-                                    <div style="font-size: 12px; color: #6a6f73; margin-bottom: 5px;">
+                                <div class="note-item" style="padding: 15px; background: var(--light-gray); border-radius: 4px; margin-bottom: 10px; border-left: 4px solid var(--primary-color);">
+                                    <div style="font-size: 12px; color: var(--gray-color); margin-bottom: 5px;">
                                         <?php echo date('M d, Y', strtotime($note['created_at'])); ?> 
                                         <?php if ($note['video_timestamp']): ?> 
                                             at <?php echo floor($note['video_timestamp'] / 60); ?>:<?php echo sprintf('%02d', $note['video_timestamp'] % 60); ?>
                                         <?php
         endif; ?>
                                     </div>
-                                    <div style="font-size: 14px; line-height: 1.5;"><?php echo nl2br(htmlspecialchars($note['note_text'])); ?></div>
+                                    <div style="font-size: 14px; line-height: 1.5; color: var(--dark-color);"><?php echo nl2br(htmlspecialchars($note['note_text'])); ?></div>
                                 </div>
                             <?php
     endforeach; ?>
@@ -162,11 +170,11 @@ endif; ?>
                         <button id="ask-qt-btn" class="btn btn-secondary" style="border: 1px solid #1c1d1f; height: 40px;">Ask a new question</button>
                     </div>
 
-                    <div id="ask-qt-form" style="display: none; margin-bottom: 25px; background: #f7f9fa; padding: 20px; border-radius: 8px; border: 1px solid #d1d7dc;">
-                        <h4 style="margin-bottom: 15px; font-size: 16px;">Ask a question</h4>
-                        <textarea id="qt-input" style="width: 100%; height: 80px; padding: 12px; border: 1px solid #d1d7dc; border-radius: 4px; font-family: inherit; margin-bottom: 15px; font-size: 14px;" placeholder="What do you want to ask about this specific lecture?"></textarea>
+                    <div id="ask-qt-form" style="display: none; margin-bottom: 25px; background: var(--light-gray); padding: 20px; border-radius: 8px; border: 1px solid var(--border-color);">
+                        <h4 style="margin-bottom: 15px; font-size: 16px; color: var(--dark-color);">Ask a question</h4>
+                        <textarea id="qt-input" style="width: 100%; height: 80px; padding: 12px; border: 1px solid var(--border-color); border-radius: 4px; font-family: inherit; margin-bottom: 15px; font-size: 14px; background: var(--bg-card); color: var(--dark-color);" placeholder="What do you want to ask about this specific lecture?"></textarea>
                         <div style="display: flex; gap: 10px;">
-                            <button id="submit-qt-btn" class="btn btn-primary" style="background: #1c1d1f; color: white;">Post Question</button>
+                            <button id="submit-qt-btn" class="btn btn-primary" style="background: var(--dark-color); color: var(--white);">Post Question</button>
                             <button id="cancel-qt-btn" class="btn btn-secondary">Cancel</button>
                         </div>
                     </div>
@@ -179,12 +187,12 @@ endif; ?>
                 </div>
 
                 <div class="tab-content" id="tab-resources" style="padding-top: 25px; display: none;">
-                    <h2 style="font-size: 24px; margin-bottom: 15px;">Resources</h2>
+                    <h2 style="font-size: 24px; margin-bottom: 15px; color: var(--dark-color);">Resources</h2>
                     <div class="resource-list">
-                        <div style="display: flex; align-items: center; justify-content: space-between; padding: 15px; border: 1px solid #d1d7dc; border-radius: 4px; margin-bottom: 10px;">
+                        <div style="display: flex; align-items: center; justify-content: space-between; padding: 15px; border: 1px solid var(--border-color); border-radius: 4px; margin-bottom: 10px;">
                             <div style="display: flex; align-items: center; gap: 12px;">
                                 <i class="fa fa-file-pdf" style="color: #ff3c3c; font-size: 20px;"></i>
-                                <span style="font-weight: 700;">Lecture Slides.pdf</span>
+                                <span style="font-weight: 700; color: var(--dark-color);">Lecture Slides.pdf</span>
                             </div>
                             <a href="#" class="btn btn-secondary" style="padding: 6px 15px; font-size: 13px;">Download</a>
                         </div>
@@ -237,7 +245,7 @@ endforeach; ?>
     </div>
 
     <script>
-        function updateProgress(lessonId, status) {
+        function updateProgress(lessonId, status, watchedTime = 0) {
             const courseId = <?php echo $course_id; ?>;
             
             fetch('api/update_progress.php', {
@@ -246,18 +254,53 @@ endforeach; ?>
                 body: JSON.stringify({
                     lesson_id: lessonId,
                     course_id: courseId,
-                    status: status
+                    status: status,
+                    watched_time: watchedTime
                 })
             })
             .then(res => res.json())
             .then(data => {
-                if (data.success) {
+                if (data.success && status === 'completed') {
                     console.log('Progress updated:', data.progress_percent + '%');
-                    // Update progress display in header
-                    document.querySelector('.progress-text-header').innerText = 'Your progress: ' + data.progress_percent + '%';
+                    const progressEl = document.querySelector('.progress-text-header');
+                    if (progressEl) progressEl.innerText = 'Your progress: ' + data.progress_percent + '%';
                 }
             })
             .catch(err => console.error('Error updating progress:', err));
+        }
+
+        // --- Resume & Timestamp Logic ---
+        const video = document.getElementById('course-video');
+        const savedTime = <?php echo isset($timestamps[$current_lesson_id]) ? (int)$timestamps[$current_lesson_id] : 0; ?>;
+        const lessonIdNum = <?php echo $current_lesson_id; ?>;
+        
+        if (video) {
+            // Restore timestamp once metadata is loaded
+            video.addEventListener('loadedmetadata', () => {
+                if(savedTime > 0 && savedTime < video.duration) {
+                    video.currentTime = savedTime;
+                    console.log('Resumed from timestamp:', savedTime);
+                }
+            });
+
+            // Sync progress every 5 seconds
+            setInterval(() => {
+                if (!video.paused && !video.ended) {
+                    updateProgress(lessonIdNum, 'started', Math.floor(video.currentTime));
+                }
+            }, 5000);
+
+            // Mark completed when ended
+            video.addEventListener('ended', () => {
+                updateProgress(lessonIdNum, 'completed', Math.floor(video.duration));
+                // Find next lesson link and highlight or redirect
+                const activeItem = document.querySelector('.lecture-item.active');
+                if(activeItem && activeItem.nextElementSibling) {
+                    // Update checkmark visually
+                    activeItem.querySelector('.check-circle').classList.add('completed');
+                    activeItem.querySelector('.check-circle').innerHTML = '<i class="fa fa-check"></i>';
+                }
+            });
         }
 
         document.querySelectorAll('.check-circle').forEach(btn => {
@@ -465,5 +508,4 @@ endforeach; ?>
             });
         };
     </script>
-</body>
-<?php include '../../includes/footer.php'; ?>
+<?php include '../../includes/portal_footer.php'; ?>

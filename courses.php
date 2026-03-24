@@ -5,21 +5,43 @@ session_start();
 $category_slug = $_GET['category'] ?? 'all';
 $search_query = $_GET['search'] ?? '';
 
-// Mocking category titles
-$categories = [
-    'all' => 'All Courses',
-    'development' => 'Development',
-    'java' => 'Java Development',
-    'python' => 'Python',
-    'ai' => 'Artificial Intelligence',
-    'design' => 'Design',
-    'marketing' => 'Marketing'
-];
 
-$page_title = $categories[$category_slug] ?? 'Courses';
+
+// Fetch Category Name if applicable
+$page_title = 'All Courses';
+if ($category_slug !== 'all') {
+    $stmt = $pdo->prepare("SELECT name FROM categories WHERE slug = ?");
+    $stmt->execute([$category_slug]);
+    $cat_name = $stmt->fetchColumn();
+    if ($cat_name)
+        $page_title = $cat_name;
+}
 if (!empty($search_query)) {
     $page_title = "Results for \"" . htmlspecialchars($search_query) . "\"";
 }
+
+// Build Dynamic Query
+$params = [];
+$sql = "SELECT c.*, u.full_name as instructor_name, 
+        (SELECT COUNT(*) FROM lessons l WHERE l.course_id = c.id) as lesson_count,
+        COALESCE((SELECT SUM(duration_mins) FROM lessons l WHERE l.course_id = c.id), 0) as total_duration
+        FROM courses c 
+        JOIN users u ON c.instructor_id = u.id WHERE 1=1 AND c.status = 'published'";
+
+if (!empty($search_query)) {
+    $sql .= " AND (c.title LIKE ? OR c.description LIKE ?)";
+    $params[] = '%' . $search_query . '%';
+    $params[] = '%' . $search_query . '%';
+}
+
+if ($category_slug !== 'all') {
+    $sql .= " AND c.category_id = (SELECT id FROM categories WHERE slug = ?)";
+    $params[] = $category_slug;
+}
+
+$stmt = $pdo->prepare($sql);
+$stmt->execute($params);
+$courses = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 include 'includes/header.php';
 ?>
@@ -60,76 +82,45 @@ include 'includes/header.php';
         <div style="flex: 1;">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
                 <button class="btn btn-secondary" style="padding: 10px 20px; font-size: 14px;"><i class="fa fa-filter"></i> Filter</button>
-                <div style="font-weight: 700; font-size: 14px;">1,245 results</div>
+                <div style="font-weight: 700; font-size: 14px;"><?php echo count($courses); ?> results</div>
             </div>
 
             <div class="course-list-stack">
-                <!-- Course 1 (Java as requested) -->
-                <div class="course-horizontal-card">
-                    <div class="card-thumb" style="background: linear-gradient(45deg, #f89820, #5382a1);">
-                        <i class="fab fa-java" style="color: white; font-size: 48px;"></i>
+                <?php if (empty($courses)): ?>
+                    <div style="text-align: center; padding: 50px; background: #f7f9fa; border-radius: 8px;">
+                        <i class="fa fa-search" style="font-size: 40px; color: #d1d7dc; margin-bottom: 15px;"></i>
+                        <h3 style="font-size: 20px; margin-bottom: 10px;">No courses found</h3>
+                        <p style="color: #6a6f73;">Try adjusting your search or filters to find what you're looking for.</p>
                     </div>
-                    <div class="card-info">
-                        <h3>Java Programming Masterclass for Software Developers</h3>
-                        <p class="desc">Learn Java In This Course And Become a Computer Programmer. Core Java Learn Java Programming.</p>
-                        <p class="instructor">Tim Buchalka, Learn Programming Academy</p>
-                        <div class="rating">
-                            <span style="font-weight: 700; color: #b4690e;">4.7</span>
-                            <i class="fa fa-star" style="color: #b4690e; font-size: 12px;"></i>
-                            <span style="color: var(--gray-color); font-size: 13px;">(182,450 ratings)</span>
+                <?php
+else: ?>
+                    <?php foreach ($courses as $c): ?>
+                    <a href="<?php echo $base_url; ?>course_details.php?id=<?php echo $c['id']; ?>" class="course-horizontal-card" style="text-decoration: none; color: inherit; display: flex;">
+                        <div class="card-thumb" style="width: 260px; flex-shrink: 0; background: url('<?php echo $base_url; ?>assets/img/courses/<?php echo htmlspecialchars($c['thumbnail'] ?: 'default.jpg'); ?>') center/cover;" onerror="this.style.backgroundImage='url(https://via.placeholder.com/260x145)'">
                         </div>
-                        <div style="font-size: 13px; color: var(--gray-color); margin-top: 5px;">
-                            80.5 total hours &bull; 450 lectures &bull; All Levels
+                        <div class="card-info" style="flex: 1; padding: 15px 20px; display: flex; flex-direction: column;">
+                            <h3 style="font-size: 18px; font-weight: 800; margin-bottom: 5px;"><?php echo htmlspecialchars($c['title']); ?></h3>
+                            <p class="desc" style="font-size: 14px; color: #4d5156; margin-bottom: 5px; line-height: 1.4;"><?php echo htmlspecialchars(substr($c['description'], 0, 120)) . '...'; ?></p>
+                            <p class="instructor" style="font-size: 12px; color: #6a6f73; margin-bottom: 5px;"><?php echo htmlspecialchars($c['instructor_name']); ?></p>
+                            
+                            <div class="rating" style="display: flex; align-items: center; gap: 5px;">
+                                <span style="font-weight: 700; color: #b4690e;">4.8</span>
+                                <i class="fa fa-star" style="color: #b4690e; font-size: 12px;"></i>
+                                <span style="color: #6a6f73; font-size: 13px;">(2,105 ratings)</span>
+                            </div>
+                            
+                            <div style="font-size: 12px; color: #6a6f73; margin-top: auto;">
+                                <?php echo round($c['total_duration'] / 60, 1); ?> total hours &bull; <?php echo $c['lesson_count']; ?> lectures &bull; All Levels
+                            </div>
                         </div>
-                    </div>
-                    <div class="card-price">
-                        <div style="font-weight: 700; font-size: 18px;">$12.99</div>
-                        <div style="text-decoration: line-through; color: var(--gray-color); font-size: 14px;">$84.99</div>
-                    </div>
-                </div>
-
-                <!-- Course 2 -->
-                <div class="course-horizontal-card">
-                    <div class="card-thumb" style="background: linear-gradient(45deg, #1fa2ff, #12d8fa);"></div>
-                    <div class="card-info">
-                        <h3>Complete Web Bootcamp 2026</h3>
-                        <p class="desc">Become a Full-Stack Web Developer with just ONE course. HTML, CSS, Javascript, Node, React, MongoDB and more!</p>
-                        <p class="instructor">Dr. Angela Yu</p>
-                        <div class="rating">
-                            <span style="font-weight: 700; color: #b4690e;">4.8</span>
-                            <i class="fa fa-star" style="color: #b4690e; font-size: 12px;"></i>
-                            <span style="color: var(--gray-color); font-size: 13px;">(245,000 ratings)</span>
+                        <div class="card-price" style="width: 120px; text-align: right; padding: 15px 20px;">
+                            <div style="font-weight: 800; font-size: 18px; color: #1c1d1f;"><?php echo $c['price'] > 0 ? '$' . number_format($c['price'], 2) : 'Free'; ?></div>
                         </div>
-                        <div style="font-size: 13px; color: var(--gray-color); margin-top: 5px;">
-                            65 total hours &bull; 490 lectures &bull; All Levels
-                        </div>
-                    </div>
-                    <div class="card-price">
-                        <div style="font-weight: 700; font-size: 18px;">$9.99</div>
-                    </div>
-                </div>
-
-                <!-- Course 3 -->
-                <div class="course-horizontal-card">
-                    <div class="card-thumb" style="background: linear-gradient(45deg, #f093fb, #f5576c);"></div>
-                    <div class="card-info">
-                        <h3>Python for Data Science and Machine Learning Bootcamp</h3>
-                        <p class="desc">Learn how to use NumPy, Pandas, Seaborn, Matplotlib, Plotly, Scikit-Learn, Machine Learning, Tensorflow, and more!</p>
-                        <p class="instructor">Jose Portilla</p>
-                        <div class="rating">
-                            <span style="font-weight: 700; color: #b4690e;">4.6</span>
-                            <i class="fa fa-star" style="color: #b4690e; font-size: 12px;"></i>
-                            <span style="color: var(--gray-color); font-size: 13px;">(150,230 ratings)</span>
-                        </div>
-                        <div style="font-size: 13px; color: var(--gray-color); margin-top: 5px;">
-                            25 total hours &bull; 165 lectures &bull; All Levels
-                        </div>
-                    </div>
-                    <div class="card-price">
-                        <div style="font-weight: 700; font-size: 18px;">$14.99</div>
-                        <div style="text-decoration: line-through; color: var(--gray-color); font-size: 14px;">$94.99</div>
-                    </div>
-                </div>
+                    </a>
+                    <?php
+    endforeach; ?>
+                <?php
+endif; ?>
             </div>
         </div>
     </div>

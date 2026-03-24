@@ -5,14 +5,12 @@ if (!isset($_SESSION['user_id']) || $_SESSION['user_role'] !== 'admin') {
     exit();
 }
 $portal_type = 'admin';
-$portal_context = 'admin';
-$base_url = "../../";
-include '../../includes/header.php';
+$root = "../../";
+$page_title = 'Admin Dashboard';
+include '../../includes/portal_header.php';
 ?>
 
-<div class="portal-shell">
-    <?php include '../../includes/portal_header_sidebar.php'; ?>
-    <div class="portal-content">
+
         <h1 style="font-size: 28px; font-weight: 800; color: #1c1d1f; margin-bottom: 24px;">Admin Dashboard</h1>
 
 
@@ -95,6 +93,5 @@ include '../../includes/header.php';
     </table>
 </div>
     </div>
-</div>
 
-<?php include '../../includes/footer.php'; ?>
+<?php include '../../includes/portal_footer.php'; ?>

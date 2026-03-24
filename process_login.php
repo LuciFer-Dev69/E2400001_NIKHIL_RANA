@@ -22,8 +22,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             // Login success
             $_SESSION['user_id'] = $user['id'];
             $_SESSION['user_name'] = $user['full_name'];
+            $_SESSION['full_name'] = $user['full_name'];
+            $_SESSION['email'] = $user['email'];
             $_SESSION['username'] = $user['username'] ?? explode(' ', $user['full_name'])[0];
             $_SESSION['user_role'] = $user['role'];
+
+            // Ensure gamification row exists for student
+            if ($user['role'] === 'student') {
+                $pdo->prepare("INSERT IGNORE INTO gamification_stats (user_id, xp, streak_days, last_login_date) VALUES (?, 0, 0, CURDATE())")->execute([$user['id']]);
+                // Send welcome notification only once
+                $notif_check = $pdo->prepare("SELECT COUNT(*) FROM notifications WHERE user_id = ?");
+                $notif_check->execute([$user['id']]);
+                if ($notif_check->fetchColumn() == 0) {
+                    $pdo->prepare("INSERT INTO notifications (user_id, title, message) VALUES (?, 'Welcome to SkillEdu! 🎉', 'Start your first lesson to earn XP and badges!')")->execute([$user['id']]);
+                }
+            }
 
             // Redirect based on role
             if ($user['role'] === 'admin') {

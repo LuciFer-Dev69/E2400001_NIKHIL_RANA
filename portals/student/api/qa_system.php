@@ -10,111 +10,99 @@ if (!isset($_SESSION['user_id'])) {
 }
 
 $user_id = $_SESSION['user_id'];
-$data = json_decode(file_get_contents('php://input'), true);
-$action = isset($data['action']) ? $data['action'] : (isset($_GET['action']) ? $_GET['action'] : '');
+$method = $_SERVER['REQUEST_METHOD'];
 
-try {
-    // 1. Ensure Q&A tables exist
-    $pdo->exec("CREATE TABLE IF NOT EXISTS course_questions (
-        id INT AUTO_INCREMENT PRIMARY KEY,
-        course_id INT NOT NULL,
-        lesson_id INT NOT NULL,
-        user_id INT NOT NULL,
-        question_text TEXT NOT NULL,
-        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-    )");
-
-    $pdo->exec("CREATE TABLE IF NOT EXISTS course_answers (
-        id INT AUTO_INCREMENT PRIMARY KEY,
-        question_id INT NOT NULL,
-        user_id INT NOT NULL,
-        answer_text TEXT NOT NULL,
-        is_instructor BOOLEAN DEFAULT FALSE,
-        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-    )");
-
-    if ($action === 'ask') {
-        $course_id = (int)$data['course_id'];
-        $lesson_id = (int)$data['lesson_id'];
-        $question_text = trim($data['question_text']);
-
-        if (empty($question_text)) {
-            echo json_encode(['success' => false, 'message' => 'Question cannot be empty']);
-            exit();
-        }
-
-        $stmt = $pdo->prepare("INSERT INTO course_questions (course_id, lesson_id, user_id, question_text) VALUES (?, ?, ?, ?)");
-        $stmt->execute([$course_id, $lesson_id, $user_id, $question_text]);
-        $question_id = $pdo->lastInsertId();
-
-        $fullName = $_SESSION['full_name'] ?? 'Student';
-
-        echo json_encode([
-            'success' => true,
-            'question' => [
-                'id' => $question_id,
-                'user_name' => $fullName,
-                'question_text' => $question_text,
-                'created_at' => date('M d, Y'),
-                'answers' => []
-            ]
-        ]);
-        exit();
-    }
+if ($method === 'GET') {
+    $action = $_GET['action'] ?? '';
 
     if ($action === 'get') {
         $lesson_id = isset($_GET['lesson_id']) ? (int)$_GET['lesson_id'] : 0;
-
-        // Fetch questions
-        $stmt = $pdo->prepare("
-            SELECT q.*, u.full_name as user_name 
-            FROM course_questions q
-            JOIN users u ON q.user_id = u.id
-            WHERE q.lesson_id = ?
-            ORDER BY q.created_at DESC
-        ");
-        $stmt->execute([$lesson_id]);
-        $questions = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
-        // Fetch answers for these questions
-        if (!empty($questions)) {
-            $q_ids = array_column($questions, 'id');
-            $in = str_repeat('?,', count($q_ids) - 1) . '?';
-            $stmt = $pdo->prepare("
-                SELECT a.*, u.full_name as user_name 
-                FROM course_answers a
-                JOIN users u ON a.user_id = u.id
-                WHERE a.question_id IN ($in)
-                ORDER BY a.created_at ASC
-            ");
-            $stmt->execute($q_ids);
-            $answers = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
-            // Group answers by question
-            $grouped_answers = [];
-            foreach ($answers as $a) {
-                $grouped_answers[$a['question_id']][] = $a;
-            }
-
-            foreach ($questions as &$q) {
-                $q['created_at'] = date('M d, Y', strtotime($q['created_at']));
-                $q['answers'] = $grouped_answers[$q['id']] ?? [];
-
-                // Format answer dates
-                foreach ($q['answers'] as &$ans) {
-                    $ans['created_at'] = date('M d, Y', strtotime($ans['created_at']));
-                }
-            }
+        if (!$lesson_id) {
+            echo json_encode(['success' => false, 'message' => 'Missing lesson_id']);
+            exit();
         }
 
-        echo json_encode(['success' => true, 'questions' => $questions]);
-        exit();
+        try {
+            // Fetch top-level questions
+            $stmt = $pdo->prepare("
+                SELECT cd.id, cd.message as question_text, cd.created_at, u.full_name as user_name
+                FROM course_discussions cd
+                JOIN users u ON cd.user_id = u.id
+                WHERE cd.lesson_id = ? AND cd.parent_id IS NULL
+                ORDER BY cd.created_at DESC
+            ");
+            $stmt->execute([$lesson_id]);
+            $questions_raw = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+            // Fetch answers for these questions
+            $q_ids = array_column($questions_raw, 'id');
+            $answers_by_q = [];
+
+            if (!empty($q_ids)) {
+                $inQuery = implode(',', array_fill(0, count($q_ids), '?'));
+                $stmtAnswers = $pdo->prepare("
+                    SELECT cd.id, cd.parent_id, cd.message as answer_text, cd.created_at, u.full_name as user_name, u.role
+                    FROM course_discussions cd
+                    JOIN users u ON cd.user_id = u.id
+                    WHERE cd.parent_id IN ($inQuery)
+                    ORDER BY cd.created_at ASC
+                ");
+                $stmtAnswers->execute($q_ids);
+                $answers_raw = $stmtAnswers->fetchAll(PDO::FETCH_ASSOC);
+
+                foreach ($answers_raw as $ans) {
+                    $ans_formatted = [
+                        'user_name' => $ans['user_name'],
+                        'is_instructor' => ($ans['role'] === 'instructor') ? 1 : 0,
+                        'created_at' => date('M j, Y g:i A', strtotime($ans['created_at'])),
+                        'answer_text' => htmlspecialchars($ans['answer_text'])
+                    ];
+                    $answers_by_q[$ans['parent_id']][] = $ans_formatted;
+                }
+            }
+
+            // Format final array
+            $questions = [];
+            foreach ($questions_raw as $q) {
+                $questions[] = [
+                    'id' => $q['id'],
+                    'user_name' => htmlspecialchars($q['user_name']),
+                    'created_at' => date('M j, Y g:i A', strtotime($q['created_at'])),
+                    'question_text' => htmlspecialchars($q['question_text']),
+                    'answers' => $answers_by_q[$q['id']] ?? []
+                ];
+            }
+
+            echo json_encode(['success' => true, 'questions' => $questions]);
+
+        }
+        catch (PDOException $e) {
+            echo json_encode(['success' => false, 'message' => 'Database error']);
+        }
     }
-
-    echo json_encode(['success' => false, 'message' => 'Invalid action']);
-
 }
-catch (PDOException $e) {
-    echo json_encode(['success' => false, 'message' => 'Database error: ' . $e->getMessage()]);
+elseif ($method === 'POST') {
+    $data = json_decode(file_get_contents('php://input'), true);
+    $action = $data['action'] ?? '';
+
+    if ($action === 'ask') {
+        $course_id = (int)($data['course_id'] ?? 0);
+        $lesson_id = (int)($data['lesson_id'] ?? 0);
+        $question_text = trim($data['question_text'] ?? '');
+
+        if (!$course_id || !$lesson_id || empty($question_text)) {
+            echo json_encode(['success' => false, 'message' => 'Invalid data']);
+            exit();
+        }
+
+        try {
+            $stmt = $pdo->prepare("INSERT INTO course_discussions (course_id, lesson_id, user_id, message) VALUES (?, ?, ?, ?)");
+            $stmt->execute([$course_id, $lesson_id, $user_id, $question_text]);
+            echo json_encode(['success' => true]);
+        }
+        catch (PDOException $e) {
+            echo json_encode(['success' => false, 'message' => 'Database error']);
+        }
+    }
 }
 ?>

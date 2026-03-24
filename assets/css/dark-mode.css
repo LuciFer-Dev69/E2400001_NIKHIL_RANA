@@ -1,0 +1,165 @@
+/* Dark Mode Variables and Overrides */
+[data-theme="dark"] {
+    --primary-color: #FF416C;
+    --dark-color: #f7f9fa;
+    /* Inverted for text */
+    --gray-color: #a1a7ac;
+    --light-gray: #2d2f31;
+    /* Dark background */
+    --white: #1c1d1f;
+    --border-color: #3e4143;
+    --shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+    --bg-page: #131415;
+    --bg-card: #1c1d1f;
+    --bg-sidebar: #1c1d1f;
+}
+
+[data-theme="dark"] body {
+    background-color: var(--bg-page);
+    color: var(--dark-color);
+}
+
+[data-theme="dark"] header {
+    background-color: var(--white);
+    border-bottom: 1px solid var(--border-color);
+}
+
+[data-theme="dark"] .logo {
+    color: #ffffff;
+}
+
+[data-theme="dark"] .nav-link,
+[data-theme="dark"] .dropdown-item {
+    color: var(--dark-color);
+}
+
+[data-theme="dark"] .search-bar input {
+    background-color: var(--light-gray);
+    color: var(--dark-color);
+    border-color: var(--border-color);
+}
+
+[data-theme="dark"] .search-bar input:focus {
+    background-color: var(--white);
+    color: var(--dark-color);
+    border-color: var(--gray-color);
+}
+
+[data-theme="dark"] .btn-secondary {
+    background-color: transparent;
+    color: var(--dark-color);
+    border-color: var(--border-color);
+}
+
+[data-theme="dark"] .btn-secondary:hover {
+    background-color: var(--light-gray);
+}
+
+[data-theme="dark"] .btn-primary {
+    background-color: var(--dark-color);
+    color: var(--white);
+}
+
+[data-theme="dark"] .btn-primary:hover {
+    background-color: #ffffff;
+}
+
+[data-theme="dark"] .stat-card,
+[data-theme="dark"] .continue-learning,
+[data-theme="dark"] .course-card-v2,
+[data-theme="dark"] .course-card-premium,
+[data-theme="dark"] .portal-sidebar,
+[data-theme="dark"] .explore-dropdown,
+[data-theme="dark"] .tab-pane,
+[data-theme="dark"] .skills-nav-section,
+[data-theme="dark"] .portal-inner-header,
+[data-theme="dark"] .nav-popover,
+[data-theme="dark"] .dropdown-item:hover,
+[data-theme="dark"] .sidebar-link:hover,
+[data-theme="dark"] .sidebar-link.active {
+    background-color: var(--bg-card) !important;
+    border-color: var(--border-color) !important;
+    color: var(--dark-color) !important;
+}
+
+[data-theme="dark"] .portal-shell {
+    background-color: var(--bg-page) !important;
+}
+
+[data-theme="dark"] .sidebar-link {
+    color: var(--gray-color);
+}
+
+[data-theme="dark"] .sidebar-link.active,
+[data-theme="dark"] .sidebar-link:hover {
+    color: #ffffff !important;
+}
+
+[data-theme="dark"] .portal-inner-header select,
+[data-theme="dark"] .portal-inner-header input,
+[data-theme="dark"] .settings-content input,
+[data-theme="dark"] .settings-content textarea {
+    background-color: var(--light-gray) !important;
+    color: var(--dark-color) !important;
+    border-color: var(--border-color) !important;
+}
+
+[data-theme="dark"] .settings-tab {
+    color: var(--gray-color) !important;
+}
+
+[data-theme="dark"] .settings-tab.active {
+    color: #ffffff !important;
+    border-bottom-color: #ffffff !important;
+}
+
+[data-theme="dark"] .settings-content {
+    color: var(--dark-color);
+}
+
+[data-theme="dark"] .achievement-card,
+[data-theme="dark"] .settings-box {
+    background-color: var(--bg-card) !important;
+    border-color: var(--border-color) !important;
+}
+
+/* Animations and Hover Effects (Performance UI Polish) */
+.course-card-v2,
+.course-card-premium,
+.stat-card,
+.btn,
+.settings-tab {
+    transition: all 0.3s ease;
+}
+
+.course-card-v2:hover,
+.course-card-premium:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.15);
+}
+
+[data-theme="dark"] .course-card-v2:hover,
+[data-theme="dark"] .course-card-premium:hover {
+    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.5);
+}
+
+.skeleton {
+    background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+    background-size: 200% 100%;
+    animation: skeleton-loading 1.5s infinite;
+}
+
+[data-theme="dark"] .skeleton {
+    background: linear-gradient(90deg, #2d2f31 25%, #3e4143 50%, #2d2f31 75%);
+    background-size: 200% 100%;
+}
+
+@keyframes skeleton-loading {
+    0% {
+        background-position: 200% 0;
+    }
+
+    100% {
+        background-position: -200% 0;
+    }
+}

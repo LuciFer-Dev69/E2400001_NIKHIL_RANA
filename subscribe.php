@@ -16,7 +16,7 @@ include 'includes/header.php';
                 <p style="margin-top: 15px; font-size: 14px; color: #6a6f73;">Starting at $10.00 per month. Cancel anytime.</p>
             </div>
             <div class="sub-hero-image">
-                <img src="https://images.squarespace-cdn.com/content/v1/55df6bb1e4b008d758362678/1484196831633-ST2K2RZYW1H3Y9M2VZ00/ke17ZwdGBToddI8pDm48kK6stS_tY3I4D-8Gv9j0o2pZw-zPPgdn4jUwVcJE1ZvWQUxwkmyExglNqGp0IvTJZUJFbgE-7XRK3dMEBRBhUpx_iY5_yidk8F0L_S07I1K5vV-v51vL5v5vU9yM8W_F2a1o1v1v1v1v/ke17ZwdGBToddI8pDm48kK6stS_tY3I4D-8Gv9j0o2pZw-zPPgdn4jUwVcJE1ZvWQUxwkmyExglNqGp0IvTJZUJFbgE-7XRK3dMEBRBhUpx_iY5_yidk8F0L_S07I1K5vV-v51vL5v5vU9yM8W_F2a1o1v1v1v1v" alt="Success" style="border-radius: 8px;">
+                <img src="https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&q=80&w=600" alt="Success" style="border-radius: 8px; width: 100%;">
             </div>
         </div>
     </section>
@@ -47,7 +47,7 @@ include 'includes/header.php';
     <section class="sub-feature container">
         <div class="sub-feature-grid">
             <div style="flex: 1;">
-                <img src="https://images.squarespace-cdn.com/content/v1/55df6bb1e4b008d758362678/1484196831633-ST2K2RZYW1H3Y9M2VZ00/ke17ZwdGBToddI8pDm48kK6stS_tY3I4D-8Gv9j0o2pZw-zPPgdn4jUwVcJE1ZvWQUxwkmyExglNqGp0IvTJZUJFbgE-7XRK3dMEBRBhUpx_iY5_yidk8F0L_S07I1K5vV-v51vL5v5vU9yM8W_F2a1o1v1v1v1v/ke17ZwdGBToddI8pDm48kK6stS_tY3I4D-8Gv9j0o2pZw-zPPgdn4jUwVcJE1ZvWQUxwkmyExglNqGp0IvTJZUJFbgE-7XRK3dMEBRBhUpx_iY5_yidk8F0L_S07I1K5vV-v51vL5v5vU9yM8W_F2a1o1v1v1v1v" style="width: 100%; border-radius: 8px;">
+                <img src="https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&q=80&w=600" style="width: 100%; border-radius: 8px;">
             </div>
             <div class="sub-feature-content" style="flex: 1;">
                 <p style="color: #6a6f73; font-weight: 700; font-size: 14px; margin-bottom: 10px;">Current</p>

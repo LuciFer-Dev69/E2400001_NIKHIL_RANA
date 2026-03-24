@@ -6,15 +6,13 @@ if (!isset($_SESSION['user_id'])) {
     exit();
 }
 
+$root = "../../";
+$page_title = 'Instructor Dashboard';
 $portal_type = 'instructor';
-$portal_context = 'instructor';
-$base_url = "../../";
-include '../../includes/header.php';
+include '../../includes/portal_header.php';
 ?>
 
-<div class="portal-shell">
-    <?php include '../../includes/portal_header_sidebar.php'; ?>
-    <div class="portal-content">
+
 
 
 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px;">
@@ -127,5 +125,4 @@ include '../../includes/header.php';
 </div>
 
     </div>
-</div>
-<?php include '../../includes/footer.php'; ?>
+<?php include '../../includes/portal_footer.php'; ?>

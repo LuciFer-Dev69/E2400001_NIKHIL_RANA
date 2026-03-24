@@ -48,6 +48,7 @@ $cert_id = "UC-" . strtoupper(substr(md5($user_id . $course_id . time()), 0, 12)
     <meta charset="UTF-8">
     <title>Certificate of Completion - <?php echo htmlspecialchars($data['title']); ?></title>
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         body {
             margin: 0;
@@ -174,11 +175,9 @@ $cert_id = "UC-" . strtoupper(substr(md5($user_id . $course_id . time()), 0, 12)
             z-index: 2;
         }
         
-        .print-btn {
+        .print-btn, .share-btn {
             position: fixed;
             top: 30px;
-            right: 30px;
-            background: #1c1d1f;
             color: white;
             border: none;
             padding: 12px 24px;
@@ -188,9 +187,16 @@ $cert_id = "UC-" . strtoupper(substr(md5($user_id . $course_id . time()), 0, 12)
             cursor: pointer;
             box-shadow: 0 4px 12px rgba(0,0,0,0.2);
             z-index: 1000;
+            display: flex;
+            align-items: center;
+            gap: 10px;
         }
+        .print-btn { right: 30px; background: #1c1d1f; }
         .print-btn:hover { background: #333; }
         
+        .share-btn { right: 260px; background: #0077B5; }
+        .share-btn:hover { background: #005e93; }
+
         @media print {
             body { background: white; }
             .cert-container { 
@@ -206,7 +212,10 @@ $cert_id = "UC-" . strtoupper(substr(md5($user_id . $course_id . time()), 0, 12)
 <body>
 
     <button class="print-btn" onclick="window.print()">
-        <i class="fa fa-print"></i> Download / Print PDF
+        <i class="fa fa-print"></i> Download / Print
+    </button>
+    <button class="share-btn" onclick="window.open('https://www.linkedin.com/profile/add?startTask=CERTIFICATION_NAME&name=<?php echo urlencode($data['title']); ?>&issueYear=<?php echo date('Y'); ?>&issueMonth=<?php echo date('n'); ?>&certUrl=' + encodeURIComponent(window.location.href), '_blank')">
+        <i class="fab fa-linkedin"></i> Add to LinkedIn
     </button>
 
     <div class="cert-container">
