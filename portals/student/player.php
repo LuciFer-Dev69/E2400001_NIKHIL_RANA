@@ -85,9 +85,6 @@ $page_title = 'Learning Player';
 include '../../includes/portal_header.php';
 ?>
 
-?>
- </style>
-
 
 <div class="player-container">
         <!-- Main Content Area -->
@@ -132,6 +129,12 @@ endif; ?>
                     <p style="color: var(--dark-color); line-height: 1.6; opacity: 0.9;">
                         This lecture covers the fundamental concepts of <?php echo $current_lesson['title']; ?>. 
                     </p>
+                    
+                    <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid var(--border-color);">
+                        <h3 style="font-size: 18px; margin-bottom: 10px; color: var(--dark-color);">How are you liking the course?</h3>
+                        <p style="color: var(--gray-color); font-size: 14px; margin-bottom: 15px;">Your feedback helps the instructor improve and helps other students choose the right course.</p>
+                        <button onclick="document.getElementById('review-modal').style.display='flex'" class="btn btn-secondary" style="border: 1px solid var(--dark-color); color: var(--dark-color);"><i class="fa fa-star"></i> Leave a Review</button>
+                    </div>
                 </div>
 
                 <div class="tab-content" id="tab-notes" style="padding-top: 25px; display: none;">
@@ -143,7 +146,7 @@ endif; ?>
                     <div id="notes-list">
                         <h4 style="margin-bottom: 15px;">Your notes</h4>
                         <?php if (empty($notes)): ?>
-                            <p id="no-notes-msg" style="color: #6a6f73; font-style: italic;">No notes yet for this lecture.</p>
+                            <p id="no-notes-msg" style="color: var(--gray-color); font-style: italic;">No notes yet for this lecture.</p>
                         <?php
 else: ?>
                             <?php foreach ($notes as $note): ?>
@@ -181,7 +184,7 @@ endif; ?>
 
                     <div id="qa-list">
                         <div class="qa-placeholder">
-                            <p style="color: #6a6f73; font-style: italic;">Loading questions...</p>
+                            <p style="color: var(--gray-color); font-style: italic;">Loading questions...</p>
                         </div>
                     </div>
                 </div>
@@ -345,7 +348,7 @@ endforeach; ?>
             if (questions.length === 0) {
                 qaList.innerHTML = `
                     <div class="qa-placeholder" style="text-align: center; padding: 20px;">
-                        <p style="color: #6a6f73; font-style: italic;">No questions have been asked yet for this lecture. Be the first!</p>
+                        <p style="color: var(--gray-color); font-style: italic;">No questions have been asked yet for this lecture. Be the first!</p>
                     </div>
                 `;
                 return;
@@ -354,30 +357,30 @@ endforeach; ?>
             let html = '';
             questions.forEach(q => {
                 html += `
-                    <div class="qa-item" style="padding: 15px; border: 1px solid #d1d7dc; border-radius: 8px; margin-bottom: 15px;">
+                    <div class="qa-item" style="padding: 15px; border: 1px solid var(--border-color); border-radius: 8px; margin-bottom: 15px;">
                         <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
                             <div style="font-weight: 700; font-size: 14px;">${q.user_name}</div>
-                            <div style="font-size: 12px; color: #6a6f73;">${q.created_at}</div>
+                            <div style="font-size: 12px; color: var(--gray-color);">${q.created_at}</div>
                         </div>
                         <p style="margin-bottom: 10px; font-size: 15px;">${q.question_text}</p>
                         
-                        <div class="qa-answers" style="margin-left: 20px; padding-left: 15px; border-left: 2px solid #e0e0e0;">
+                        <div class="qa-answers" style="margin-left: 20px; padding-left: 15px; border-left: 2px solid var(--border-color);">
                 `;
                 if (q.answers.length > 0) {
                     q.answers.forEach(a => {
                         html += `
-                            <div style="margin-top: 10px; padding-top: 10px; border-top: 1px solid #f1f3f5;">
+                            <div style="margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--border-color);">
                                 <div style="display: flex; gap: 8px; margin-bottom: 5px; align-items: center;">
                                     <span style="font-weight: 700; font-size: 13px;">${a.user_name}</span>
                                     ${a.is_instructor == 1 ? '<span style="background: #2ecc71; color: white; padding: 2px 6px; border-radius: 4px; font-size: 10px; font-weight: 700;">Instructor</span>' : ''}
-                                    <span style="font-size: 11px; color: #6a6f73;">${a.created_at}</span>
+                                    <span style="font-size: 11px; color: var(--gray-color);">${a.created_at}</span>
                                 </div>
                                 <p style="font-size: 14px;">${a.answer_text}</p>
                             </div>
                         `;
                     });
                 } else {
-                    html += `<p style="font-size: 13px; color: #6a6f73; font-style: italic; margin-top: 10px;">No answers yet.</p>`;
+                    html += `<p style="font-size: 13px; color: var(--gray-color); font-style: italic; margin-top: 10px;">No answers yet.</p>`;
                 }
                 
                 html += `
@@ -487,9 +490,9 @@ endforeach; ?>
 
                     const newNote = document.createElement('div');
                     newNote.className = 'note-item';
-                    newNote.style = "padding: 15px; background: #f8f9fa; border-radius: 4px; margin-bottom: 10px; border-left: 4px solid var(--primary-color);";
+                    newNote.style = "padding: 15px; background: var(--light-gray); border-radius: 4px; margin-bottom: 10px; border-left: 4px solid var(--primary-color);";
                     newNote.innerHTML = `
-                        <div style="font-size: 12px; color: #6a6f73; margin-bottom: 5px;">Just now</div>
+                        <div style="font-size: 12px; color: var(--gray-color); margin-bottom: 5px;">Just now</div>
                         <div style="font-size: 14px; line-height: 1.5;">${noteText.replace(/\n/g, '<br>')}</div>
                     `;
                     
@@ -507,5 +510,103 @@ endforeach; ?>
                 btn.innerText = 'Save note';
             });
         };
+    </script>
+
+    <!-- Review Modal -->
+    <div id="review-modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 9999; justify-content: center; align-items: center;">
+        <div style="background: var(--bg-card); padding: 30px; border-radius: 12px; width: 100%; max-width: 500px; position: relative;">
+            <button onclick="document.getElementById('review-modal').style.display='none'" style="position: absolute; top: 15px; right: 15px; background: none; border: none; font-size: 20px; cursor: pointer; color: var(--gray-color);">&times;</button>
+            <h2 style="font-size: 24px; font-weight: 800; color: var(--dark-color); margin-bottom: 5px;">Leave a Review</h2>
+            <p style="color: var(--gray-color); font-size: 14px; margin-bottom: 20px;">Tell us about your experience.</p>
+            
+            <div id="review-stars-container" style="display: flex; gap: 10px; margin-bottom: 20px; justify-content: center;">
+                <i class="far fa-star review-star" data-val="1" style="font-size: 30px; cursor: pointer; color: #f1c40f;"></i>
+                <i class="far fa-star review-star" data-val="2" style="font-size: 30px; cursor: pointer; color: #f1c40f;"></i>
+                <i class="far fa-star review-star" data-val="3" style="font-size: 30px; cursor: pointer; color: #f1c40f;"></i>
+                <i class="far fa-star review-star" data-val="4" style="font-size: 30px; cursor: pointer; color: #f1c40f;"></i>
+                <i class="far fa-star review-star" data-val="5" style="font-size: 30px; cursor: pointer; color: #f1c40f;"></i>
+            </div>
+            
+            <input type="hidden" id="review-rating-val" value="0">
+            
+            <textarea id="review-comment-val" rows="4" placeholder="Tell us if this course met your expectations..." style="width: 100%; padding: 15px; border-radius: 6px; border: 1px solid var(--border-color); background: var(--light-gray); color: var(--dark-color); font-family: inherit; margin-bottom: 20px; resize: vertical;"></textarea>
+            
+            <button id="submit-review-btn" class="btn btn-primary" style="width: 100%; padding: 15px; font-size: 16px;">Submit Review</button>
+        </div>
+    </div>
+
+    <script>
+        // Star Rating Logic
+        const stars = document.querySelectorAll('.review-star');
+        let selectedRating = 0;
+        
+        stars.forEach(star => {
+            star.addEventListener('mouseover', function() {
+                const val = this.getAttribute('data-val');
+                highlightStars(val);
+            });
+            star.addEventListener('mouseout', function() {
+                highlightStars(selectedRating);
+            });
+            star.addEventListener('click', function() {
+                selectedRating = this.getAttribute('data-val');
+                document.getElementById('review-rating-val').value = selectedRating;
+                highlightStars(selectedRating);
+            });
+        });
+        
+        function highlightStars(val) {
+            stars.forEach(s => {
+                if (s.getAttribute('data-val') <= val) {
+                    s.classList.remove('far');
+                    s.classList.add('fas');
+                } else {
+                    s.classList.remove('fas');
+                    s.classList.add('far');
+                }
+            });
+        }
+        
+        // Submit Review
+        document.getElementById('submit-review-btn').addEventListener('click', function() {
+            const btn = this;
+            const rating = document.getElementById('review-rating-val').value;
+            const comment = document.getElementById('review-comment-val').value;
+            const courseId = <?php echo $course_id; ?>;
+            
+            if (rating == 0) {
+                alert("Please select a star rating first.");
+                return;
+            }
+            
+            btn.disabled = true;
+            btn.innerText = 'Submitting...';
+            
+            fetch('../../api/submit_review.php', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    course_id: courseId,
+                    rating: rating,
+                    comment: comment
+                })
+            })
+            .then(res => res.json())
+            .then(data => {
+                if(data.success) {
+                    document.getElementById('review-modal').style.display = 'none';
+                    alert("Thank you! Your review has been submitted and is pending moderation.");
+                } else {
+                    alert("Error: " + data.message);
+                }
+                btn.disabled = false;
+                btn.innerText = 'Submit Review';
+            })
+            .catch(err => {
+                alert("A network error occurred.");
+                btn.disabled = false;
+                btn.innerText = 'Submit Review';
+            });
+        });
     </script>
 <?php include '../../includes/portal_footer.php'; ?>

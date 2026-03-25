@@ -48,7 +48,7 @@ try {
 
     // 2. Fetch Paginated Records
     $sql = "
-        SELECT c.*, u.full_name as instructor_name, e.progress_percent, e.enrolled_at
+        SELECT c.*, c.id AS course_id, u.full_name as instructor_name, e.progress_percent, e.enrolled_at, e.is_purchased
         FROM enrollments e
         JOIN courses c ON e.course_id = c.id
         JOIN users u ON c.instructor_id = u.id
@@ -120,7 +120,7 @@ include '../../includes/portal_header.php';
             <?php
 else: ?>
                 <?php foreach ($courses_enrolled as $course):
-        $is_locked = ($course['price'] > 0);
+        $is_locked = ($course['price'] > 0 && $course['is_purchased'] == 0);
 ?>
                 <div class="course-card-premium <?php echo $is_locked ? 'locked' : ''; ?>" style="position: relative;">
                     <?php if ($is_locked): ?>
@@ -146,7 +146,7 @@ else: ?>
                             <div style="margin-bottom: 20px; padding: 12px; background: #fffcf0; border: 1px solid #feeac1; border-radius: 8px; font-size: 12px; color: #b4690e; font-weight: 700; display: flex; align-items: center; gap: 8px;">
                                 <i class="fa fa-shopping-cart"></i> Single purchase required
                             </div>
-                            <a href="#" class="btn btn-primary" style="width: 100%; padding: 12px; font-weight: 800; background: #1c1d1f; color: white; border: none; border-radius: 8px;">Unlock for $<?php echo number_format($course['price'], 2); ?></a>
+                            <a href="../../checkout.php?id=<?php echo $course['course_id']; ?>" class="btn btn-primary" style="width: 100%; padding: 12px; font-weight: 800; background: #1c1d1f; color: white; border: none; border-radius: 8px;"><i class="fa fa-lock-open" style="margin-right: 6px;"></i>Unlock for $<?php echo number_format($course['price'], 2); ?></a>
                         <?php
         else: ?>
                             <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; font-size: 12px; font-weight: 700; color: #1c1d1f;">

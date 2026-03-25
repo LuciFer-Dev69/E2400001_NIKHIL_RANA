@@ -69,7 +69,7 @@ include '../../includes/portal_header.php';
                     </div>
                 </div>
                 
-                <div style="background: linear-gradient(135deg, #1c1d1f 0%, #3e4143 100%); padding: 30px; border-radius: 12px; color: white; text-align: center;">
+                <div style="background: linear-gradient(135deg, var(--white) 0%, var(--border-color) 100%); padding: 30px; border-radius: 12px; color: #fff; text-align: center; box-shadow: var(--shadow);">
                     <i class="fa fa-fire" style="font-size: 40px; color: #FF416C; margin-bottom: 15px;"></i>
                     <h3 style="font-size: 20px; margin-bottom: 10px;">Maintain Your Streak!</h3>
                     <p style="font-size: 14px; opacity: 0.8; margin-bottom: 20px;">Schedule at least 15 minutes of learning every day to keep your streak alive.</p>

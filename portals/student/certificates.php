@@ -51,7 +51,7 @@ include '../../includes/portal_header.php';
             <?php
 else: ?>
                 <?php foreach ($completed_courses as $course): ?>
-                    <div style="background: #fff; border: 1px solid #d1d7dc; border-radius: 8px; overflow: hidden; display: flex; flex-direction: column;">
+                    <div style="background: var(--white); border: 1px solid var(--border-color); border-radius: 8px; overflow: hidden; display: flex; flex-direction: column;">
                         <div style="height: 160px; position: relative;">
                             <img src="../../assets/img/courses/<?php echo $course['thumbnail'] ?: 'default.jpg'; ?>" style="width: 100%; height: 100%; object-fit: cover;" onerror="this.src='https://images.unsplash.com/photo-1498050108023-c5249f4df085?auto=format&fit=crop&w=400&q=80'">
                             <div style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center; color: white;">

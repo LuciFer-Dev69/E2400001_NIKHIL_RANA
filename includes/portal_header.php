@@ -240,13 +240,13 @@ document.addEventListener('DOMContentLoaded', function() {
                 list.innerHTML = '<div style="text-align:center;padding:20px 0;color:#6a6f73;font-size:13px;">No alerts.</div>';
             } else {
                 list.innerHTML = data.notifications.map(n => `
-                    <div style="display:flex;gap:10px;padding:10px 0;border-bottom:1px solid #f7f9fa;${n.is_read?'opacity:0.6':''}">
-                        <div style="width:30px;height:30px;background:#ebf6ff;border-radius:50%;display:flex;align-items:center;justify-content:center;color:#0a84ff;flex-shrink:0;">
+                    <div style="display:flex;gap:10px;padding:10px 0;border-bottom:1px solid var(--border-color);${n.is_read?'opacity:0.6':''}">
+                        <div style="width:30px;height:30px;background:var(--light-gray);border-radius:50%;display:flex;align-items:center;justify-content:center;color:var(--primary-color);flex-shrink:0;">
                             <i class="fa fa-bell" style="font-size:12px;"></i>
                         </div>
                         <div>
-                            <div style="font-size:13px;font-weight:700;">${n.title}</div>
-                            <div style="font-size:12px;color:#6a6f73;">${n.message}</div>
+                            <div style="font-size:13px;font-weight:700;color:var(--dark-color);">${n.title}</div>
+                            <div style="font-size:12px;color:var(--gray-color);">${n.message}</div>
                         </div>
                     </div>`).join('');
             }

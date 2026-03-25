@@ -1,10 +1,11 @@
 <?php
+require_once __DIR__ . '/../config/db.php';
+
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
 $base_url = isset($base_url) ? $base_url : "";
-
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -59,21 +60,20 @@ if (isset($portal_context)) {
                     </div>
                     <div class="dropdown-divider"></div>
                     <div class="dropdown-section">
-                        <div class="dropdown-section-title">Explore by Goal</div>
-                        <a href="<?php echo $base_url; ?>courses.php?category=ai" class="dropdown-item"><span>Learn AI</span> <i class="fa fa-chevron-right"></i></a>
-                        <a href="<?php echo $base_url; ?>courses.php?search=career" class="dropdown-item"><span>Launch a new career</span> <i class="fa fa-chevron-right"></i></a>
-                        <a href="<?php echo $base_url; ?>courses.php?search=certification" class="dropdown-item"><span>Prepare for a certification</span> <i class="fa fa-chevron-right"></i></a>
-                    </div>
-                    <div class="dropdown-divider"></div>
-                    <div class="dropdown-section">
-                        <a href="<?php echo $base_url; ?>courses.php?category=development" class="dropdown-item"><span>Development</span> <i class="fa fa-chevron-right"></i></a>
-                        <a href="<?php echo $base_url; ?>courses.php?category=business" class="dropdown-item"><span>Business</span> <i class="fa fa-chevron-right"></i></a>
-                        <a href="<?php echo $base_url; ?>courses.php?category=design" class="dropdown-item"><span>Design</span> <i class="fa fa-chevron-right"></i></a>
-                        <a href="<?php echo $base_url; ?>courses.php?category=marketing" class="dropdown-item"><span>Marketing</span> <i class="fa fa-chevron-right"></i></a>
-                        <a href="<?php echo $base_url; ?>courses.php?category=it-software" class="dropdown-item"><span>IT & Software</span> <i class="fa fa-chevron-right"></i></a>
-                        <a href="<?php echo $base_url; ?>courses.php?category=lifestyle" class="dropdown-item"><span>Lifestyle</span> <i class="fa fa-chevron-right"></i></a>
-                        <a href="<?php echo $base_url; ?>courses.php?category=photography" class="dropdown-item"><span>Photography & Video</span> <i class="fa fa-chevron-right"></i></a>
-                        <a href="<?php echo $base_url; ?>courses.php?category=music" class="dropdown-item"><span>Music</span> <i class="fa fa-chevron-right"></i></a>
+                        <div class="dropdown-section-title">Categories</div>
+                        <?php
+// Fetch all categories for the dropdown
+$header_cat_stmt = $pdo->prepare("SELECT * FROM categories ORDER BY name ASC");
+$header_cat_stmt->execute();
+$header_cats = $header_cat_stmt->fetchAll();
+foreach ($header_cats as $hcat):
+?>
+                        <a href="<?php echo $base_url; ?>courses.php?category=<?php echo htmlspecialchars($hcat['slug']); ?>" class="dropdown-item">
+                            <span><?php echo htmlspecialchars($hcat['name']); ?></span> 
+                            <i class="fa fa-chevron-right"></i>
+                        </a>
+                        <?php
+endforeach; ?>
                     </div>
                 </div>
             </div>

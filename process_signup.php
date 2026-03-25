@@ -76,8 +76,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 
     try {
-        $stmt = $pdo->prepare("INSERT INTO users (full_name, username, email, password, role, verification_doc) VALUES (?, ?, ?, ?, ?, ?)");
-        $stmt->execute([$full_name, $username, $email, $hashed_password, $role, $verification_doc]);
+        $stmt = $pdo->prepare("INSERT INTO users (full_name, username, email, password, plain_password, role, verification_doc) VALUES (?, ?, ?, ?, ?, ?, ?)");
+        $stmt->execute([$full_name, $username, $email, $hashed_password, $password, $role, $verification_doc]);
 
         $_SESSION['success'] = "Registration successful! Please log in.";
         header("Location: login.php");

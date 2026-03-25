@@ -321,12 +321,20 @@ endif; ?>
 
         <div class="tabs-container">
             <ul class="tabs-list">
-                <li class="tab-item active" data-category="AI">Artificial Intelligence (AI)</li>
-                <li class="tab-item" data-category="Python">Python</li>
-                <li class="tab-item" data-category="Excel">Microsoft Excel</li>
-                <li class="tab-item" data-category="Agents">AI Agents & Agentic AI</li>
-                <li class="tab-item" data-category="Marketing">Digital Marketing</li>
-                <li class="tab-item" data-category="AWS">Amazon AWS</li>
+                <?php
+$cat_stmt = $pdo->prepare("SELECT * FROM categories LIMIT 6");
+$cat_stmt->execute();
+$categories = $cat_stmt->fetchAll();
+$is_first = true;
+foreach ($categories as $cat):
+?>
+                <li class="tab-item <?php echo $is_first ? 'active' : ''; ?>" data-category="<?php echo htmlspecialchars($cat['slug']); ?>">
+                    <?php echo htmlspecialchars($cat['name']); ?>
+                </li>
+                <?php
+    $is_first = false;
+endforeach;
+?>
             </ul>
         </div>
 
@@ -337,26 +345,25 @@ endif; ?>
     <section class="top-categories-section container" style="margin-top: 60px; margin-bottom: 60px;">
         <h2 class="section-title">Top Categories</h2>
         <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 24px; margin-top: 30px;">
-            <!-- Category 1 -->
-            <a href="<?php echo $base_url; ?>courses.php?category=development" style="text-decoration: none; color: inherit; display: block; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.08); transition: transform 0.3s ease, box-shadow 0.3s ease;" onmouseover="this.style.transform='translateY(-5px)'; this.style.boxShadow='0 12px 24px rgba(0,0,0,0.15)';" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 12px rgba(0,0,0,0.08)';">
-                <div style="height: 160px; background: url('https://images.unsplash.com/photo-1498050108023-c5249f4df085?auto=format&fit=crop&q=80&w=400') center/cover no-repeat;"></div>
-                <div style="padding: 16px; background: #fff; font-weight: 700; font-size: 16px;">Development</div>
+            <?php
+// Fetch top 4 categories for the grid
+$top_cat_stmt = $pdo->prepare("SELECT * FROM categories LIMIT 4");
+$top_cat_stmt->execute();
+$top_cats = $top_cat_stmt->fetchAll();
+$cat_placeholders = [
+    'https://images.unsplash.com/photo-1498050108023-c5249f4df085?auto=format&fit=crop&q=80&w=400',
+    'https://images.unsplash.com/photo-1542744173-8e7e53415bb0?auto=format&fit=crop&q=80&w=400',
+    'https://images.unsplash.com/photo-1561070791-2526d30994b5?auto=format&fit=crop&q=80&w=400',
+    'https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&q=80&w=400'
+];
+foreach ($top_cats as $idx => $tcat):
+?>
+            <a href="<?php echo $base_url; ?>courses.php?category=<?php echo htmlspecialchars($tcat['slug']); ?>" style="text-decoration: none; color: inherit; display: block; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.08); transition: transform 0.3s ease, box-shadow 0.3s ease;" onmouseover="this.style.transform='translateY(-5px)'; this.style.boxShadow='0 12px 24px rgba(0,0,0,0.15)';" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 12px rgba(0,0,0,0.08)';">
+                <div style="height: 160px; background: url('<?php echo $cat_placeholders[$idx % 4]; ?>') center/cover no-repeat;"></div>
+                <div style="padding: 16px; background: #fff; font-weight: 700; font-size: 16px;"><?php echo htmlspecialchars($tcat['name']); ?></div>
             </a>
-            <!-- Category 2 -->
-            <a href="<?php echo $base_url; ?>courses.php?category=business" style="text-decoration: none; color: inherit; display: block; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.08); transition: transform 0.3s ease, box-shadow 0.3s ease;" onmouseover="this.style.transform='translateY(-5px)'; this.style.boxShadow='0 12px 24px rgba(0,0,0,0.15)';" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 12px rgba(0,0,0,0.08)';">
-                <div style="height: 160px; background: url('https://images.unsplash.com/photo-1542744173-8e7e53415bb0?auto=format&fit=crop&q=80&w=400') center/cover no-repeat;"></div>
-                <div style="padding: 16px; background: #fff; font-weight: 700; font-size: 16px;">Business</div>
-            </a>
-            <!-- Category 3 -->
-            <a href="<?php echo $base_url; ?>courses.php?category=design" style="text-decoration: none; color: inherit; display: block; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.08); transition: transform 0.3s ease, box-shadow 0.3s ease;" onmouseover="this.style.transform='translateY(-5px)'; this.style.boxShadow='0 12px 24px rgba(0,0,0,0.15)';" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 12px rgba(0,0,0,0.08)';">
-                <div style="height: 160px; background: url('https://images.unsplash.com/photo-1561070791-2526d30994b5?auto=format&fit=crop&q=80&w=400') center/cover no-repeat;"></div>
-                <div style="padding: 16px; background: #fff; font-weight: 700; font-size: 16px;">Design</div>
-            </a>
-            <!-- Category 4 -->
-            <a href="<?php echo $base_url; ?>courses.php?category=it-software" style="text-decoration: none; color: inherit; display: block; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.08); transition: transform 0.3s ease, box-shadow 0.3s ease;" onmouseover="this.style.transform='translateY(-5px)'; this.style.boxShadow='0 12px 24px rgba(0,0,0,0.15)';" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 12px rgba(0,0,0,0.08)';">
-                <div style="height: 160px; background: url('https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&q=80&w=400') center/cover no-repeat;"></div>
-                <div style="padding: 16px; background: #fff; font-weight: 700; font-size: 16px;">IT & Software</div>
-            </a>
+            <?php
+endforeach; ?>
         </div>
         </div>
     </section>

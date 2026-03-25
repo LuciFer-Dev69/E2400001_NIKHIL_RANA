@@ -2,6 +2,7 @@
 require_once 'config/db.php';
 session_start();
 
+$base_url = isset($base_url) ? $base_url : "";
 $category_slug = $_GET['category'] ?? 'all';
 $search_query = $_GET['search'] ?? '';
 
@@ -95,28 +96,33 @@ include 'includes/header.php';
                 <?php
 else: ?>
                     <?php foreach ($courses as $c): ?>
-                    <a href="<?php echo $base_url; ?>course_details.php?id=<?php echo $c['id']; ?>" class="course-horizontal-card" style="text-decoration: none; color: inherit; display: flex;">
-                        <div class="card-thumb" style="width: 260px; flex-shrink: 0; background: url('<?php echo $base_url; ?>assets/img/courses/<?php echo htmlspecialchars($c['thumbnail'] ?: 'default.jpg'); ?>') center/cover;" onerror="this.style.backgroundImage='url(https://via.placeholder.com/260x145)'">
-                        </div>
-                        <div class="card-info" style="flex: 1; padding: 15px 20px; display: flex; flex-direction: column;">
-                            <h3 style="font-size: 18px; font-weight: 800; margin-bottom: 5px;"><?php echo htmlspecialchars($c['title']); ?></h3>
-                            <p class="desc" style="font-size: 14px; color: #4d5156; margin-bottom: 5px; line-height: 1.4;"><?php echo htmlspecialchars(substr($c['description'], 0, 120)) . '...'; ?></p>
-                            <p class="instructor" style="font-size: 12px; color: #6a6f73; margin-bottom: 5px;"><?php echo htmlspecialchars($c['instructor_name']); ?></p>
-                            
-                            <div class="rating" style="display: flex; align-items: center; gap: 5px;">
-                                <span style="font-weight: 700; color: #b4690e;">4.8</span>
-                                <i class="fa fa-star" style="color: #b4690e; font-size: 12px;"></i>
-                                <span style="color: #6a6f73; font-size: 13px;">(2,105 ratings)</span>
+                    <div class="course-horizontal-card" style="display: flex; cursor: default; background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 8px; overflow: hidden; margin-bottom: 20px; transition: transform 0.2s, box-shadow 0.2s;">
+                        <a href="<?php echo $base_url; ?>course_details.php?id=<?php echo $c['id']; ?>" style="display: flex; flex: 1; text-decoration: none; color: inherit;">
+                            <div class="card-thumb" style="width: 260px; flex-shrink: 0; background: url('<?php echo $base_url; ?>assets/img/courses/<?php echo htmlspecialchars($c['thumbnail'] ?: 'default.jpg'); ?>') center/cover;" onerror="this.style.backgroundImage='url(https://via.placeholder.com/260x145)'">
                             </div>
-                            
-                            <div style="font-size: 12px; color: #6a6f73; margin-top: auto;">
-                                <?php echo round($c['total_duration'] / 60, 1); ?> total hours &bull; <?php echo $c['lesson_count']; ?> lectures &bull; All Levels
+                            <div class="card-info" style="flex: 1; padding: 15px 20px; display: flex; flex-direction: column;">
+                                <h3 style="font-size: 18px; font-weight: 800; margin-bottom: 5px;"><?php echo htmlspecialchars($c['title']); ?></h3>
+                                <p class="desc" style="font-size: 14px; color: #4d5156; margin-bottom: 5px; line-height: 1.4;"><?php echo htmlspecialchars(substr($c['description'], 0, 120)) . '...'; ?></p>
+                                <p class="instructor" style="font-size: 12px; color: #6a6f73; margin-bottom: 5px; font-weight: 600;">By <?php echo htmlspecialchars($c['instructor_name']); ?></p>
+                                <div class="rating" style="display: flex; align-items: center; gap: 5px;">
+                                    <span style="font-weight: 700; color: #b4690e;">4.8</span>
+                                    <i class="fa fa-star" style="color: #b4690e; font-size: 12px;"></i>
+                                    <span style="color: #6a6f73; font-size: 13px;">(2,105 ratings)</span>
+                                </div>
+                                <div style="font-size: 12px; color: #6a6f73; margin-top: auto;">
+                                    <?php echo round($c['total_duration'] / 60, 1); ?> total hours &bull; <?php echo $c['lesson_count']; ?> lectures &bull; All Levels
+                                </div>
                             </div>
+                        </a>
+                        <div class="card-price" style="width: 160px; text-align: right; padding: 15px 20px; display: flex; flex-direction: column; justify-content: center; align-items: flex-end; gap: 10px; flex-shrink: 0; border-left: 1px solid var(--border-color); background: var(--light-gray);">
+                            <div style="font-weight: 800; font-size: 20px; color: var(--dark-color);"><?php echo $c['price'] > 0 ? '$' . number_format($c['price'], 2) : 'Free'; ?></div>
+                            <a href="<?php echo $base_url; ?>checkout.php?id=<?php echo $c['id']; ?>" 
+                               class="btn btn-primary" 
+                               style="padding: 10px 15px; font-size: 13px; font-weight: 800; white-space: nowrap; width: 100%; text-align: center; <?php echo $c['price'] == 0 ? 'background: #2ecc71; border-color: #2ecc71;' : ''; ?>">
+                                <?php echo $c['price'] > 0 ? 'Buy Now' : 'Enroll Free'; ?>
+                            </a>
                         </div>
-                        <div class="card-price" style="width: 120px; text-align: right; padding: 15px 20px;">
-                            <div style="font-weight: 800; font-size: 18px; color: #1c1d1f;"><?php echo $c['price'] > 0 ? '$' . number_format($c['price'], 2) : 'Free'; ?></div>
-                        </div>
-                    </a>
+                    </div>
                     <?php
     endforeach; ?>
                 <?php

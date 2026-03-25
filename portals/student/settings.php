@@ -59,12 +59,12 @@ if (strlen($initials) > 2)
                             <div style="font-size: 28px; font-weight: 800; color: #FF416C;"><i class="fa fa-star" style="font-size: 18px; position: relative; top: -3px;"></i> <?php echo number_format($g_stats['xp'] ?? 0); ?></div>
                             <div style="font-size: 11px; color: var(--gray-color); font-weight: 700; text-transform: uppercase;">Total XP</div>
                         </div>
-                        <div style="width: 1px; background: #d1d7dc;"></div>
+                        <div style="width: 1px; background: var(--border-color);"></div>
                         <div style="text-align: center;">
                             <div style="font-size: 28px; font-weight: 800; color: #2ecc71;"><i class="fa fa-award" style="font-size: 18px; position: relative; top: -3px;"></i> <?php echo count($my_badges); ?></div>
                             <div style="font-size: 11px; color: #6a6f73; font-weight: 700; text-transform: uppercase;">Badges</div>
                         </div>
-                        <div style="width: 1px; background: #d1d7dc;"></div>
+                        <div style="width: 1px; background: var(--border-color);"></div>
                         <div style="text-align: center;">
                             <div style="font-size: 28px; font-weight: 800; color: #e67e22;"><i class="fa fa-fire" style="font-size: 18px; position: relative; top: -3px;"></i> <?php echo $g_stats['streak_days'] ?? 0; ?></div>
                             <div style="font-size: 11px; color: #6a6f73; font-weight: 700; text-transform: uppercase;">Day Streak</div>
@@ -87,14 +87,14 @@ if (strlen($initials) > 2)
                         <form id="profile-form">
                             <div style="margin-bottom: 20px;">
                                 <label style="display: block; font-weight: 700; margin-bottom: 8px; font-size: 14px;">Full Name</label>
-                                <input type="text" id="profile-name" value="<?php echo htmlspecialchars($user['full_name']); ?>" style="width: 100%; padding: 12px; border: 1px solid #d1d7dc; border-radius: 4px; font-size: 15px;">
+                                <input type="text" id="profile-name" value="<?php echo htmlspecialchars($user['full_name']); ?>" style="width: 100%; padding: 12px; border: 1px solid var(--border-color); border-radius: 4px; font-size: 15px; background: var(--bg-card); color: var(--dark-color);">
                             </div>
                             <div style="margin-bottom: 25px;">
                                 <label style="display: block; font-weight: 700; margin-bottom: 8px; font-size: 14px;">Headline / Bio</label>
-                                <textarea id="profile-bio" rows="4" style="width: 100%; padding: 12px; border: 1px solid #d1d7dc; border-radius: 4px; font-size: 15px; font-family: inherit;" placeholder="Tell us a bit about yourself..."><?php echo htmlspecialchars($user['bio'] ?? ''); ?></textarea>
+                                <textarea id="profile-bio" rows="4" style="width: 100%; padding: 12px; border: 1px solid var(--border-color); border-radius: 4px; font-size: 15px; font-family: inherit; background: var(--bg-card); color: var(--dark-color);" placeholder="Tell us a bit about yourself..."><?php echo htmlspecialchars($user['bio'] ?? ''); ?></textarea>
                             </div>
                             <div id="profile-msg" style="margin-bottom: 15px; font-weight: 700; font-size: 14px;"></div>
-                            <button type="submit" class="btn btn-primary" id="save-profile-btn" style="background: #1c1d1f; color: white;">Save Profile</button>
+                            <button type="submit" class="btn btn-primary" id="save-profile-btn" style="border: none;">Save Profile</button>
                         </form>
                     </div>
 
@@ -102,7 +102,7 @@ if (strlen($initials) > 2)
                     <div id="badges-tab" class="settings-content" style="display: none;">
                         <h2 style="font-size: 20px; font-weight: 800; margin-bottom: 20px; color: var(--dark-color);">Your Badges</h2>
                         <?php if (empty($my_badges)): ?>
-                            <div style="text-align: center; padding: 40px; background: #f7f9fa; border-radius: 8px; border: 1px dashed #d1d7dc;">
+                            <div style="text-align: center; padding: 40px; background: var(--bg-page); border-radius: 8px; border: 1px dashed var(--border-color);">
                                 <i class="fa fa-award" style="font-size: 40px; color: #d1d7dc; margin-bottom: 15px;"></i>
                                 <p style="color: #6a6f73; font-weight: 700;">You haven't earned any badges yet.</p>
                                 <p style="font-size: 14px; color: #6a6f73;">Complete lessons and courses to unlock achievements!</p>
@@ -111,7 +111,7 @@ if (strlen($initials) > 2)
 else: ?>
                             <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 20px;">
                                 <?php foreach ($my_badges as $badge): ?>
-                                    <div style="background: #fff; border: 1px solid #d1d7dc; border-radius: 8px; padding: 20px; text-align: center; box-shadow: 0 4px 6px rgba(0,0,0,0.05);">
+                                    <div style="background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 8px; padding: 20px; text-align: center; box-shadow: var(--shadow);">
                                         <div style="width: 60px; height: 60px; background: #e8f5e9; color: #2ecc71; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 24px; margin: 0 auto 15px auto;">
                                             <i class="fa fa-medal"></i>
                                         </div>
@@ -130,14 +130,14 @@ endif; ?>
                         <form id="password-form">
                             <div style="margin-bottom: 20px;">
                                 <label style="display: block; font-weight: 700; margin-bottom: 8px; font-size: 14px;">Current Password</label>
-                                <input type="password" id="current-password" required style="width: 100%; padding: 12px; border: 1px solid #d1d7dc; border-radius: 4px; font-size: 15px;">
+                                <input type="password" id="current-password" required style="width: 100%; padding: 12px; border: 1px solid var(--border-color); border-radius: 4px; font-size: 15px; background: var(--bg-card); color: var(--dark-color);">
                             </div>
                             <div style="margin-bottom: 25px;">
                                 <label style="display: block; font-weight: 700; margin-bottom: 8px; font-size: 14px;">New Password</label>
-                                <input type="password" id="new-password" required style="width: 100%; padding: 12px; border: 1px solid #d1d7dc; border-radius: 4px; font-size: 15px;">
+                                <input type="password" id="new-password" required style="width: 100%; padding: 12px; border: 1px solid var(--border-color); border-radius: 4px; font-size: 15px; background: var(--bg-card); color: var(--dark-color);">
                             </div>
                             <div id="password-msg" style="margin-bottom: 15px; font-weight: 700; font-size: 14px;"></div>
-                            <button type="submit" class="btn btn-primary" id="save-password-btn" style="background: #1c1d1f; color: white;">Change Password</button>
+                            <button type="submit" class="btn btn-primary" id="save-password-btn" style="border: none;">Change Password</button>
                         </form>
                     </div>
 

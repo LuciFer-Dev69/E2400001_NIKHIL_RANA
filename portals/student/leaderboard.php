@@ -42,7 +42,7 @@ include '../../includes/portal_header.php';
                 <h1 style="font-size: 32px; font-weight: 800; color: var(--dark-color); margin-bottom: 8px;">Global Leaderboard</h1>
                 <p style="color: var(--gray-color); font-size: 16px;">Compete with students worldwide and climb the ranks! 🏆</p>
             </div>
-            <div style="background: linear-gradient(135deg, #1c1d1f 0%, #3e4143 100%); padding: 10px 20px; border-radius: 50px; color: white; display: flex; align-items: center; gap: 15px; box-shadow: 0 4px 12px rgba(0,0,0,0.2);">
+            <div style="background: linear-gradient(135deg, var(--white) 0%, var(--border-color) 100%); padding: 10px 20px; border-radius: 50px; color: #fff; display: flex; align-items: center; gap: 15px; box-shadow: var(--shadow);">
                 <div style="font-weight: 700;">My Rank: 
                     <?php
 // simple rank calc
@@ -98,7 +98,7 @@ foreach ($leaderboard as $user):
     endif; ?>
                 </div>
                 <div style="display: flex; align-items: center; gap: 15px;">
-                    <div style="width: 44px; height: 44px; border-radius: 50%; background: var(--dark-color); color: white; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 16px;">
+                    <div style="width: 44px; height: 44px; border-radius: 50%; background: var(--primary-color); color: white; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 16px;">
                         <?php echo strtoupper(substr($user['full_name'], 0, 1)); ?>
                     </div>
                     <div>
