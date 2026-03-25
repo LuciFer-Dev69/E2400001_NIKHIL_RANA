@@ -13,7 +13,7 @@ $portal_type = 'student';
 $completed_count = 0;
 $learning_hours = 0;
 // Pagination setup
-$limit = 8;
+$limit = 10;
 $page = isset($_GET['page']) ? max(1, (int)$_GET['page']) : 1;
 $offset = ($page - 1) * $limit;
 
@@ -227,11 +227,11 @@ include '../../includes/portal_header.php';
         <h3 style="font-size: 18px; font-weight: 700; color: var(--dark-color); margin-bottom: 8px;"><?php echo $continue_course['title']; ?></h3>
         <?php if ($next_lesson): ?>
             <p style="font-size: 14px; color: var(--gray-color); margin-bottom: 15px;">Next: <?php echo $next_lesson['title']; ?></p>
-            <a href="player.php?course_id=<?php echo $continue_course['id']; ?>&lesson_id=<?php echo $next_lesson['id']; ?>" class="btn btn-primary">Resume Course</a>
+            <a href="../../ai_fundamentals.php" class="btn btn-primary">Resume Course</a>
         <?php
     else: ?>
             <p style="font-size: 14px; color: var(--gray-color); margin-bottom: 15px;">You've completed all lessons in this course!</p>
-            <a href="player.php?course_id=<?php echo $continue_course['id']; ?>" class="btn btn-primary">Review Course</a>
+            <a href="../../ai_fundamentals.php" class="btn btn-primary">Review Course</a>
         <?php
     endif; ?>
     </div>
@@ -266,7 +266,7 @@ endif; ?>
     endif; ?>
         
         <div style="position: relative; height: 160px; overflow: hidden;">
-            <img src="../../assets/img/courses/<?php echo $course['thumbnail'] ?: 'default.jpg'; ?>" style="width: 100%; height: 100%; object-fit: cover; transition: transform 0.5s; <?php echo $is_locked ? 'filter: grayscale(0.5) blur(2px);' : ''; ?>" onerror="this.src='https://images.unsplash.com/photo-1498050108023-c5249f4df085?auto=format&fit=crop&w=400&q=80'">
+            <img src="https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&q=80&w=400" style="width: 100%; height: 100%; object-fit: cover; transition: transform 0.5s; <?php echo $is_locked ? 'filter: grayscale(0.5) blur(2px);' : ''; ?>" onerror="this.src='https://images.unsplash.com/photo-1498050108023-c5249f4df085?auto=format&fit=crop&w=400&q=80'">
             <?php if ($is_locked): ?>
             <div style="position: absolute; top: 10px; right: 80px; background: #ff8a00; color: white; padding: 4px 10px; border-radius: 4px; font-size: 10px; font-weight: 800; text-transform: uppercase; z-index: 3;">
                 Locked
@@ -287,7 +287,7 @@ endif; ?>
                 <div style="margin-bottom: 20px; padding: 10px; background: var(--bg-page); border: 1px dashed var(--border-color); border-radius: 6px; font-size: 12px; color: var(--primary-color); font-weight: 700; text-align: center;">
                     <i class="fa fa-shopping-cart"></i> Purchase required
                 </div>
-                <a href="../../checkout.php?id=<?php echo $course['course_id']; ?>" class="btn btn-primary" style="width: 100%; padding: 10px; font-weight: 800; border: none;"><i class="fa fa-lock-open" style="margin-right: 6px;"></i>Unlock for $<?php echo number_format($course['price'], 2); ?></a>
+                <a href="../../checkout_subscription.php" class="btn btn-primary" style="width: 100%; padding: 10px; font-weight: 800; border: none;"><i class="fa fa-lock-open" style="margin-right: 6px;"></i>Unlock for $<?php echo number_format($course['price'], 2); ?></a>
             <?php
     else: ?>
                 <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; font-size: 12px; font-weight: 700;">
@@ -296,7 +296,7 @@ endif; ?>
                 <div class="premium-progress" style="margin: 0 0 20px 0;">
                     <div class="premium-progress-bar" style="width: <?php echo $course['progress_percent']; ?>%;"></div>
                 </div>
-                <a href="player.php?course_id=<?php echo $course_id; ?>" class="btn btn-secondary" style="width: 100%; padding: 10px; font-weight: 700;">View Course</a>
+                <a href="../../ai_fundamentals.php" class="btn btn-secondary" style="width: 100%; padding: 10px; font-weight: 700;">View Course</a>
             <?php
     endif; ?>
         </div>
@@ -505,7 +505,5 @@ function h($str)
                 .catch(err => console.error('Request failed', err));
             });
         });
-    });
-
     });
 </script>

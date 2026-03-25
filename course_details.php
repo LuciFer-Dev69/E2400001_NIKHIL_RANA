@@ -72,7 +72,7 @@ include 'includes/header.php';
         
         <!-- Sticky Sidebar Card -->
         <div style="flex: 1; background: var(--bg-card); color: var(--dark-color); border-radius: 8px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.2); position: sticky; top: 20px;">
-            <div style="height: 200px; background: url('assets/img/courses/<?php echo $course['thumbnail'] ?: 'default.jpg'; ?>') center/cover;" onerror="this.style.backgroundImage='url(https://via.placeholder.com/400x200)'">
+            <div style="height: 200px; background: url('https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&q=80&w=400') center/cover;" onerror="this.style.backgroundImage='url(https://via.placeholder.com/400x200)'">
                 <div style="width: 100%; height: 100%; background: rgba(0,0,0,0.3); display: flex; align-items: center; justify-content: center; cursor: pointer;">
                     <i class="fa fa-play-circle" style="font-size: 60px; color: white; opacity: 0.9;"></i>
                 </div>

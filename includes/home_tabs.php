@@ -31,7 +31,7 @@ foreach ($categories as $cat):
         foreach ($courses as $c): ?>
                 <div class="course-card-v2" style="display: flex; flex-direction: column; height: 100%;">
                     <a href="course_details.php?id=<?php echo $c['id']; ?>" style="text-decoration: none; color: inherit; display: flex; flex-direction: column; flex: 1;">
-                        <div class="thumb" style="background: url('assets/img/courses/<?php echo htmlspecialchars($c['thumbnail'] ?: 'default.jpg'); ?>') center/cover no-repeat; height: 145px; border-radius: 4px; border: 1px solid rgba(0,0,0,0.05);" onerror="this.style.backgroundImage='url(https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&q=80&w=400)'"></div>
+                        <div class="thumb" style="background: url('https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&q=80&w=400') center/cover no-repeat; height: 145px; border-radius: 4px; border: 1px solid rgba(0,0,0,0.05);" onerror="this.style.backgroundImage='url(https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&q=80&w=400)'"></div>
                         <h4 style="font-size: 16px; font-weight: 800; margin: 10px 0 5px; line-height: 1.4; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; height: 44px;"><?php echo htmlspecialchars($c['title']); ?></h4>
                         <div class="instructor" style="font-size: 12px; color: #6a6f73; margin-bottom: 5px;"><?php echo htmlspecialchars($c['instructor_name']); ?></div>
                         <div class="rating" style="display: flex; align-items: center; gap: 4px; font-weight: 700; font-size: 14px; color: #b4690e;">

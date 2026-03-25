@@ -21,6 +21,30 @@ if (!empty($search_query)) {
     $page_title = "Results for \"" . htmlspecialchars($search_query) . "\"";
 }
 
+// Pagination logic
+$limit = 10;
+$page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
+if ($page < 1)
+    $page = 1;
+$offset = ($page - 1) * $limit;
+
+// Count Total Records for Pagination
+$count_sql = "SELECT COUNT(*) FROM courses c WHERE c.status = 'published'";
+$count_params = [];
+if (!empty($search_query)) {
+    $count_sql .= " AND (c.title LIKE ? OR c.description LIKE ?)";
+    $count_params[] = '%' . $search_query . '%';
+    $count_params[] = '%' . $search_query . '%';
+}
+if ($category_slug !== 'all') {
+    $count_sql .= " AND c.category_id = (SELECT id FROM categories WHERE slug = ?)";
+    $count_params[] = $category_slug;
+}
+$stmt = $pdo->prepare($count_sql);
+$stmt->execute($count_params);
+$total_records = $stmt->fetchColumn();
+$total_pages = ceil($total_records / $limit);
+
 // Build Dynamic Query
 $params = [];
 $sql = "SELECT c.*, u.full_name as instructor_name, 
@@ -40,7 +64,7 @@ if ($category_slug !== 'all') {
     $params[] = $category_slug;
 }
 
-$stmt = $pdo->prepare($sql);
+$stmt = $pdo->prepare($sql . " LIMIT $limit OFFSET $offset");
 $stmt->execute($params);
 $courses = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
@@ -98,7 +122,7 @@ else: ?>
                     <?php foreach ($courses as $c): ?>
                     <div class="course-horizontal-card" style="display: flex; cursor: default; background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 8px; overflow: hidden; margin-bottom: 20px; transition: transform 0.2s, box-shadow 0.2s;">
                         <a href="<?php echo $base_url; ?>course_details.php?id=<?php echo $c['id']; ?>" style="display: flex; flex: 1; text-decoration: none; color: inherit;">
-                            <div class="card-thumb" style="width: 260px; flex-shrink: 0; background: url('<?php echo $base_url; ?>assets/img/courses/<?php echo htmlspecialchars($c['thumbnail'] ?: 'default.jpg'); ?>') center/cover;" onerror="this.style.backgroundImage='url(https://via.placeholder.com/260x145)'">
+                            <div class="card-thumb" style="width: 260px; flex-shrink: 0; background: url('https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&q=80&w=400') center/cover;" onerror="this.style.backgroundImage='url(https://via.placeholder.com/260x145)'">
                             </div>
                             <div class="card-info" style="flex: 1; padding: 15px 20px; display: flex; flex-direction: column;">
                                 <h3 style="font-size: 18px; font-weight: 800; margin-bottom: 5px;"><?php echo htmlspecialchars($c['title']); ?></h3>
@@ -128,6 +152,46 @@ else: ?>
                 <?php
 endif; ?>
             </div>
+
+            <!-- Pagination Controls -->
+            <?php if ($total_pages > 1): ?>
+            <div style="display: flex; justify-content: center; align-items: center; gap: 15px; margin-top: 40px; margin-bottom: 20px;">
+                <?php if ($page > 1): ?>
+                    <a href="?page=<?php echo $page - 1; ?>&category=<?php echo urlencode($category_slug); ?>&search=<?php echo urlencode($search_query); ?>" class="btn btn-secondary" style="padding: 10px 20px; font-weight: 700; border-radius: 8px;">
+                        <i class="fa fa-chevron-left" style="margin-right: 8px;"></i> Previous
+                    </a>
+                <?php
+    else: ?>
+                    <button class="btn btn-secondary" disabled style="padding: 10px 20px; font-weight: 700; border-radius: 8px; border: 1px solid var(--border-color); opacity: 0.5; cursor: not-allowed;">
+                        <i class="fa fa-chevron-left" style="margin-right: 8px;"></i> Previous
+                    </button>
+                <?php
+    endif; ?>
+
+                <div style="display: flex; gap: 8px; align-items: center;">
+                    <?php for ($i = 1; $i <= $total_pages; $i++): ?>
+                        <a href="?page=<?php echo $i; ?>&category=<?php echo urlencode($category_slug); ?>&search=<?php echo urlencode($search_query); ?>" 
+                           style="width: 38px; height: 38px; display: flex; align-items: center; justify-content: center; text-decoration: none; border-radius: 50%; border: 1px solid <?php echo $i == $page ? 'var(--primary-color)' : 'var(--border-color)'; ?>; background: <?php echo $i == $page ? 'var(--primary-color)' : 'transparent'; ?>; color: <?php echo $i == $page ? 'white' : 'var(--dark-color)'; ?>; font-weight: 700; transition: all 0.2s;">
+                            <?php echo $i; ?>
+                        </a>
+                    <?php
+    endfor; ?>
+                </div>
+
+                <?php if ($page < $total_pages): ?>
+                    <a href="?page=<?php echo $page + 1; ?>&category=<?php echo urlencode($category_slug); ?>&search=<?php echo urlencode($search_query); ?>" class="btn btn-secondary" style="padding: 10px 20px; font-weight: 700; border-radius: 8px;">
+                        Next <i class="fa fa-chevron-right" style="margin-left: 8px;"></i>
+                    </a>
+                <?php
+    else: ?>
+                    <button class="btn btn-secondary" disabled style="padding: 10px 20px; font-weight: 700; border-radius: 8px; border: 1px solid var(--border-color); opacity: 0.5; cursor: not-allowed;">
+                        Next <i class="fa fa-chevron-right" style="margin-left: 8px;"></i>
+                    </button>
+                <?php
+    endif; ?>
+            </div>
+            <?php
+endif; ?>
         </div>
     </div>
 </div>

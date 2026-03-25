@@ -131,7 +131,7 @@ else: ?>
         endif; ?>
                     
                     <div style="position: relative; height: 160px; overflow: hidden; border-radius: 8px 8px 0 0;">
-                        <img src="../../assets/img/courses/<?php echo $course['thumbnail'] ?: 'default.jpg'; ?>" style="width: 100%; height: 100%; object-fit: cover; transition: transform 0.5s; <?php echo $is_locked ? 'filter: grayscale(0.5) blur(2px);' : ''; ?>" onerror="this.src='https://images.unsplash.com/photo-1498050108023-c5249f4df085?auto=format&fit=crop&w=400&q=80'">
+                        <img src="https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&q=80&w=400" style="width: 100%; height: 100%; object-fit: cover; transition: transform 0.5s; <?php echo $is_locked ? 'filter: grayscale(0.5) blur(2px);' : ''; ?>" onerror="this.src='https://images.unsplash.com/photo-1498050108023-c5249f4df085?auto=format&fit=crop&w=400&q=80'">
                         <div style="position: absolute; top: 12px; right: 12px; background: <?php echo $is_locked ? '#ff8a00' : '#2ecc71'; ?>; color: white; padding: 5px 12px; border-radius: 4px; font-size: 10px; font-weight: 800; text-transform: uppercase; z-index: 3; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
                             <?php echo $is_locked ? 'Locked' : 'Free'; ?>
                         </div>
@@ -146,7 +146,7 @@ else: ?>
                             <div style="margin-bottom: 20px; padding: 12px; background: #fffcf0; border: 1px solid #feeac1; border-radius: 8px; font-size: 12px; color: #b4690e; font-weight: 700; display: flex; align-items: center; gap: 8px;">
                                 <i class="fa fa-shopping-cart"></i> Single purchase required
                             </div>
-                            <a href="../../checkout.php?id=<?php echo $course['course_id']; ?>" class="btn btn-primary" style="width: 100%; padding: 12px; font-weight: 800; background: #1c1d1f; color: white; border: none; border-radius: 8px;"><i class="fa fa-lock-open" style="margin-right: 6px;"></i>Unlock for $<?php echo number_format($course['price'], 2); ?></a>
+                            <a href="../../checkout_subscription.php" class="btn btn-primary" style="width: 100%; padding: 12px; font-weight: 800; background: #1c1d1f; color: white; border: none; border-radius: 8px;"><i class="fa fa-lock-open" style="margin-right: 6px;"></i>Unlock for $<?php echo number_format($course['price'], 2); ?></a>
                         <?php
         else: ?>
                             <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; font-size: 12px; font-weight: 700; color: #1c1d1f;">
@@ -155,7 +155,7 @@ else: ?>
                             <div class="premium-progress" style="margin: 0 0 20px 0; height: 6px; background: #d1d7dc;">
                                 <div class="premium-progress-bar" style="width: <?php echo $course['progress_percent']; ?>%; height: 100%;"></div>
                             </div>
-                            <a href="player.php?course_id=<?php echo $course['id']; ?>" class="btn btn-secondary" style="width: 100%; padding: 12px; font-weight: 800; border-radius: 8px;">View Course</a>
+                            <a href="../../ai_fundamentals.php" class="btn btn-secondary" style="width: 100%; padding: 12px; font-weight: 800; border-radius: 8px;">View Course</a>
                         <?php
         endif; ?>
                     </div>
