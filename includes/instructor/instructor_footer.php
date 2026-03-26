@@ -1,7 +1,11 @@
-        </div> <!-- End .portal-content -->
-    </main> <!-- End .portal-main -->
+            </div> <!-- End .portal-content -->
+        </main> <!-- End .portal-main -->
 </div> <!-- End .admin-shell -->
 
+<!-- Toast Container -->
+<div id="toast-container"></div>
+
+<script src="<?php echo $root; ?>assets/js/notifications.js" defer></script>
 <script>
     document.addEventListener('DOMContentLoaded', () => {
         // Initial Theme Icon Set
@@ -11,8 +15,6 @@
             icon.className = 'fas fa-sun';
         }
     });
-
-    // Sidebar Active State styling is handled by CSS (inheriting from admin.css)
 </script>
 
 </body>

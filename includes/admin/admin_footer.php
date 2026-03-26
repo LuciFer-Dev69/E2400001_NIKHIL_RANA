@@ -2,6 +2,11 @@
     </main> <!-- End .portal-main -->
 </div> <!-- End .admin-shell -->
 
+<!-- Toast Container -->
+<div id="toast-container"></div>
+
+<script src="<?php echo $root; ?>assets/js/notifications.js" defer></script>
+
 <script>
     document.addEventListener('DOMContentLoaded', () => {
         // Handle User Menu Popover

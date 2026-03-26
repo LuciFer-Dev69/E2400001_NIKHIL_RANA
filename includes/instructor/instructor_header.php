@@ -156,12 +156,8 @@ $initials = substr($initials, 0, 2);
     </aside>
 
     <!-- MAIN CONTENT -->
-    </main>
-</div>
-
-<!-- Toast Container -->
-<div id="toast-container"></div>
-
-<script src="<?php echo $root; ?>assets/js/notifications.js" defer></script>
-</body>
-</html>
+    <main class="admin-main">
+        <div class="admin-content">
+<?php
+// Page content follows...
+?>
