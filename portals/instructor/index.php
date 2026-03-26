@@ -7,15 +7,23 @@ $page_title = 'Instructor Dashboard';
 include '../../includes/instructor/instructor_header.php';
 
 $inst_id = $_SESSION['user_id'];
-
-    // Data is now handled by api/instructor_analytics.php via instructor_analytics.js
-}
-catch (PDOException $e) {
-    die("Database Error.");
-}
 ?>
-
 <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 30px;">
+    <div>
+        <h1 style="font-size: 28px; font-weight: 800; color: var(--dark-color); margin-bottom: 8px;">Welcome back, <?php echo htmlspecialchars($_SESSION['full_name']); ?>!</h1>
+        <p style="color: var(--gray-color); font-size: 15px;">Here is your Creator Analytics overview for today.</p>
+    </div>
+    <div>
+        <a href="create_course.php" class="btn btn-primary" style="padding: 10px 20px; font-weight: 700; background: #9b59b6; border-color: #9b59b6;">
+            <i class="fa fa-magic" style="margin-right: 8px;"></i> Create New Course
+        </a>
+    </div>
+</div>
+
+<!-- STAT CARDS -->
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 20px; margin-bottom: 40px;">
+    <div style="background: var(--bg-card); padding: 25px; border-radius: 12px; border: 1px solid var(--border-color); box-shadow: var(--shadow);">
+        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 15px;">
     <div>
         <h1 style="font-size: 28px; font-weight: 800; color: var(--dark-color); margin-bottom: 8px;">Welcome back, <?php echo htmlspecialchars($_SESSION['full_name']); ?>!</h1>
         <p style="color: var(--gray-color); font-size: 15px;">Here is your Creator Analytics overview for today.</p>
