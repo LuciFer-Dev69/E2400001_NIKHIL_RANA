@@ -216,6 +216,6 @@ class InstructorAnalytics {
 // Global initialization
 document.addEventListener('DOMContentLoaded', () => {
     window.Analytics = new InstructorAnalytics({
-        baseUrl: window.SkillEduConfig.baseUrl
+        baseUrl: '../../'
     });
 });

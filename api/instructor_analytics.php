@@ -47,6 +47,7 @@ try {
 
         // Enrollment Trends (7 days)
         $trends = [];
+        $total_trend_count = 0;
         for ($i = 6; $i >= 0; $i--) {
             $date = date('Y-m-d', strtotime("-$i days"));
             $label = date('D', strtotime($date));
@@ -55,7 +56,17 @@ try {
             $stmt->execute([$inst_id, $date]);
             $count = (int)$stmt->fetchColumn();
 
+            $total_trend_count += $count;
             $trends[] = ['label' => $label, 'value' => $count];
+        }
+
+        // If no data exists, provide an empty state so the graph still draws its axes
+        if ($total_trend_count === 0) {
+            $trends = [];
+            for ($i = 6; $i >= 0; $i--) {
+                $label = date('D', strtotime("-$i days"));
+                $trends[] = ['label' => $label, 'value' => 0]; // Empty data line
+            }
         }
 
         // Student Distribution by Course
