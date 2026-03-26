@@ -544,3 +544,5 @@ function h($str)
         });
     });
 </script>
+
+<?php include '../../includes/portal_footer.php'; ?>

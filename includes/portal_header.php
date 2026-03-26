@@ -193,12 +193,4 @@ endif; ?>
 <?php
 // Page content follows...
 ?>
-    </main>
-</div>
 
-<!-- Toast Container -->
-<div id="toast-container"></div>
-
-<script src="<?php echo $root; ?>assets/js/notifications.js" defer></script>
-</body>
-</html>
