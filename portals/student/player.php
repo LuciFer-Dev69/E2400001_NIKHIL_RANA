@@ -1,612 +1,307 @@
 <?php
-require_once '../../config/db.php';
+require_once __DIR__ . '/../../config/db.php';
 session_start();
 
-// 1. Authentication Check
 if (!isset($_SESSION['user_id'])) {
     header("Location: ../../login.php");
     exit();
 }
 
-$user_id = $_SESSION['user_id'];
 $course_id = isset($_GET['course_id']) ? (int)$_GET['course_id'] : 0;
+$lesson_id = isset($_GET['lesson_id']) ? (int)$_GET['lesson_id'] : 0;
 
 if (!$course_id) {
-    echo "No course selected.";
+    header("Location: courses.php");
     exit();
 }
 
-// 2. Enrollment Verification
-try {
-    $stmt = $pdo->prepare("SELECT * FROM enrollments WHERE student_id = ? AND course_id = ?");
-    $stmt->execute([$user_id, $course_id]);
-    $enrollment = $stmt->fetch();
+// Check Subscription/Enrollment
+$is_authorized = false;
+$user_id = $_SESSION['user_id'];
 
-    if (!$enrollment) {
-        echo "You are not enrolled in this course.";
-        exit();
-    }
+// Check for direct enrollment or active subscription
+$stmt = $pdo->prepare("SELECT id FROM enrollments WHERE student_id = ? AND course_id = ?");
+$stmt->execute([$user_id, $course_id]);
+if ($stmt->fetch())
+    $is_authorized = true;
 
-    // 3. Fetch Course & Instructor
-    $stmt = $pdo->prepare("
-        SELECT c.*, u.full_name as instructor_name 
-        FROM courses c 
-        JOIN users u ON c.instructor_id = u.id 
-        WHERE c.id = ?
-    ");
-    $stmt->execute([$course_id]);
-    $course = $stmt->fetch();
+if (!$is_authorized) {
+    $stmt = $pdo->prepare("SELECT id FROM user_subscriptions WHERE user_id = ? AND status = 'active' AND (expires_at IS NULL OR expires_at > NOW())");
+    $stmt->execute([$user_id]);
+    if ($stmt->fetch())
+        $is_authorized = true;
+}
 
-    // 4. Fetch Lessons
-    $stmt = $pdo->prepare("SELECT * FROM lessons WHERE course_id = ? ORDER BY order_num ASC");
-    $stmt->execute([$course_id]);
-    $lessons = $stmt->fetchAll();
+if (!$is_authorized) {
+    header("Location: ../../course_details.php?id=$course_id&error=not_authorized");
+    exit();
+}
 
-    if (empty($lessons)) {
-        echo "No lessons found for this course.";
-        exit();
-    }
+// Fetch Course & Lessons
+$stmt = $pdo->prepare("SELECT title FROM courses WHERE id = ?");
+$stmt->execute([$course_id]);
+$course = $stmt->fetch();
 
-    // 5. Fetch Progress
-    $stmt = $pdo->prepare("SELECT lesson_id, status, last_watched_time FROM user_lesson_progress WHERE user_id = ? AND course_id = ?");
-    $stmt->execute([$user_id, $course_id]);
-    $progress_data_raw = $stmt->fetchAll(PDO::FETCH_ASSOC);
-    $progress_data = [];
-    $timestamps = [];
-    foreach ($progress_data_raw as $row) {
-        $progress_data[$row['lesson_id']] = $row['status'];
-        $timestamps[$row['lesson_id']] = $row['last_watched_time'];
-    }
+$stmt = $pdo->prepare("SELECT * FROM sections WHERE course_id = ? ORDER BY order_num ASC");
+$stmt->execute([$course_id]);
+$sections = $stmt->fetchAll();
 
-    // 6. Identify Current Lesson
-    $current_lesson_id = isset($_GET['lesson_id']) ? (int)$_GET['lesson_id'] : $lessons[0]['id'];
-    $current_lesson = null;
-    foreach ($lessons as $lesson) {
-        if ($lesson['id'] == $current_lesson_id) {
-            $current_lesson = $lesson;
+$stmt = $pdo->prepare("SELECT * FROM lessons WHERE course_id = ? ORDER BY order_num ASC");
+$stmt->execute([$course_id]);
+$lessons = $stmt->fetchAll();
+
+// Group lessons
+$grouped_lessons = [];
+foreach ($lessons as $lesson) {
+    $sid = $lesson['section_id'] ?: 0;
+    $grouped_lessons[$sid][] = $lesson;
+}
+
+if (empty($sections)) {
+    $sections = [['id' => 0, 'title' => 'Course Content']];
+}
+
+// Current Lesson
+$current_lesson = null;
+if ($lesson_id) {
+    foreach ($lessons as $l) {
+        if ($l['id'] == $lesson_id) {
+            $current_lesson = $l;
             break;
         }
     }
-    if (!$current_lesson)
-        $current_lesson = $lessons[0];
-
-    // 7. Fetch Notes for current lesson
-    $stmt = $pdo->prepare("SELECT * FROM user_notes WHERE user_id = ? AND lesson_id = ? ORDER BY created_at DESC");
-    $stmt->execute([$user_id, $current_lesson_id]);
-    $notes = $stmt->fetchAll();
-
 }
-catch (PDOException $e) {
-    die("Database error: " . $e->getMessage());
+if (!$current_lesson && !empty($lessons)) {
+    $current_lesson = $lessons[0];
 }
 
-$root = "../../";
-$page_title = 'Learning Player';
-include '../../includes/portal_header.php';
+$page_title = $course['title'] . " | Player";
 ?>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><?php echo $page_title; ?></title>
+    <link rel="stylesheet" href="../../assets/css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --player-bg: #1c1d1f;
+            --sidebar-bg: #fff;
+            --accent: #d6293e; /* Consistent Red Theme */
+        }
+        body {
+            margin: 0;
+            padding: 0;
+            background: #000;
+            font-family: 'Inter', sans-serif;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+        }
+        .player-header {
+            height: 56px;
+            background: var(--player-bg);
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            display: flex;
+            align-items: center;
+            padding: 0 20px;
+            color: #fff;
+            justify-content: space-between;
+            z-index: 100;
+        }
+        .player-main {
+            display: flex;
+            flex: 1;
+            overflow: hidden;
+        }
+        .video-content {
+            flex: 1;
+            background: #000;
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto;
+        }
+        .video-wrapper {
+            width: 100%;
+            aspect-ratio: 16/9;
+            background: #000;
+            position: sticky;
+            top: 0;
+        }
+        .video-wrapper video {
+            width: 100%;
+            height: 100%;
+        }
+        .lesson-info {
+            padding: 30px 40px;
+            color: #fff;
+            background: #1c1d1f;
+        }
+        .player-sidebar {
+            width: 350px;
+            background: var(--sidebar-bg);
+            border-left: 1px solid #d1d7dc;
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto;
+        }
+        .sidebar-header {
+            padding: 15px 20px;
+            border-bottom: 1px solid #d1d7dc;
+            font-weight: 700;
+            color: #1c1d1f;
+        }
+        .accordion-item {
+            border-bottom: 1px solid #d1d7dc;
+        }
+        .accordion-header {
+            padding: 15px 20px;
+            background: #f7f9fa;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 14px;
+            font-weight: 700;
+        }
+        .accordion-body {
+            display: none;
+        }
+        .lesson-link {
+            padding: 12px 20px;
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            text-decoration: none;
+            color: #1c1d1f;
+            font-size: 13px;
+            transition: background 0.2s;
+        }
+        .lesson-link:hover {
+            background: #f7f9fa;
+        }
+        .lesson-link.active {
+            background: #e4e6e7;
+        }
+        .lesson-link i {
+            margin-top: 3px;
+            color: #6a6f73;
+        }
+        .lesson-link.active i {
+            color: var(--accent);
+        }
+        @media (max-width: 991px) {
+            .player-main {
+                flex-direction: column;
+            }
+            .player-sidebar {
+                width: 100%;
+                border-left: none;
+                border-top: 1px solid #d1d7dc;
+                height: 400px;
+                flex: none;
+            }
+            body {
+                overflow: auto;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="player-header">
+        <div style="display: flex; align-items: center; gap: 20px;">
+            <a href="index.php" style="color: #fff; text-decoration: none; font-size: 20px;"><i class="fa fa-times"></i></a>
+            <div style="border-left: 1px solid rgba(255,255,255,0.2); padding-left: 20px;">
+                <h4 style="margin: 0; font-size: 14px;"><?php echo htmlspecialchars($course['title']); ?></h4>
+            </div>
+        </div>
+        <div>
+            <button style="background: var(--accent); color: white; border: none; padding: 8px 16px; border-radius: 4px; font-weight: 700; cursor: pointer;">Share <i class="fa fa-share"></i></button>
+        </div>
+    </header>
 
-
-<div class="player-container">
-        <!-- Main Content Area -->
-        <main class="player-main">
-            <div class="video-section">
-                <!-- If it's a video lesson -->
-                <?php if ($current_lesson['video_url']): ?>
-                    <div style="background: #000; width: 100%; aspect-ratio: 16/9; position: relative;">
-                        <!-- Assuming the URL is a filename we serve, or an external link -->
-                        <?php if (strpos($current_lesson['video_url'], 'http') === 0): ?>
-                            <!-- External video/iframe fallback. E.g YouTube. -->
-                            <iframe id="course-iframe" src="<?php echo $current_lesson['video_url']; ?>" style="width: 100%; height: 100%; border: none;" allowfullscreen></iframe>
-                        <?php
-    else: ?>
-                            <!-- Better to use HTML5 video for local files so we can track timestamp -->
-                            <video id="course-video" src="../../assets/videos/<?php echo $current_lesson['video_url']; ?>" controls style="width: 100%; height: 100%;" preload="metadata"></video>
-                        <?php
-    endif; ?>
-                    </div>
-                <!-- Placeholder for non-video content -->
+    <div class="player-main">
+        <div class="video-content">
+            <div class="video-wrapper">
+                <?php if ($current_lesson): ?>
+                    <video id="mainPlayer" controls poster="https://pagedone.io/asset/uploads/1705386154.png">
+                        <source src="<?php echo htmlspecialchars($current_lesson['video_url'] ?: 'https://www.w3schools.com/html/mov_bbb.mp4'); ?>" type="video/mp4">
+                        Your browser does not support the video tag.
+                    </video>
                 <?php
 else: ?>
-                    <div style="padding: 60px; color: var(--dark-color); background: var(--bg-card); width: 100%; height: 100%; overflow-y: auto;">
-                        <h1><?php echo $current_lesson['title']; ?></h1>
-                        <p>This is a text-based lesson content.</p>
+                    <div style="height: 100%; display: flex; align-items: center; justify-content: center; color: #fff;">
+                        No video found for this lesson.
                     </div>
                 <?php
 endif; ?>
             </div>
-
-            <!-- Learning Tools Tabs -->
-            <div class="player-tabs-container">
-                <div class="player-tabs">
-                    <div class="player-tab active">Overview</div>
-                    <div class="player-tab">Notes</div>
-                    <div class="player-tab">Q&A</div>
-                    <div class="player-tab">Resources</div>
+            <div class="lesson-info">
+                <h1 style="font-size: 24px; margin-bottom: 20px;"><?php echo htmlspecialchars($current_lesson['title']); ?></h1>
+                <div style="display: flex; gap: 30px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 10px; margin-bottom: 20px;">
+                    <a href="#" style="color: #fff; text-decoration: none; font-weight: 700; border-bottom: 3px solid #fff; padding-bottom: 8px;">Overview</a>
+                    <a href="#" style="color: #d1d7dc; text-decoration: none;">Notes</a>
+                    <a href="#" style="color: #d1d7dc; text-decoration: none;">Announcements</a>
+                    <a href="#" style="color: #d1d7dc; text-decoration: none;">Reviews</a>
                 </div>
-                
-                <div class="tab-content" id="tab-overview" style="padding-top: 25px;">
-                    <h2 style="font-size: 24px; margin-bottom: 15px; color: var(--dark-color);">About this lecture</h2>
-                    <p style="color: var(--dark-color); line-height: 1.6; opacity: 0.9;">
-                        This lecture covers the fundamental concepts of <?php echo $current_lesson['title']; ?>. 
-                    </p>
-                    
-                    <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid var(--border-color);">
-                        <h3 style="font-size: 18px; margin-bottom: 10px; color: var(--dark-color);">How are you liking the course?</h3>
-                        <p style="color: var(--gray-color); font-size: 14px; margin-bottom: 15px;">Your feedback helps the instructor improve and helps other students choose the right course.</p>
-                        <button onclick="document.getElementById('review-modal').style.display='flex'" class="btn btn-secondary" style="border: 1px solid var(--dark-color); color: var(--dark-color);"><i class="fa fa-star"></i> Leave a Review</button>
-                    </div>
-                </div>
-
-                <div class="tab-content" id="tab-notes" style="padding-top: 25px; display: none;">
-                    <h2 style="font-size: 24px; margin-bottom: 15px; color: var(--dark-color);">Create a new note</h2>
-                    <div style="margin-bottom: 20px;">
-                        <textarea id="note-input" style="width: 100%; height: 100px; padding: 15px; border: 1px solid var(--border-color); border-radius: 4px; font-family: inherit; background: var(--light-gray); color: var(--dark-color);" placeholder="Type your note here..."></textarea>
-                        <button id="save-note-btn" class="btn btn-secondary" style="margin-top: 10px; background: var(--dark-color); color: var(--white);">Save note</button>
-                    </div>
-                    <div id="notes-list">
-                        <h4 style="margin-bottom: 15px;">Your notes</h4>
-                        <?php if (empty($notes)): ?>
-                            <p id="no-notes-msg" style="color: var(--gray-color); font-style: italic;">No notes yet for this lecture.</p>
-                        <?php
-else: ?>
-                            <?php foreach ($notes as $note): ?>
-                                <div class="note-item" style="padding: 15px; background: var(--light-gray); border-radius: 4px; margin-bottom: 10px; border-left: 4px solid var(--primary-color);">
-                                    <div style="font-size: 12px; color: var(--gray-color); margin-bottom: 5px;">
-                                        <?php echo date('M d, Y', strtotime($note['created_at'])); ?> 
-                                        <?php if ($note['video_timestamp']): ?> 
-                                            at <?php echo floor($note['video_timestamp'] / 60); ?>:<?php echo sprintf('%02d', $note['video_timestamp'] % 60); ?>
-                                        <?php
-        endif; ?>
-                                    </div>
-                                    <div style="font-size: 14px; line-height: 1.5; color: var(--dark-color);"><?php echo nl2br(htmlspecialchars($note['note_text'])); ?></div>
-                                </div>
-                            <?php
-    endforeach; ?>
-                        <?php
-endif; ?>
-                    </div>
-                </div>
-
-                <div class="tab-content" id="tab-qa" style="padding-top: 25px; display: none;">
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-                        <h2 style="font-size: 24px;">Questions in this course</h2>
-                        <button id="ask-qt-btn" class="btn btn-secondary" style="border: 1px solid #1c1d1f; height: 40px;">Ask a new question</button>
-                    </div>
-
-                    <div id="ask-qt-form" style="display: none; margin-bottom: 25px; background: var(--light-gray); padding: 20px; border-radius: 8px; border: 1px solid var(--border-color);">
-                        <h4 style="margin-bottom: 15px; font-size: 16px; color: var(--dark-color);">Ask a question</h4>
-                        <textarea id="qt-input" style="width: 100%; height: 80px; padding: 12px; border: 1px solid var(--border-color); border-radius: 4px; font-family: inherit; margin-bottom: 15px; font-size: 14px; background: var(--bg-card); color: var(--dark-color);" placeholder="What do you want to ask about this specific lecture?"></textarea>
-                        <div style="display: flex; gap: 10px;">
-                            <button id="submit-qt-btn" class="btn btn-primary" style="background: var(--dark-color); color: var(--white);">Post Question</button>
-                            <button id="cancel-qt-btn" class="btn btn-secondary">Cancel</button>
-                        </div>
-                    </div>
-
-                    <div id="qa-list">
-                        <div class="qa-placeholder">
-                            <p style="color: var(--gray-color); font-style: italic;">Loading questions...</p>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="tab-content" id="tab-resources" style="padding-top: 25px; display: none;">
-                    <h2 style="font-size: 24px; margin-bottom: 15px; color: var(--dark-color);">Resources</h2>
-                    <div class="resource-list">
-                        <div style="display: flex; align-items: center; justify-content: space-between; padding: 15px; border: 1px solid var(--border-color); border-radius: 4px; margin-bottom: 10px;">
-                            <div style="display: flex; align-items: center; gap: 12px;">
-                                <i class="fa fa-file-pdf" style="color: #ff3c3c; font-size: 20px;"></i>
-                                <span style="font-weight: 700; color: var(--dark-color);">Lecture Slides.pdf</span>
-                            </div>
-                            <a href="#" class="btn btn-secondary" style="padding: 6px 15px; font-size: 13px;">Download</a>
-                        </div>
-                    </div>
-                </div>
+                <p style="color: #d1d7dc; line-height: 1.6;">Welcome to this lesson on <?php echo htmlspecialchars($current_lesson['title']); ?>. In this module, we will explore the core concepts and practical applications of the subject.</p>
             </div>
-        </main>
+        </div>
 
-        <!-- Curriculum Sidebar -->
         <aside class="player-sidebar">
-            <div class="curriculum-header">
-                Course content
-            </div>
-            
-            <div class="curriculum-sections">
-                <!-- Section 1 (Static for now) -->
-                <div class="curriculum-section">
-                    <div class="curriculum-section-title">
-                        <span>Section 1: Introduction</span>
-                        <i class="fa fa-chevron-down"></i>
+            <div class="sidebar-header">Course content</div>
+            <?php foreach ($sections as $idx => $section): ?>
+                <div class="accordion-item">
+                    <div class="accordion-header" onclick="toggleAccordion(this)">
+                        <div style="display: flex; flex-direction: column;">
+                            <span>Section <?php echo $idx + 1; ?>: <?php echo htmlspecialchars($section['title']); ?></span>
+                            <span style="font-size: 11px; color: #6a6f73; margin-top: 4px;">0 / <?php echo count($grouped_lessons[$section['id']] ?? []); ?> | <?php
+    $sec_mins = array_sum(array_column($grouped_lessons[$section['id']] ?? [], 'duration_mins'));
+    echo $sec_mins; ?>min
+                            </span>
+                        </div>
+                        <i class="fa fa-chevron-up"></i>
                     </div>
-                    
-                    <div class="lecture-list">
-                        <?php foreach ($lessons as $lesson): ?>
-                            <?php
-    $is_active = $lesson['id'] == $current_lesson_id;
-    $status = $progress_data[$lesson['id']] ?? 'not_started';
+                    <div class="accordion-body" style="display: block;">
+                        <?php
+    $sec_lessons = $grouped_lessons[$section['id']] ?? [];
+    foreach ($sec_lessons as $lesson):
+        $active = ($lesson['id'] == $current_lesson['id']) ? 'active' : '';
 ?>
-                            <a href="?course_id=<?php echo $course_id; ?>&lesson_id=<?php echo $lesson['id']; ?>" class="lecture-item <?php echo $is_active ? 'active' : ''; ?>">
-                                <div class="check-circle <?php echo $status == 'completed' ? 'completed' : ''; ?>">
-                                    <?php if ($status == 'completed')
-        echo '<i class="fa fa-check"></i>'; ?>
-                                </div>
-                                <div class="lecture-info">
-                                    <h4 style="font-weight: <?php echo $is_active ? '700' : '400'; ?>;">
-                                        <?php echo $lesson['order_num']; ?>. <?php echo $lesson['title']; ?>
-                                    </h4>
-                                    <div class="lecture-meta">
-                                        <i class="fa fa-play-circle" style="font-size: 11px;"></i>
-                                        <span><?php echo $lesson['duration_mins']; ?>min</span>
-                                    </div>
+                            <a href="?course_id=<?php echo $course_id; ?>&lesson_id=<?php echo $lesson['id']; ?>" class="lesson-link <?php echo $active; ?>">
+                                <input type="checkbox" style="margin-top: 4px;">
+                                <div style="display: flex; flex-direction: column;">
+                                    <span style="margin-bottom: 5px;"><?php echo htmlspecialchars($lesson['title']); ?></span>
+                                    <span style="font-size: 11px; color: #6a6f73;"><i class="fa fa-play-circle"></i> <?php echo $lesson['duration_mins']; ?>min</span>
                                 </div>
                             </a>
                         <?php
-endforeach; ?>
+    endforeach; ?>
                     </div>
                 </div>
-            </div>
+            <?php
+endforeach; ?>
         </aside>
     </div>
 
     <script>
-        function updateProgress(lessonId, status, watchedTime = 0) {
-            const courseId = <?php echo $course_id; ?>;
+        function toggleAccordion(header) {
+            const body = header.nextElementSibling;
+            const icon = header.querySelector('i');
             
-            fetch('api/update_progress.php', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    lesson_id: lessonId,
-                    course_id: courseId,
-                    status: status,
-                    watched_time: watchedTime
-                })
-            })
-            .then(res => res.json())
-            .then(data => {
-                if (data.success && status === 'completed') {
-                    console.log('Progress updated:', data.progress_percent + '%');
-                    const progressEl = document.querySelector('.progress-text-header');
-                    if (progressEl) progressEl.innerText = 'Your progress: ' + data.progress_percent + '%';
-                }
-            })
-            .catch(err => console.error('Error updating progress:', err));
-        }
-
-        // --- Resume & Timestamp Logic ---
-        const video = document.getElementById('course-video');
-        const savedTime = <?php echo isset($timestamps[$current_lesson_id]) ? (int)$timestamps[$current_lesson_id] : 0; ?>;
-        const lessonIdNum = <?php echo $current_lesson_id; ?>;
-        
-        if (video) {
-            // Restore timestamp once metadata is loaded
-            video.addEventListener('loadedmetadata', () => {
-                if(savedTime > 0 && savedTime < video.duration) {
-                    video.currentTime = savedTime;
-                    console.log('Resumed from timestamp:', savedTime);
-                }
-            });
-
-            // Sync progress every 5 seconds
-            setInterval(() => {
-                if (!video.paused && !video.ended) {
-                    updateProgress(lessonIdNum, 'started', Math.floor(video.currentTime));
-                }
-            }, 5000);
-
-            // Mark completed when ended
-            video.addEventListener('ended', () => {
-                updateProgress(lessonIdNum, 'completed', Math.floor(video.duration));
-                // Find next lesson link and highlight or redirect
-                const activeItem = document.querySelector('.lecture-item.active');
-                if(activeItem && activeItem.nextElementSibling) {
-                    // Update checkmark visually
-                    activeItem.querySelector('.check-circle').classList.add('completed');
-                    activeItem.querySelector('.check-circle').innerHTML = '<i class="fa fa-check"></i>';
-                }
-            });
-        }
-
-        document.querySelectorAll('.check-circle').forEach(btn => {
-            btn.onclick = (e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                
-                const item = btn.closest('.lecture-item');
-                const lessonId = new URL(item.href).searchParams.get('lesson_id');
-                const isCompleted = btn.classList.contains('completed');
-                const newStatus = isCompleted ? 'in_progress' : 'completed';
-
-                btn.classList.toggle('completed');
-                btn.innerHTML = btn.classList.contains('completed') ? '<i class="fa fa-check"></i>' : '';
-                
-                updateProgress(lessonId, newStatus);
+            if (body.style.display === 'block') {
+                body.style.display = 'none';
+                icon.classList.remove('fa-chevron-up');
+                icon.classList.add('fa-chevron-down');
+            } else {
+                body.style.display = 'block';
+                icon.classList.remove('fa-chevron-down');
+                icon.classList.add('fa-chevron-up');
             }
-        });
-
-        // Tab switching logic
-        let qaLoaded = false;
-        
-        function loadQA() {
-            const lessonId = <?php echo $current_lesson_id; ?>;
-            const qaList = document.getElementById('qa-list');
-            
-            fetch(`api/qa_system.php?action=get&lesson_id=${lessonId}`)
-            .then(res => res.json())
-            .then(data => {
-                if (data.success) {
-                    renderQA(data.questions);
-                }
-            })
-            .catch(err => {
-                qaList.innerHTML = '<p>Error loading questions.</p>';
-                console.error(err);
-            });
         }
-        
-        function renderQA(questions) {
-            const qaList = document.getElementById('qa-list');
-            if (questions.length === 0) {
-                qaList.innerHTML = `
-                    <div class="qa-placeholder" style="text-align: center; padding: 20px;">
-                        <p style="color: var(--gray-color); font-style: italic;">No questions have been asked yet for this lecture. Be the first!</p>
-                    </div>
-                `;
-                return;
-            }
-            
-            let html = '';
-            questions.forEach(q => {
-                html += `
-                    <div class="qa-item" style="padding: 15px; border: 1px solid var(--border-color); border-radius: 8px; margin-bottom: 15px;">
-                        <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
-                            <div style="font-weight: 700; font-size: 14px;">${q.user_name}</div>
-                            <div style="font-size: 12px; color: var(--gray-color);">${q.created_at}</div>
-                        </div>
-                        <p style="margin-bottom: 10px; font-size: 15px;">${q.question_text}</p>
-                        
-                        <div class="qa-answers" style="margin-left: 20px; padding-left: 15px; border-left: 2px solid var(--border-color);">
-                `;
-                if (q.answers.length > 0) {
-                    q.answers.forEach(a => {
-                        html += `
-                            <div style="margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--border-color);">
-                                <div style="display: flex; gap: 8px; margin-bottom: 5px; align-items: center;">
-                                    <span style="font-weight: 700; font-size: 13px;">${a.user_name}</span>
-                                    ${a.is_instructor == 1 ? '<span style="background: #2ecc71; color: white; padding: 2px 6px; border-radius: 4px; font-size: 10px; font-weight: 700;">Instructor</span>' : ''}
-                                    <span style="font-size: 11px; color: var(--gray-color);">${a.created_at}</span>
-                                </div>
-                                <p style="font-size: 14px;">${a.answer_text}</p>
-                            </div>
-                        `;
-                    });
-                } else {
-                    html += `<p style="font-size: 13px; color: var(--gray-color); font-style: italic; margin-top: 10px;">No answers yet.</p>`;
-                }
-                
-                html += `
-                        </div>
-                    </div>
-                `;
-            });
-            qaList.innerHTML = html;
-        }
-
-        document.querySelectorAll('.player-tab').forEach(tab => {
-            tab.onclick = () => {
-                document.querySelector('.player-tab.active').classList.remove('active');
-                tab.classList.add('active');
-                
-                // Hide all content
-                document.querySelectorAll('.tab-content').forEach(c => c.style.display = 'none');
-                
-                // Show selected content
-                const tabName = tab.innerText.toLowerCase();
-                if (tabName === 'overview') document.getElementById('tab-overview').style.display = 'block';
-                if (tabName === 'notes') document.getElementById('tab-notes').style.display = 'block';
-                if (tabName === 'q&a') {
-                    document.getElementById('tab-qa').style.display = 'block';
-                    if (!qaLoaded) {
-                        loadQA();
-                        qaLoaded = true;
-                    }
-                }
-                if (tabName === 'resources') document.getElementById('tab-resources').style.display = 'block';
-            }
-        });
-
-        document.getElementById('ask-qt-btn').onclick = () => {
-            document.getElementById('ask-qt-form').style.display = 'block';
-            document.getElementById('ask-qt-btn').style.display = 'none';
-        };
-        
-        document.getElementById('cancel-qt-btn').onclick = () => {
-             document.getElementById('ask-qt-form').style.display = 'none';
-             document.getElementById('ask-qt-btn').style.display = 'block';
-             document.getElementById('qt-input').value = '';
-        };
-        
-        document.getElementById('submit-qt-btn').onclick = () => {
-            const btn = document.getElementById('submit-qt-btn');
-            const qtText = document.getElementById('qt-input').value;
-            const lessonId = <?php echo $current_lesson_id; ?>;
-            const courseId = <?php echo $course_id; ?>;
-            
-            if (!qtText.trim()) return;
-            
-            btn.disabled = true;
-            btn.innerText = 'Posting...';
-            
-            fetch('api/qa_system.php', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ action: 'ask', course_id: courseId, lesson_id: lessonId, question_text: qtText })
-            })
-            .then(res => res.json())
-            .then(data => {
-                if (data.success) {
-                    document.getElementById('qt-input').value = '';
-                    document.getElementById('ask-qt-form').style.display = 'none';
-                    document.getElementById('ask-qt-btn').style.display = 'block';
-                    loadQA(); // reload list
-                }
-                btn.disabled = false;
-                btn.innerText = 'Post Question';
-            })
-            .catch(err => {
-                console.error(err);
-                btn.disabled = false;
-                btn.innerText = 'Post Question';
-            });
-        };
-
-
-        document.getElementById('save-note-btn').onclick = () => {
-            const btn = document.getElementById('save-note-btn');
-            const noteText = document.getElementById('note-input').value;
-            const lessonId = <?php echo $current_lesson_id; ?>;
-            const courseId = <?php echo $course_id; ?>;
-
-            if (!noteText.trim()) return;
-
-            btn.disabled = true;
-            btn.innerText = 'Saving...';
-
-            fetch('api/manage_notes.php', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    action: 'save',
-                    course_id: courseId,
-                    lesson_id: lessonId,
-                    note_text: noteText
-                })
-            })
-            .then(res => res.json())
-            .then(data => {
-                if (data.success) {
-                    const notesList = document.getElementById('notes-list');
-                    const noNotesMsg = document.getElementById('no-notes-msg');
-                    if (noNotesMsg) noNotesMsg.remove();
-
-                    const newNote = document.createElement('div');
-                    newNote.className = 'note-item';
-                    newNote.style = "padding: 15px; background: var(--light-gray); border-radius: 4px; margin-bottom: 10px; border-left: 4px solid var(--primary-color);";
-                    newNote.innerHTML = `
-                        <div style="font-size: 12px; color: var(--gray-color); margin-bottom: 5px;">Just now</div>
-                        <div style="font-size: 14px; line-height: 1.5;">${noteText.replace(/\n/g, '<br>')}</div>
-                    `;
-                    
-                    const h4 = notesList.querySelector('h4');
-                    h4.after(newNote);
-
-                    document.getElementById('note-input').value = '';
-                }
-                btn.disabled = false;
-                btn.innerText = 'Save note';
-            })
-            .catch(err => {
-                console.error('Error saving note:', err);
-                btn.disabled = false;
-                btn.innerText = 'Save note';
-            });
-        };
     </script>
-
-    <!-- Review Modal -->
-    <div id="review-modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 9999; justify-content: center; align-items: center;">
-        <div style="background: var(--bg-card); padding: 30px; border-radius: 12px; width: 100%; max-width: 500px; position: relative;">
-            <button onclick="document.getElementById('review-modal').style.display='none'" style="position: absolute; top: 15px; right: 15px; background: none; border: none; font-size: 20px; cursor: pointer; color: var(--gray-color);">&times;</button>
-            <h2 style="font-size: 24px; font-weight: 800; color: var(--dark-color); margin-bottom: 5px;">Leave a Review</h2>
-            <p style="color: var(--gray-color); font-size: 14px; margin-bottom: 20px;">Tell us about your experience.</p>
-            
-            <div id="review-stars-container" style="display: flex; gap: 10px; margin-bottom: 20px; justify-content: center;">
-                <i class="far fa-star review-star" data-val="1" style="font-size: 30px; cursor: pointer; color: #f1c40f;"></i>
-                <i class="far fa-star review-star" data-val="2" style="font-size: 30px; cursor: pointer; color: #f1c40f;"></i>
-                <i class="far fa-star review-star" data-val="3" style="font-size: 30px; cursor: pointer; color: #f1c40f;"></i>
-                <i class="far fa-star review-star" data-val="4" style="font-size: 30px; cursor: pointer; color: #f1c40f;"></i>
-                <i class="far fa-star review-star" data-val="5" style="font-size: 30px; cursor: pointer; color: #f1c40f;"></i>
-            </div>
-            
-            <input type="hidden" id="review-rating-val" value="0">
-            
-            <textarea id="review-comment-val" rows="4" placeholder="Tell us if this course met your expectations..." style="width: 100%; padding: 15px; border-radius: 6px; border: 1px solid var(--border-color); background: var(--light-gray); color: var(--dark-color); font-family: inherit; margin-bottom: 20px; resize: vertical;"></textarea>
-            
-            <button id="submit-review-btn" class="btn btn-primary" style="width: 100%; padding: 15px; font-size: 16px;">Submit Review</button>
-        </div>
-    </div>
-
-    <script>
-        // Star Rating Logic
-        const stars = document.querySelectorAll('.review-star');
-        let selectedRating = 0;
-        
-        stars.forEach(star => {
-            star.addEventListener('mouseover', function() {
-                const val = this.getAttribute('data-val');
-                highlightStars(val);
-            });
-            star.addEventListener('mouseout', function() {
-                highlightStars(selectedRating);
-            });
-            star.addEventListener('click', function() {
-                selectedRating = this.getAttribute('data-val');
-                document.getElementById('review-rating-val').value = selectedRating;
-                highlightStars(selectedRating);
-            });
-        });
-        
-        function highlightStars(val) {
-            stars.forEach(s => {
-                if (s.getAttribute('data-val') <= val) {
-                    s.classList.remove('far');
-                    s.classList.add('fas');
-                } else {
-                    s.classList.remove('fas');
-                    s.classList.add('far');
-                }
-            });
-        }
-        
-        // Submit Review
-        document.getElementById('submit-review-btn').addEventListener('click', function() {
-            const btn = this;
-            const rating = document.getElementById('review-rating-val').value;
-            const comment = document.getElementById('review-comment-val').value;
-            const courseId = <?php echo $course_id; ?>;
-            
-            if (rating == 0) {
-                alert("Please select a star rating first.");
-                return;
-            }
-            
-            btn.disabled = true;
-            btn.innerText = 'Submitting...';
-            
-            fetch('../../api/submit_review.php', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    course_id: courseId,
-                    rating: rating,
-                    comment: comment
-                })
-            })
-            .then(res => res.json())
-            .then(data => {
-                if(data.success) {
-                    document.getElementById('review-modal').style.display = 'none';
-                    alert("Thank you! Your review has been submitted and is pending moderation.");
-                } else {
-                    alert("Error: " + data.message);
-                }
-                btn.disabled = false;
-                btn.innerText = 'Submit Review';
-            })
-            .catch(err => {
-                alert("A network error occurred.");
-                btn.disabled = false;
-                btn.innerText = 'Submit Review';
-            });
-        });
-    </script>
-<?php include '../../includes/portal_footer.php'; ?>
+</body>
+</html>

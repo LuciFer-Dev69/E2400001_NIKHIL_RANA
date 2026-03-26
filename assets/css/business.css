@@ -1,0 +1,281 @@
+.business-page {
+    background: #ffffff;
+    color: #1c1d1f;
+    line-height: 1.5;
+}
+
+.business-hero {
+    padding: 80px 0;
+    background: #ffffff;
+}
+
+.hero-flex {
+    display: flex;
+    align-items: center;
+    gap: 60px;
+}
+
+.hero-text {
+    flex: 1;
+}
+
+.hero-text h1 {
+    font-size: 48px;
+    font-weight: 800;
+    line-height: 1.1;
+    margin-bottom: 25px;
+    color: #1c1d1f;
+}
+
+.hero-text p {
+    font-size: 18px;
+    color: #6a6f73;
+    margin-bottom: 35px;
+    max-width: 540px;
+}
+
+.hero-actions {
+    display: flex;
+    gap: 15px;
+    margin-bottom: 40px;
+}
+
+.hero-actions .btn {
+    padding: 15px 32px;
+    font-size: 16px;
+}
+
+.video-cta {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    font-size: 14px;
+    color: #1c1d1f;
+}
+
+.play-btn {
+    width: 44px;
+    height: 44px;
+    background: #FF416C;
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.play-btn:hover {
+    transform: scale(1.1);
+}
+
+.hero-image {
+    flex: 1;
+}
+
+.hero-image img {
+    width: 100%;
+    border-radius: 12px;
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.1);
+}
+
+/* Approach Section */
+.approach-section {
+    padding: 100px 0;
+    background: #f7f9fa;
+}
+
+.section-header {
+    text-align: center;
+    margin-bottom: 60px;
+}
+
+.section-header h2 {
+    font-size: 36px;
+    margin-bottom: 20px;
+}
+
+.section-header p {
+    max-width: 800px;
+    margin: 0 auto;
+    color: #6a6f73;
+}
+
+.approach-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 25px;
+}
+
+.approach-card {
+    background: white;
+    padding: 30px;
+    border-radius: 8px;
+    border: 1px solid #d1d7dc;
+    transition: 0.3s;
+}
+
+.approach-card:hover {
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+}
+
+.card-icon {
+    font-size: 24px;
+    color: #FF416C;
+    margin-bottom: 20px;
+}
+
+.approach-card h3 {
+    font-size: 18px;
+    margin-bottom: 15px;
+}
+
+.approach-card p {
+    font-size: 14px;
+    color: #6a6f73;
+    margin-bottom: 20px;
+    min-height: 80px;
+}
+
+.learn-more {
+    color: #1c1d1f;
+    text-decoration: none;
+    font-weight: 700;
+    font-size: 14px;
+}
+
+/* AI Fluency Section */
+.ai-fluency-section {
+    padding: 100px 0;
+}
+
+.ai-flex {
+    display: flex;
+    align-items: center;
+    gap: 80px;
+}
+
+.ai-image {
+    flex: 1;
+}
+
+.ai-image img {
+    width: 100%;
+    border-radius: 12px;
+}
+
+.ai-content {
+    flex: 1;
+}
+
+.ai-content .badge {
+    background: #e1f5fe;
+    color: #0288d1;
+    padding: 4px 12px;
+    border-radius: 4px;
+    font-size: 12px;
+    font-weight: 700;
+    margin-bottom: 20px;
+    display: inline-block;
+}
+
+.ai-content h2 {
+    font-size: 32px;
+    margin-bottom: 25px;
+}
+
+.ai-content p {
+    font-size: 16px;
+    color: #6a6f73;
+    margin-bottom: 30px;
+}
+
+/* Stats Section */
+.stats-section {
+    padding: 100px 0;
+    background: #f7f9fa;
+}
+
+.stats-flex {
+    display: flex;
+    align-items: flex-start;
+    gap: 80px;
+}
+
+.stats-text {
+    flex: 1;
+}
+
+.stats-text h2 {
+    font-size: 32px;
+    margin-bottom: 40px;
+}
+
+.stats-grid {
+    display: flex;
+    gap: 40px;
+}
+
+.stat-item {
+    border-top: 1px solid #d1d7dc;
+    padding-top: 20px;
+}
+
+.stat-item .number {
+    display: block;
+    font-size: 44px;
+    font-weight: 800;
+    color: #1c1d1f;
+    margin-bottom: 10px;
+}
+
+.stat-item p {
+    font-size: 14px;
+    color: #6a6f73;
+    margin-bottom: 15px;
+}
+
+.stat-link {
+    font-size: 12px;
+    color: #007791;
+    text-decoration: underline;
+}
+
+.stats-image {
+    flex: 1;
+}
+
+.stats-image img {
+    width: 100%;
+    border-radius: 12px;
+}
+
+/* Responsive */
+@media (max-width: 992px) {
+
+    .hero-flex,
+    .ai-flex,
+    .stats-flex {
+        flex-direction: column;
+        gap: 40px;
+    }
+
+    .approach-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .hero-text h1 {
+        font-size: 36px;
+    }
+}
+
+@media (max-width: 600px) {
+    .approach-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .hero-actions {
+        flex-direction: column;
+    }
+}

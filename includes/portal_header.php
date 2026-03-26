@@ -48,7 +48,9 @@ if ($portal_type === 'admin')
     <link rel="stylesheet" href="<?php echo $root; ?>assets/css/style.css">
     <link rel="stylesheet" href="<?php echo $root; ?>assets/css/portal.css">
     <script src="<?php echo $root; ?>assets/js/responsive.js" defer></script>
+    <script src="<?php echo $root; ?>assets/js/global-sync.js" defer></script>
     <link rel="stylesheet" href="<?php echo $root; ?>assets/css/dark-mode.css">
+    <link rel="stylesheet" href="<?php echo $root; ?>assets/css/notifications.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script>
         const savedTheme = localStorage.getItem('skilledu_theme');
@@ -115,33 +117,39 @@ if ($portal_type === 'admin')
                 <i class="far fa-moon" id="theme-icon"></i>
             </button>
 
-            <div style="position: relative;">
-                <button id="bell-toggle" title="Notifications" style="background: none; border: none; cursor: pointer; font-size: 18px; color: var(--dark-color); width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center;">
+            <!-- Notification Bell -->
+            <div class="notification-wrapper">
+                <button id="notif-bell" style="background: none; border: none; cursor: pointer; font-size: 18px; color: var(--dark-color); width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; position: relative; transition: all 0.2s;">
                     <i class="far fa-bell"></i>
-                    <span id="notification-badge" style="display: none; position: absolute; top: 4px; right: 4px; background: #e74c3c; width: 10px; height: 10px; border-radius: 50%; border: 2px solid white;"></span>
+                    <span id="notif-badge" class="notification-badge">0</span>
                 </button>
-                <div id="notifications-popover" class="nav-popover" style="opacity: 0; visibility: hidden; right: 0; width: 320px;">
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
-                        <h4 style="margin: 0; font-size: 15px;">Notifications</h4>
-                        <button id="mark-read-btn" style="background: none; border: none; font-size: 12px; color: var(--primary-color); cursor: pointer; font-weight: 700; display: none;">Mark all read</button>
+                <div id="notif-dropdown" class="notification-dropdown">
+                    <div class="notification-header">
+                        <h4>Notifications</h4>
+                        <button onclick="markAllRead()" style="background: none; border: none; font-size: 11px; color: var(--primary-color); font-weight: 800; cursor: pointer;">Mark all as read</button>
                     </div>
-                    <div id="notifications-list">
-                        <div style="text-align: center; padding: 20px 0; color: #6a6f73; font-size: 13px;">Loading...</div>
+                    <div id="notif-list" class="notification-list">
+                        <!-- Loaded via JS -->
+                        <div style="padding: 30px; text-align: center; color: var(--gray-color); font-size: 13px;">Loading...</div>
+                    </div>
+                    <div class="notification-footer">
+                        <a href="<?php echo $root; ?>portals/student/notifications.php" style="font-size: 12px; color: var(--primary-color); font-weight: 800; text-decoration: none;">View all updates</a>
                     </div>
                 </div>
             </div>
 
             <!-- Profile Account -->
-            <div style="position: relative;">
                 <div id="user-menu-toggle" class="user-avatar" style="cursor: pointer;" title="Account">
-                    <?php echo $initials; ?>
+                    <span id="navbar-user-initials"><?php echo $initials; ?></span>
                 </div>
                 <div id="user-menu-popover" class="nav-popover" style="opacity: 0; visibility: hidden; right: 0; width: 220px; padding: 0;">
                     <div style="padding: 15px; border-bottom: 1px solid var(--border-color); display: flex; align-items: center; gap: 10px;">
-                        <div class="user-avatar" style="width: 40px; height: 40px; font-size: 14px; flex-shrink: 0;"><?php echo $initials; ?></div>
+                        <div class="user-avatar" style="width: 40px; height: 40px; font-size: 14px; flex-shrink: 0;">
+                            <span id="navbar-dropdown-initials"><?php echo $initials; ?></span>
+                        </div>
                         <div>
-                            <div style="font-weight: 800; font-size: 14px;"><?php echo htmlspecialchars($fullName); ?></div>
-                            <div style="font-size: 12px; color: #6a6f73;"><?php echo htmlspecialchars($_SESSION['email'] ?? ''); ?></div>
+                            <div id="navbar-user-name" style="font-weight: 800; font-size: 14px;"><?php echo htmlspecialchars($fullName); ?></div>
+                            <div id="navbar-user-email" style="font-size: 12px; color: #6a6f73;"><?php echo htmlspecialchars($_SESSION['email'] ?? ''); ?></div>
                         </div>
                     </div>
                     <div style="padding: 8px 0;">
@@ -185,79 +193,12 @@ endif; ?>
 <?php
 // Page content follows...
 ?>
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-    // Utility elements
-    const bellToggle = document.getElementById('bell-toggle');
-    const notifPopover = document.getElementById('notifications-popover');
-    const userMenuToggle = document.getElementById('user-menu-toggle');
-    const userMenuPopover = document.getElementById('user-menu-popover');
+    </main>
+</div>
 
-    function closeAllPopovers() {
-        if (notifPopover) { notifPopover.style.opacity = '0'; notifPopover.style.visibility = 'hidden'; }
-        if (userMenuPopover) { userMenuPopover.style.opacity = '0'; userMenuPopover.style.visibility = 'hidden'; }
-    }
+<!-- Toast Container -->
+<div id="toast-container"></div>
 
-    if (bellToggle) {
-        bellToggle.addEventListener('click', e => {
-            e.stopPropagation();
-            const isVisible = notifPopover.style.visibility === 'visible';
-            closeAllPopovers();
-            if (!isVisible) { notifPopover.style.opacity = '1'; notifPopover.style.visibility = 'visible'; }
-        });
-    }
-
-    if (userMenuToggle) {
-        userMenuToggle.addEventListener('click', e => {
-            e.stopPropagation();
-            const isVisible = userMenuPopover.style.visibility === 'visible';
-            closeAllPopovers();
-            if (!isVisible) { userMenuPopover.style.opacity = '1'; userMenuPopover.style.visibility = 'visible'; }
-        });
-    }
-
-    document.addEventListener('click', closeAllPopovers);
-
-    // Initial Icon Sync
-    const icon = document.getElementById('theme-icon');
-    if (icon && localStorage.getItem('skilledu_theme') === 'dark') {
-        icon.className = 'fas fa-sun';
-    }
-
-    // Load Notifications Logic
-    const baseUrl = '<?php echo $root; ?>';
-    function loadNotifications() {
-        fetch(baseUrl + 'api/notifications.php?action=get')
-        .then(r => r.json())
-        .then(data => {
-            if (!data.success) return;
-            const badge = document.getElementById('notification-badge');
-            const markBtn = document.getElementById('mark-read-btn');
-            badge.style.display = data.unread_count > 0 ? 'block' : 'none';
-            if (markBtn) markBtn.style.display = data.unread_count > 0 ? 'block' : 'none';
-            const list = document.getElementById('notifications-list');
-            if (data.notifications.length === 0) {
-                list.innerHTML = '<div style="text-align:center;padding:20px 0;color:#6a6f73;font-size:13px;">No alerts.</div>';
-            } else {
-                list.innerHTML = data.notifications.map(n => `
-                    <div style="display:flex;gap:10px;padding:10px 0;border-bottom:1px solid var(--border-color);${n.is_read?'opacity:0.6':''}">
-                        <div style="width:30px;height:30px;background:var(--light-gray);border-radius:50%;display:flex;align-items:center;justify-content:center;color:var(--primary-color);flex-shrink:0;">
-                            <i class="fa fa-bell" style="font-size:12px;"></i>
-                        </div>
-                        <div>
-                            <div style="font-size:13px;font-weight:700;color:var(--dark-color);">${n.title}</div>
-                            <div style="font-size:12px;color:var(--gray-color);">${n.message}</div>
-                        </div>
-                    </div>`).join('');
-            }
-        });
-    }
-    loadNotifications();
-    setInterval(loadNotifications, 60000);
-
-    document.getElementById('mark-read-btn')?.addEventListener('click', e => {
-        e.stopPropagation();
-        fetch(baseUrl + 'api/notifications.php?action=mark_read').then(() => loadNotifications());
-    });
-});
-</script>
+<script src="<?php echo $root; ?>assets/js/notifications.js" defer></script>
+</body>
+</html>

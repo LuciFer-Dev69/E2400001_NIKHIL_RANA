@@ -33,7 +33,7 @@ $base_url = "";
     <header class="checkout-header">
         <!-- SKILLEDU LOGO FROM PROJECT ASSETS -->
         <a href="index.php" class="logo">Skill<span>Edu</span></a>
-        <a href="subscribe.php" style="color: var(--primary-purple); font-weight: 700; text-decoration: none; font-size: 14px;">Cancel</a>
+        <a href="subscribe.php" style="color: var(--primary-red); font-weight: 700; text-decoration: none; font-size: 14px;">Cancel</a>
     </header>
 
     <div class="checkout-container">
@@ -163,7 +163,7 @@ $base_url = "";
             <div class="disclaimer">
                 Cancel anytime by visiting the Subscriptions page in your account.
                 <br><br>
-                Your subscription will begin today and a charge of <span id="disclaimerPrice">$120.00</span> automatically each year after that until you cancel. By clicking "Start Subscription" you agree to our <a href="#" style="color: var(--primary-purple);">Terms</a> and authorize this recurring charge. No refunds or partial credits except where required by law.
+                Your subscription will begin today and a charge of <span id="disclaimerPrice">$120.00</span> automatically each year after that until you cancel. By clicking "Start Subscription" you agree to our <a href="#" style="color: var(--primary-red);">Terms</a> and authorize this recurring charge. No refunds or partial credits except where required by law.
             </div>
 
             <button class="btn-checkout" onclick="startSubscription()" id="subBtn">
@@ -243,15 +243,34 @@ $base_url = "";
         }
 
         // Subscription Logic
-        function startSubscription() {
+        async function startSubscription() {
             const btn = document.getElementById('subBtn');
             btn.disabled = true;
             btn.innerHTML = '<i class="fa fa-spinner fa-spin" style="margin-right: 8px;"></i> Processing...';
             
-            // Simulate processing
-            setTimeout(() => {
-                document.getElementById('successModal').style.display = 'flex';
-            }, 2000);
+            const formData = new FormData();
+            formData.append('plan', currentPlan === 'yearly' ? 'Yearly Access' : 'Monthly Access');
+
+            try {
+                const response = await fetch('portals/student/api/process_subscription.php', {
+                    method: 'POST',
+                    body: formData
+                });
+                const result = await response.json();
+
+                if (result.success) {
+                    document.getElementById('successModal').style.display = 'flex';
+                } else {
+                    alert(result.message || 'Subscription failed. Please try again.');
+                    btn.disabled = false;
+                    btn.innerHTML = '<i class="fa fa-lock" style="margin-right: 8px; font-size: 13px;"></i> Start Subscription';
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('An error occurred. Please try again later.');
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fa fa-lock" style="margin-right: 8px; font-size: 13px;"></i> Start Subscription';
+            }
         }
     </script>
 </body>

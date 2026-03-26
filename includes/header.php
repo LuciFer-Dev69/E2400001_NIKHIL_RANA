@@ -21,6 +21,7 @@ endif; ?>
     <link rel="stylesheet" href="<?php echo $base_url; ?>assets/css/dark-mode.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="<?php echo $base_url; ?>assets/js/responsive.js" defer></script>
+    <script src="<?php echo $base_url; ?>assets/js/global-sync.js" defer></script>
     <script>
         // Check local storage for dark mode preference before rendering to prevent flash
         if (localStorage.getItem('skilledu_theme') === 'dark') {
@@ -150,6 +151,7 @@ if (isset($_SESSION['user_id'])):
 
                         <div class="user-menu-container" style="position: relative;">
                             <div class="user-avatar" id="user-menu-toggle" style="cursor: pointer;" title="Account Menu">
+                                <span id="navbar-user-initials">
                                 <?php
     $initials = '';
     $fullName = $_SESSION['full_name'] ?? 'User';
@@ -162,17 +164,18 @@ if (isset($_SESSION['user_id'])):
     }
     echo substr($initials, 0, 2);
 ?>
+                                </span>
                             </div>
                             <div class="nav-popover user-dropdown" id="user-menu-popover" style="width: 250px; padding: 0; right: 0;">
                                 <div style="padding: 20px; border-bottom: 1px solid #f1f3f5; display: flex; align-items: center; gap: 12px;">
                                     <div class="user-avatar" style="width: 44px; height: 44px; font-size: 16px; margin: 0; flex-shrink: 0;">
-                                        <?php echo substr($initials, 0, 2); ?>
+                                        <span id="navbar-dropdown-initials"><?php echo substr($initials, 0, 2); ?></span>
                                     </div>
                                     <div style="min-width: 0;">
-                                        <div style="font-weight: 800; font-size: 14px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: #1c1d1f;">
+                                        <div id="navbar-user-name" style="font-weight: 800; font-size: 14px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: #1c1d1f;">
                                             <?php echo htmlspecialchars($_SESSION['full_name'] ?? 'User'); ?>
                                         </div>
-                                        <div style="font-size: 12px; color: #6a6f73; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                                        <div id="navbar-user-email" style="font-size: 12px; color: #6a6f73; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
                                             <?php echo htmlspecialchars($_SESSION['email'] ?? 'student@skilledu.com'); ?>
                                         </div>
                                     </div>
@@ -197,7 +200,7 @@ if (isset($_SESSION['user_id'])):
                     </div>
                 <?php
 else: ?>
-                    <a href="#" class="nav-link hide-mobile">SkillEdu Business</a>
+                    <a href="<?php echo $base_url; ?>business.php" class="nav-link hide-mobile">SkillEdu Business</a>
                     <a href="#" class="nav-link hide-mobile">Teach on SkillEdu</a>
                     <a href="#" class="nav-link"><i class="fa fa-shopping-cart" style="font-size: 18px;"></i></a>
                     

@@ -76,7 +76,7 @@ try {
             WHERE c.category_id = ? AND c.status = 'published' AND c.id NOT IN (
                 SELECT course_id FROM enrollments WHERE student_id = ?
             )
-            ORDER BY c.created_at DESC LIMIT 4
+            ORDER BY c.created_at DESC LIMIT 12
         ");
         $stmt->execute([$top_cat['category_id'], $user_id]);
         $recommendations = $stmt->fetchAll();
@@ -92,7 +92,7 @@ try {
             JOIN users u ON c.instructor_id = u.id
             JOIN categories cat ON c.category_id = cat.id
             WHERE c.status = 'published'
-            LIMIT 4
+            LIMIT 12
         ");
         $recommendations = $stmt->fetchAll();
     }
@@ -227,11 +227,11 @@ include '../../includes/portal_header.php';
         <h3 style="font-size: 18px; font-weight: 700; color: var(--dark-color); margin-bottom: 8px;"><?php echo $continue_course['title']; ?></h3>
         <?php if ($next_lesson): ?>
             <p style="font-size: 14px; color: var(--gray-color); margin-bottom: 15px;">Next: <?php echo $next_lesson['title']; ?></p>
-            <a href="../../ai_fundamentals.php" class="btn btn-primary">Resume Course</a>
+            <a href="../../course_details.php?id=<?php echo $continue_course['id']; ?>" class="btn btn-primary">Resume Course</a>
         <?php
     else: ?>
             <p style="font-size: 14px; color: var(--gray-color); margin-bottom: 15px;">You've completed all lessons in this course!</p>
-            <a href="../../ai_fundamentals.php" class="btn btn-primary">Review Course</a>
+            <a href="../../course_details.php?id=<?php echo $continue_course['id']; ?>" class="btn btn-primary">Review Course</a>
         <?php
     endif; ?>
     </div>
@@ -296,7 +296,7 @@ endif; ?>
                 <div class="premium-progress" style="margin: 0 0 20px 0;">
                     <div class="premium-progress-bar" style="width: <?php echo $course['progress_percent']; ?>%;"></div>
                 </div>
-                <a href="../../ai_fundamentals.php" class="btn btn-secondary" style="width: 100%; padding: 10px; font-weight: 700;">View Course</a>
+                <a href="../../course_details.php?id=<?php echo $course['id']; ?>" class="btn btn-secondary" style="width: 100%; padding: 10px; font-weight: 700;">View Course</a>
             <?php
     endif; ?>
         </div>
@@ -341,26 +341,68 @@ endif; ?>
     
     <!-- Smart Recommendations -->
     <?php if (!empty($recommendations)): ?>
-    <div style="margin-top: 50px;">
-        <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 25px;">
-            <i class="fa fa-lightbulb" style="color: #FF416C; font-size: 24px;"></i>
-            <h2 style="font-size: 24px; color: var(--dark-color);"><?php echo htmlspecialchars($rec_title); ?></h2>
+    <div style="margin-top: 50px; overflow: hidden;">
+        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 25px;">
+            <div style="display: flex; align-items: center; gap: 10px;">
+                <i class="fa fa-fire" style="color: #FF416C; font-size: 24px;"></i>
+                <h2 style="font-size: 24px; color: var(--dark-color);"><?php echo htmlspecialchars($rec_title); ?></h2>
+            </div>
+            <div style="display: flex; gap: 10px;">
+                <button id="scroll-left" class="btn btn-secondary" style="width: 40px; height: 40px; border-radius: 50%; padding: 0; display: flex; align-items: center; justify-content: center; border: 1px solid var(--border-color);"><i class="fa fa-chevron-left"></i></button>
+                <button id="scroll-right" class="btn btn-secondary" style="width: 40px; height: 40px; border-radius: 50%; padding: 0; display: flex; align-items: center; justify-content: center; border: 1px solid var(--border-color);"><i class="fa fa-chevron-right"></i></button>
+            </div>
         </div>
-        <div class="courses-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 25px;">
-            <?php foreach ($recommendations as $rec): ?>
-            <div class="course-card-v2" style="background: var(--white); border: 1px solid var(--border-color); border-radius: 8px; overflow: hidden; transition: transform 0.3s ease;">
-                <div style="height: 160px; background: url('../../assets/img/courses/<?php echo $rec['thumbnail'] ?: 'default.jpg'; ?>') center/cover no-repeat;" onerror="this.style.backgroundImage='url(https://images.unsplash.com/photo-1498050108023-c5249f4df085?auto=format&fit=crop&w=400&q=80)'"></div>
+        
+        <div id="trending-slider" style="display: flex; gap: 20px; overflow-x: auto; padding-bottom: 20px; scroll-behavior: smooth; -ms-overflow-style: none; scrollbar-width: none;">
+            <style>
+                #trending-slider::-webkit-scrollbar { display: none; }
+                .trending-card {
+                    flex: 0 0 300px;
+                    background: var(--bg-card);
+                    border: 1px solid var(--border-color);
+                    border-radius: 12px;
+                    overflow: hidden;
+                    transition: all 0.3s ease;
+                    box-shadow: var(--shadow);
+                }
+                .trending-card:hover {
+                    transform: translateY(-5px);
+                    box-shadow: 0 12px 20px rgba(0,0,0,0.1);
+                }
+            </style>
+            <?php foreach ($recommendations as $rec):
+        $thumb = $rec['thumbnail'] ?: 'default.jpg';
+        $is_external = (strpos($thumb, 'http') === 0);
+        $thumb_url = $is_external ? $thumb : "../../assets/img/courses/" . $thumb;
+?>
+            <div class="trending-card">
+                <div style="height: 160px; position: relative; overflow: hidden;">
+                    <img src="<?php echo $thumb_url; ?>" style="width: 100%; height: 100%; object-fit: cover;" onerror="this.src='https://images.unsplash.com/photo-1498050108023-c5249f4df085?auto=format&fit=crop&w=400&q=80'">
+                    <div style="position: absolute; top: 10px; left: 10px; background: rgba(0,0,0,0.7); color: white; padding: 4px 8px; border-radius: 4px; font-size: 10px; font-weight: 700; text-transform: uppercase;">
+                        <?php echo htmlspecialchars($rec['category_name'] ?? 'SkillEdu'); ?>
+                    </div>
+                </div>
                 <div style="padding: 20px;">
-                    <h3 style="font-size: 16px; font-weight: 800; margin-bottom: 10px; min-height: 44px; color: var(--dark-color);"><?php echo htmlspecialchars($rec['title'], ENT_QUOTES); ?></h3>
-                    <p style="font-size: 12px; color: var(--gray-color); margin-bottom: 15px;"><?php echo htmlspecialchars($rec['instructor_name'], ENT_QUOTES); ?></p>
-                    <div style="font-weight: 800; font-size: 18px; margin-bottom: 15px; color: var(--dark-color);">$<?php echo number_format($rec['price'], 2); ?></div>
-                    <a href="<?php echo $root; ?>courses.php?id=<?php echo $rec['id']; ?>" class="btn btn-secondary" style="width: 100%; border: 1px solid var(--border-color); color: var(--dark-color);">See Details</a>
+                    <h3 style="font-size: 16px; font-weight: 800; margin-bottom: 10px; min-height: 44px; color: var(--dark-color); line-height: 1.4;"><?php echo htmlspecialchars($rec['title']); ?></h3>
+                    <p style="font-size: 12px; color: var(--gray-color); margin-bottom: 15px;">By <?php echo htmlspecialchars($rec['instructor_name']); ?></p>
+                    <div style="display: flex; align-items: center; justify-content: space-between;">
+                        <span style="font-weight: 800; font-size: 18px; color: var(--dark-color);"><?php echo $rec['price'] == 0 ? 'FREE' : '$' . number_format($rec['price'], 2); ?></span>
+                        <a href="../../course_details.php?id=<?php echo $rec['id']; ?>" style="color: var(--primary-color); font-weight: 800; font-size: 14px; text-decoration: none;">See Details</a>
+                    </div>
                 </div>
             </div>
             <?php
     endforeach; ?>
         </div>
     </div>
+    <script>
+        document.getElementById('scroll-left')?.addEventListener('click', () => {
+            document.getElementById('trending-slider').scrollLeft -= 320;
+        });
+        document.getElementById('scroll-right')?.addEventListener('click', () => {
+            document.getElementById('trending-slider').scrollLeft += 320;
+        });
+    </script>
     <?php
 endif; ?>
 

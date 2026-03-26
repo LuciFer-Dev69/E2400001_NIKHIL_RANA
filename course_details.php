@@ -10,7 +10,7 @@ if (!$course_id) {
 
 // Fetch Course Data
 $stmt = $pdo->prepare("
-    SELECT c.*, u.full_name as instructor_name, cat.name as category_name
+    SELECT c.*, u.full_name as instructor_name, cat.name as category_name, cat.slug as category_slug
     FROM courses c
     JOIN users u ON c.instructor_id = u.id
     LEFT JOIN categories cat ON c.category_id = cat.id
@@ -23,147 +23,380 @@ if (!$course) {
     die("Course not found.");
 }
 
-// Fetch Lessons 
+// Fetch Sections
+$stmt = $pdo->prepare("SELECT * FROM sections WHERE course_id = ? ORDER BY order_num ASC");
+$stmt->execute([$course_id]);
+$sections = $stmt->fetchAll();
+
+// Fetch Lessons
 $stmt = $pdo->prepare("SELECT * FROM lessons WHERE course_id = ? ORDER BY order_num ASC");
 $stmt->execute([$course_id]);
 $lessons = $stmt->fetchAll();
+
+// Group lessons by section_id
+$grouped_lessons = [];
+foreach ($lessons as $lesson) {
+    $sid = $lesson['section_id'] ?: 0;
+    $grouped_lessons[$sid][] = $lesson;
+}
+
+// If no sections, create a dummy one for the view
+if (empty($sections)) {
+    $sections = [['id' => 0, 'title' => 'Course Content']];
+}
+
+// Check for active subscription
+$is_subscribed = false;
+if (isset($_SESSION['user_id'])) {
+    $stmt = $pdo->prepare("SELECT id FROM user_subscriptions WHERE user_id = ? AND status = 'active' AND (expires_at IS NULL OR expires_at > NOW())");
+    $stmt->execute([$_SESSION['user_id']]);
+    if ($stmt->fetch()) {
+        $is_subscribed = true;
+    }
+}
 
 $total_lessons = count($lessons);
 $total_mins = array_sum(array_column($lessons, 'duration_mins'));
 $total_hours = round($total_mins / 60, 1);
 
-// Check if Already Enrolled
-$is_enrolled = false;
-$is_purchased = false;
-if (isset($_SESSION['user_id'])) {
-    $stmt = $pdo->prepare("SELECT is_purchased FROM enrollments WHERE student_id = ? AND course_id = ?");
-    $stmt->execute([$_SESSION['user_id'], $course_id]);
-    $enrollment = $stmt->fetch();
-    if ($enrollment) {
-        $is_enrolled = true;
-        $is_purchased = (bool)$enrollment['is_purchased'];
-    }
-}
+// Meta for Premium Feel
+$rating = 4.5;
+$rating_count = 290;
+$student_count = 15200;
 
 $page_title = $course['title'];
 include 'includes/header.php';
 ?>
 
-<!-- Dark Hero Section -->
-<div style="background: var(--dark-color); color: white; padding: 60px 0;">
-    <div class="container" style="display: flex; gap: 40px; align-items: flex-start;">
-        <div style="flex: 2;">
-            <div style="margin-bottom: 15px; font-size: 14px; color: #a435f0; font-weight: 700;">
-                <a href="courses.php?category=<?php echo urlencode($course['category_name']); ?>" style="color: inherit; text-decoration: none;"><i class="fa fa-folder-open"></i> <?php echo htmlspecialchars($course['category_name']); ?></a>
-            </div>
-            <h1 style="font-size: 36px; font-weight: 800; margin-bottom: 15px; line-height: 1.2;"><?php echo htmlspecialchars($course['title']); ?></h1>
-            <p style="font-size: 18px; line-height: 1.6; margin-bottom: 20px; color: #d1d7dc;"><?php echo htmlspecialchars(substr($course['description'], 0, 150)) . '...'; ?></p>
-            
-            <div style="display: flex; gap: 20px; align-items: center; font-size: 14px; margin-bottom: 20px;">
-                <div style="color: #f1c40f; font-weight: 800;"><i class="fa fa-star"></i> 4.8 <span style="font-weight: 400; color: #d1d7dc;">(1,234 ratings)</span></div>
-                <div><i class="fa fa-users"></i> 15,200 students</div>
-                <div><i class="fa fa-language"></i> English</div>
-            </div>
-            
-            <div style="font-size: 14px; color: #d1d7dc;">
-                Created by <a href="#" style="color: #a435f0; text-decoration: underline;"><?php echo htmlspecialchars($course['instructor_name']); ?></a>
-            </div>
-        </div>
-        
-        <!-- Sticky Sidebar Card -->
-        <div style="flex: 1; background: var(--bg-card); color: var(--dark-color); border-radius: 8px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.2); position: sticky; top: 20px;">
-            <div style="height: 200px; background: url('https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&q=80&w=400') center/cover;" onerror="this.style.backgroundImage='url(https://via.placeholder.com/400x200)'">
-                <div style="width: 100%; height: 100%; background: rgba(0,0,0,0.3); display: flex; align-items: center; justify-content: center; cursor: pointer;">
-                    <i class="fa fa-play-circle" style="font-size: 60px; color: white; opacity: 0.9;"></i>
-                </div>
-            </div>
-            <div style="padding: 24px;">
-                <h2 style="font-size: 32px; font-weight: 800; margin-bottom: 20px;">
-                    <?php echo $course['price'] > 0 ? '$' . number_format($course['price'], 2) : 'Free'; ?>
-                </h2>
-                
-                <?php if ($is_enrolled): ?>
-                    <a href="portals/student/player.php?course_id=<?php echo $course['id']; ?>" class="btn btn-primary" style="width: 100%; padding: 15px; font-size: 16px; margin-bottom: 15px; text-align: center;"><i class="fa fa-play"></i> Go to Course Player</a>
-                <?php
-else: ?>
-                    <a href="checkout.php?id=<?php echo $course['id']; ?>" class="btn btn-primary" style="width: 100%; padding: 15px; font-size: 16px; margin-bottom: 15px; text-align: center;">
-                        <?php echo $course['price'] > 0 ? 'Buy Now' : 'Enroll for Free'; ?>
-                    </a>
-                <?php
+<link rel="stylesheet" href="assets/css/course_premium.css">
+
+<main class="premium-course-page">
+    <!-- Dark Hero Section -->
+    <section class="premium-hero">
+        <div class="premium-container">
+            <div class="hero-main">
+                <nav class="breadcrumb-nav">
+                    <a href="courses.php" style="color: inherit; text-decoration: none;">Courses</a> <i class="fa fa-chevron-right"></i>
+                    <?php if ($course['category_name']): ?>
+                        <a href="courses.php?category=<?php echo urlencode($course['category_slug']); ?>" style="color: inherit; text-decoration: none;"><?php echo htmlspecialchars($course['category_name']); ?></a> <i class="fa fa-chevron-right"></i>
+                    <?php
 endif; ?>
-                
-                <p style="text-align: center; font-size: 12px; color: var(--gray-color); margin-bottom: 20px;">30-Day Money-Back Guarantee</p>
-                
-                <h4 style="font-size: 16px; font-weight: 800; margin-bottom: 10px;">This course includes:</h4>
-                <ul style="list-style: none; padding: 0; font-size: 14px; color: var(--gray-color);">
-                    <li style="margin-bottom: 10px;"><i class="fa fa-video" style="width: 20px; text-align: center;"></i> <?php echo $total_hours; ?> hours on-demand video</li>
-                    <li style="margin-bottom: 10px;"><i class="fa fa-file-alt" style="width: 20px; text-align: center;"></i> 5 articles</li>
-                    <li style="margin-bottom: 10px;"><i class="fa fa-mobile-alt" style="width: 20px; text-align: center;"></i> Access on mobile and TV</li>
-                    <li style="margin-bottom: 10px;"><i class="fa fa-certificate" style="width: 20px; text-align: center;"></i> Certificate of completion</li>
-                </ul>
-            </div>
-        </div>
-    </div>
-</div>
+                    <span><?php echo htmlspecialchars($course['title']); ?></span>
+                </nav>
 
-<div class="container" style="padding: 40px 0; display: flex; gap: 60px;">
-    <!-- Main Content -->
-    <div style="flex: 2;">
-        
-        <!-- What you'll learn box -->
-        <div style="border: 1px solid var(--border-color); padding: 24px; border-radius: 8px; margin-bottom: 40px; background: var(--bg-card);">
-            <h2 style="font-size: 20px; font-weight: 800; margin-bottom: 20px;">What you'll learn</h2>
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; font-size: 14px; line-height: 1.5;">
-                <div><i class="fa fa-check" style="color: var(--primary-color); margin-right: 10px;"></i>Master the core concepts of the subject from scratch.</div>
-                <div><i class="fa fa-check" style="color: var(--primary-color); margin-right: 10px;"></i>Build real-world projects to add to your portfolio.</div>
-                <div><i class="fa fa-check" style="color: var(--primary-color); margin-right: 10px;"></i>Learn industry best practices directly from an expert.</div>
-                <div><i class="fa fa-check" style="color: var(--primary-color); margin-right: 10px;"></i>Gain the confidence to ace interviews and pass exams.</div>
-            </div>
-        </div>
+                <div style="margin-bottom: 24px;">
+                    <!-- Branded Logo Placeholder based on instructor or category -->
+                    <img src="assets/img/logo.png" alt="SkillEdu" style="height: 32px; filter: brightness(0) invert(1);">
+                </div>
 
-        <!-- Description -->
-        <div style="margin-bottom: 40px;">
-            <h2 style="font-size: 24px; font-weight: 800; margin-bottom: 20px;">Description</h2>
-            <div style="font-size: 15px; line-height: 1.8; color: var(--dark-color);">
-                <?php echo nl2br(htmlspecialchars($course['description'])); ?>
-            </div>
-        </div>
+                <h1 class="premium-title"><?php echo htmlspecialchars($course['title']); ?></h1>
 
-        <!-- Curriculum -->
-        <div style="margin-bottom: 40px;">
-            <h2 style="font-size: 24px; font-weight: 800; margin-bottom: 5px;">Course Content</h2>
-            <p style="color: var(--gray-color); font-size: 14px; margin-bottom: 20px;"><?php echo $total_lessons; ?> lectures • <?php echo $total_hours; ?> total length</p>
-            
-            <div style="border: 1px solid var(--border-color); border-radius: 8px; overflow: hidden; background: var(--bg-card);">
-                <?php if (empty($lessons)): ?>
-                    <div style="padding: 20px; color: var(--gray-color); text-align: center;">Curriculum is being prepared. Check back soon!</div>
-                <?php
-else: ?>
-                    <?php foreach ($lessons as $idx => $lesson): ?>
-                        <div style="padding: 15px 20px; border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; background: <?php echo $idx % 2 === 0 ? 'transparent' : 'var(--light-gray)'; ?>;">
-                            <div style="display: flex; align-items: center; gap: 15px; font-size: 15px;">
-                                <i class="fa fa-play-circle" style="color: var(--gray-color);"></i>
-                                <span><?php echo htmlspecialchars($lesson['title']); ?></span>
+                <div class="course-badge-premium">
+                    <i class="fa fa-sparkles"></i> Part of SkillEdu Professional Certificate Path
+                </div>
+
+                <p class="premium-subtitle"><?php echo htmlspecialchars(substr($course['description'], 0, 200)); ?>...</p>
+
+                <div class="premium-meta">
+                    <div class="premium-meta-item">
+                        <img src="https://www.gstatic.com/images/branding/product/1x/googleg_32dp.png" alt="G" style="height: 16px; margin-right: 8px;">
+                        Created by <a href="#" style="color: #fff; text-decoration: underline; margin-left: 5px;"><?php echo htmlspecialchars($course['instructor_name']); ?></a>
+                    </div>
+                </div>
+
+                <div class="premium-meta" style="margin-top: 15px; opacity: 0.9;">
+                    <div class="premium-meta-item"><i class="fa fa-exclamation-circle"></i> Last updated <?php echo date('n/Y', strtotime($course['created_at'])); ?></div>
+                    <div class="premium-meta-item"><i class="fa fa-globe"></i> English</div>
+                    <div class="premium-meta-item"><i class="fa fa-closed-captioning"></i> English, <a href="#" style="color: #fff;">12 more</a></div>
+                </div>
+
+                <!-- Premium Info Box -->
+                <div class="premium-info-grid">
+                    <div class="premium-tab">
+                        <i class="fa fa-check-circle"></i>
+                        <span>Premium</span>
+                    </div>
+                    <div class="premium-info-content">
+                        <div class="premium-info-text">
+                            Access 26,000+ top-rated courses with SkillEdu Personal Plan.
+                        </div>
+                        <div class="premium-stats">
+                            <div class="stat-item">
+                                <span class="stat-value"><?php echo $rating; ?></span>
+                                <div class="stars" style="justify-content: center; margin-bottom: 4px;">
+                                    <i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star-half-alt"></i>
+                                </div>
+                                <a href="#reviews" class="stat-label" style="text-decoration: underline;"><?php echo number_format($rating_count); ?> ratings</a>
                             </div>
-                            <div style="font-size: 14px; color: var(--gray-color);">
-                                <?php echo $lesson['duration_mins']; ?>:00 
-                                <?php if ($idx < 2 && !$is_enrolled): ?>
-                                    <span style="color: #a435f0; font-weight: 700; margin-left: 10px; cursor: pointer;">Preview</span>
-                                <?php
-        endif; ?>
+                            <div class="stat-item">
+                                <span class="stat-value"><?php echo number_format($student_count); ?></span>
+                                <span class="stat-label">learners</span>
                             </div>
                         </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sticky Sidebar -->
+            <div class="premium-sidebar-wrapper">
+                <aside class="premium-sidebar">
+                    <div class="sidebar-preview" onclick="openVideoModal()">
+                        <img src="<?php echo htmlspecialchars($course['thumbnail']); ?>" alt="Preview" onerror="this.src='https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&q=80&w=600'">
+                        <div class="play-overlay">
+                            <div style="position: absolute; top: 20px; right: 20px; background: #fff; padding: 4px; border-radius: 4px; display: flex; align-items: center; justify-content: center;">
+                                <i class="fa fa-play" style="color: var(--udemy-accent); font-size: 14px;"></i>
+                            </div>
+                            <div style="position: absolute; top: 100px; left: 0; right: 0; text-align: center; color: rgba(255,255,255,0.7); font-size: 13px; font-weight: 700;">Preview this course</div>
+                            <i class="fa fa-play-circle"></i>
+                            <span style="font-weight: 700; font-size: 15px;">Preview this course</span>
+                        </div>
+                    </div>
+                    <div class="sidebar-content">
+                        <div class="plan-info">
+                            <i class="fa fa-info-circle" style="font-size: 20px;"></i>
+                            <p style="margin: 0; font-weight: 700;">Part of the SkillEdu Personal Plan</p>
+                            <p style="margin: 5px 0 0; color: var(--text-muted); font-size: 13px;">Subscribe to access this and 26,000+ top-rated courses. <a href="#" style="color: var(--udemy-accent); text-decoration: underline;">Learn more</a></p>
+                        </div>
+
+                        <div class="sidebar-price">
+                            <?php if ($is_subscribed): ?>
+                                <span style="font-size: 16px; color: var(--udemy-accent);">Included in your plan</span>
+                            <?php
+else: ?>
+                                From $12.00 <span>/month</span>
+                            <?php
+endif; ?>
+                        </div>
+
+                        <ul class="sidebar-features">
+                            <li><i class="fa fa-infinity"></i> Full lifetime access</li>
+                            <li><i class="fa fa-mobile-alt"></i> Access on mobile and TV</li>
+                            <li><i class="fa fa-award"></i> Certificate of completion</li>
+                        </ul>
+
+                        <?php if ($is_subscribed): ?>
+                            <button class="btn-get-started" onclick="location.href='portals/student/player.php?course_id=<?php echo $course['id']; ?>'">Start learning <i class="fa fa-arrow-right"></i></button>
+                        <?php
+else: ?>
+                            <button class="btn-get-started" onclick="location.href='checkout_subscription.php'">Get started <i class="fa fa-arrow-right"></i></button>
+                            
+                            <div style="text-align: center; margin-top: 15px;">
+                                <a href="checkout.php?id=<?php echo $course['id']; ?>" style="font-size: 14px; font-weight: 700; color: var(--udemy-dark); text-decoration: underline;">Buy this course for $<?php echo number_format($course['price'], 2); ?></a>
+                            </div>
+                        <?php
+endif; ?>
+                    </div>
+                </aside>
+            </div>
+        </div>
+    </section>
+
+    <!-- Content Sections -->
+    <section class="premium-container content-section">
+        <!-- Mobile Sidebar Placeholder -->
+        <div id="mobile-sidebar-placeholder" class="mobile-sidebar-container"></div>
+
+        <div class="content-main-wrapper">
+            <!-- Achievement Section -->
+            <div class="certificate-section">
+                <i class="fa fa-certificate" style="font-size: 64px; color: var(--udemy-accent);"></i>
+                <div class="cert-content">
+                    <h3>Earn a certificate of completion</h3>
+                    <p>After finishing all lessons, earn a professional certificate that you can share on social media, LinkedIn, or your resume to showcase your new skills.</p>
+                </div>
+                <i class="fa fa-arrow-right cert-arrow"></i>
+            </div>
+
+            <!-- What you'll learn -->
+            <div class="learning-box">
+                <h2>What you'll learn</h2>
+                <ul class="learning-list">
+                    <li><i class="fa fa-check"></i> Master the core concepts from scratch.</li>
+                    <li><i class="fa fa-check"></i> Build real-world projects to add to your portfolio.</li>
+                    <li><i class="fa fa-check"></i> Learn industry best practices directly from an expert.</li>
+                    <li><i class="fa fa-check"></i> Gain the confidence to ace interviews and pass exams.</li>
+                </ul>
+            </div>
+
+            <!-- Course Content -->
+            <div class="curriculum-section">
+                <h2 style="font-size: 24px; margin-bottom: 16px;">Course content</h2>
+                <div style="display: flex; justify-content: space-between; font-size: 14px; margin-bottom: 10px;">
+                    <span><?php echo $total_lessons; ?> lectures &bull; <?php echo $total_hours; ?> total length</span>
+                    <a href="#" style="color: var(--udemy-accent); font-weight: 700;">Expand all sections</a>
+                </div>
+
+                <div class="accordion-container">
+                    <?php foreach ($sections as $idx => $section): ?>
+                        <div class="accordion-item">
+                            <div class="accordion-header" onclick="toggleAccordion(this)">
+                                <span><?php echo htmlspecialchars($section['title']); ?></span>
+                                <i class="fa fa-chevron-<?php echo $idx === 0 ? 'up' : 'down'; ?>"></i>
+                            </div>
+                            <div class="accordion-body" style="display: <?php echo $idx === 0 ? 'block' : 'none'; ?>;">
+                                <?php
+    $sec_lessons = $grouped_lessons[$section['id']] ?? [];
+    if (empty($sec_lessons)):
+?>
+                                    <div class="lecture-item">No lessons in this section yet.</div>
+                                <?php
+    else: ?>
+                                    <?php foreach ($sec_lessons as $lesson): ?>
+                                        <div class="lecture-item">
+                                            <span><i class="fa fa-play-circle" style="margin-right: 12px;"></i> <?php echo htmlspecialchars($lesson['title']); ?></span>
+                                            <div>
+                                                <a href="#" onclick="openVideoModal()" style="color: var(--udemy-accent); text-decoration: underline; margin-right: 15px;">Preview</a> 
+                                                <?php echo $lesson['duration_mins']; ?>:00
+                                            </div>
+                                        </div>
+                                    <?php
+        endforeach; ?>
+                                <?php
+    endif; ?>
+                            </div>
+                        </div>
+                    <?php
+endforeach; ?>
+                </div>
+            </div>
+
+            <!-- Description -->
+            <div style="margin-top: 48px;">
+                <h2 style="font-size: 24px; margin-bottom: 16px;">Description</h2>
+                <div style="font-size: 16px; line-height: 1.6; color: var(--udemy-dark);">
+                    <?php echo nl2br(htmlspecialchars($course['description'])); ?>
+                </div>
+            </div>
+
+            <!-- Reviews Section -->
+            <div id="reviews" style="margin-top: 64px; padding-top: 48px; border-top: 1px solid var(--border-soft);">
+                <h2 style="font-size: 24px; margin-bottom: 24px;"><i class="fa fa-star" style="color: #b4690e;"></i> Course Rating &bull; <?php echo $rating; ?> (<?php echo number_format($rating_count); ?> ratings)</h2>
+                
+                <div class="review-card">
+                    <div class="review-header">
+                        <div class="review-avatar">JD</div>
+                        <div class="review-info">
+                            <h4>John Doe</h4>
+                            <div class="stars">
+                                <i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star"></i><i class="fa fa-star"></i>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="review-body">
+                        Great course! The explanations are very clear and easy to follow. Highly recommend.
+                    </div>
+                </div>
+
+                <button class="btn-outline-premium">Show all reviews</button>
+            </div>
+        </div>
+    </section>
+</main>
+
+<!-- Video Preview Modal -->
+<div class="modal-overlay" id="videoModal">
+    <div class="modal-container">
+        <div class="modal-header">
+            <h3>Course Preview - <?php echo htmlspecialchars($course['title']); ?></h3>
+            <button class="close-modal" onclick="closeVideoModal()">&times;</button>
+        </div>
+        <div class="video-player-container">
+            <video id="previewPlayer" controls poster="<?php echo htmlspecialchars($course['thumbnail']); ?>">
+                <source src="https://www.w3schools.com/html/mov_bbb.mp4" type="video/mp4">
+                Your browser does not support the video tag.
+            </video>
+        </div>
+        <div class="modal-content-scroll">
+            <div class="modal-section-title">Free Sample Videos:</div>
+            <ul class="preview-video-list">
+                <?php if (empty($lessons)): ?>
+                    <li class="preview-item">No preview available</li>
+                <?php
+else: ?>
+                    <?php foreach (array_slice($lessons, 0, 3) as $idx => $lesson): ?>
+                        <li class="preview-item <?php echo $idx === 0 ? 'active' : ''; ?>" onclick="playPreview('https://www.w3schools.com/html/mov_bbb.mp4', this)">
+                            <div class="preview-thumb">
+                                <img src="<?php echo htmlspecialchars($course['thumbnail']); ?>" alt="Thumb">
+                            </div>
+                            <div class="preview-info">
+                                <span class="preview-title-text"><?php echo htmlspecialchars($lesson['title']); ?></span>
+                                <span class="preview-duration"><?php echo $lesson['duration_mins']; ?>:00</span>
+                            </div>
+                        </li>
                     <?php
     endforeach; ?>
                 <?php
 endif; ?>
-            </div>
+            </ul>
         </div>
-        
     </div>
-    
-    <!-- Empty flex slot to offset sticky sidebar width -->
-    <div style="flex: 1;"></div>
 </div>
+
+<script>
+    const modal = document.getElementById('videoModal');
+    const player = document.getElementById('previewPlayer');
+
+    function openVideoModal() {
+        modal.style.display = 'flex';
+        document.body.style.overflow = 'hidden';
+        player.play();
+    }
+
+    function closeVideoModal() {
+        modal.style.display = 'none';
+        document.body.style.overflow = 'auto';
+        player.pause();
+    }
+
+    function playPreview(src, element) {
+        player.src = src;
+        player.play();
+        
+        // Update active state
+        document.querySelectorAll('.preview-item').forEach(item => item.classList.remove('active'));
+        element.classList.add('active');
+    }
+
+    // Close on overlay click
+    modal.addEventListener('click', (e) => {
+        if (e.target === modal) closeVideoModal();
+    });
+
+    // Sidebar Responsiveness Script
+    const sidebar = document.querySelector('.premium-sidebar');
+    const desktopWrapper = document.querySelector('.premium-sidebar-wrapper');
+    const mobilePlaceholder = document.getElementById('mobile-sidebar-placeholder');
+
+    function handleSidebarPosition() {
+        if (!sidebar || !mobilePlaceholder || !desktopWrapper) return;
+        if (window.innerWidth <= 991) {
+            if (sidebar.parentElement !== mobilePlaceholder) {
+                mobilePlaceholder.appendChild(sidebar);
+            }
+        } else {
+            if (sidebar.parentElement !== desktopWrapper) {
+                desktopWrapper.appendChild(sidebar);
+            }
+        }
+    }
+
+    window.addEventListener('resize', handleSidebarPosition);
+    window.addEventListener('load', handleSidebarPosition);
+
+    function toggleAccordion(header) {
+        const body = header.nextElementSibling;
+        const icon = header.querySelector('i');
+        
+        if (body.style.display === 'block') {
+            body.style.display = 'none';
+            icon.classList.remove('fa-chevron-up');
+            icon.classList.add('fa-chevron-down');
+        } else {
+            body.style.display = 'block';
+            icon.classList.remove('fa-chevron-down');
+            icon.classList.add('fa-chevron-up');
+        }
+    }
+</script>
 
 <?php include 'includes/footer.php'; ?>

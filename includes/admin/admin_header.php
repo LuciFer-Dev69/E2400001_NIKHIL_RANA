@@ -40,7 +40,9 @@ $initials = substr($initials, 0, 2);
     <link rel="stylesheet" href="<?php echo $root; ?>assets/css/portal.css">
     <link rel="stylesheet" href="<?php echo $root; ?>assets/css/admin.css">
     <link rel="stylesheet" href="<?php echo $root; ?>assets/css/dark-mode.css">
+    <link rel="stylesheet" href="<?php echo $root; ?>assets/css/notifications.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="<?php echo $root; ?>assets/js/global-sync.js" defer></script>
     
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     
@@ -85,6 +87,27 @@ $initials = substr($initials, 0, 2);
         </form>
 
         <div class="auth-icons" style="display: flex; align-items: center; gap: 20px;">
+            <!-- Notification Bell -->
+            <div class="notification-wrapper">
+                <button id="notif-bell" style="background: var(--light-gray); border: 1px solid var(--border-color); cursor: pointer; font-size: 16px; color: var(--dark-color); width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; position: relative; transition: all 0.2s;">
+                    <i class="far fa-bell"></i>
+                    <span id="notif-badge" class="notification-badge">0</span>
+                </button>
+                <div id="notif-dropdown" class="notification-dropdown">
+                    <div class="notification-header">
+                        <h4>Notifications</h4>
+                        <button onclick="markAllRead()" style="background: none; border: none; font-size: 11px; color: var(--primary-color); font-weight: 800; cursor: pointer;">Mark all as read</button>
+                    </div>
+                    <div id="notif-list" class="notification-list">
+                        <!-- Loaded via JS -->
+                        <div style="padding: 30px; text-align: center; color: var(--gray-color); font-size: 13px;">Loading...</div>
+                    </div>
+                    <div class="notification-footer">
+                        <a href="<?php echo $root; ?>portals/admin/notifications.php" style="font-size: 12px; color: var(--primary-color); font-weight: 800; text-decoration: none;">View all announcements</a>
+                    </div>
+                </div>
+            </div>
+
             <!-- Theme Toggle -->
             <button id="theme-toggle" onclick="toggleTheme(event)" title="Toggle Dark Mode" style="background: var(--light-gray); border: 1px solid var(--border-color); cursor: pointer; font-size: 16px; color: var(--dark-color); width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; transition: all 0.2s;">
                 <i class="far fa-moon" id="theme-icon"></i>
@@ -93,8 +116,10 @@ $initials = substr($initials, 0, 2);
             <!-- Profile Account / Logout -->
             <div style="position: relative;">
                 <a href="<?php echo $root; ?>logout.php" id="user-menu-toggle" style="display: flex; align-items: center; gap: 10px; cursor: pointer; padding: 5px 12px; border-radius: 50px; border: 1px solid rgba(231,76,60,0.3); background: rgba(231,76,60,0.05); text-decoration: none; transition: all 0.2s;" onmouseover="this.style.background='rgba(231,76,60,0.1)'" onmouseout="this.style.background='rgba(231,76,60,0.05)'" title="Logout">
-                    <div class="user-avatar" style="width: 32px; height: 32px; font-size: 12px; background: #e74c3c; color: white;"><?php echo $initials; ?></div>
-                    <span style="font-weight: 700; font-size: 14px; color: #e74c3c;" class="hide-mobile">Logout</span>
+                    <div class="user-avatar" style="width: 32px; height: 32px; font-size: 12px; background: #e74c3c; color: white;">
+                        <span id="navbar-user-initials"><?php echo $initials; ?></span>
+                    </div>
+                    <span id="navbar-user-name" style="font-weight: 700; font-size: 14px; color: #e74c3c;" class="hide-mobile"><?php echo htmlspecialchars($fullName); ?></span>
                     <i class="fa fa-sign-out-alt" style="font-size: 14px; color: #e74c3c;"></i>
                 </a>
             </div>
@@ -137,5 +162,12 @@ $initials = substr($initials, 0, 2);
     </aside>
 
     <!-- ADMIN MAIN CONTENT -->
-    <main class="portal-main">
-        <div class="portal-content" style="padding: 40px; max-width: 1400px; margin: 0 auto; width: 100%;">
+    </main>
+</div>
+
+<!-- Toast Container -->
+<div id="toast-container"></div>
+
+<script src="<?php echo $root; ?>assets/js/notifications.js" defer></script>
+</body>
+</html>

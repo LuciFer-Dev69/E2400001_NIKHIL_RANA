@@ -4,13 +4,14 @@
     --checkout-bg: #ffffff;
     --card-bg: #ffffff;
     --sidebar-bg: #f7f9fa;
-    --primary-purple: #a435f0;
-    --primary-hover: #8710d8;
+    --primary-red: #FF416C;
+    --primary-gradient: linear-gradient(135deg, #FF4B2B 0%, #FF416C 100%);
+    --primary-hover: #e53935;
     --text-dark: #1c1d1f;
     --text-muted: #6a6f73;
     --border-color: #d1d7dc;
     --accent-green: #1e8331;
-    --shadow-soft: 0 2px 4px rgba(0,0,0,0.08), 0 4px 12px rgba(0,0,0,0.08);
+    --shadow-soft: 0 2px 4px rgba(0, 0, 0, 0.08), 0 4px 12px rgba(0, 0, 0, 0.08);
 }
 
 .checkout-page {
@@ -71,7 +72,7 @@
 }
 
 .plan-card.active {
-    border: 2px solid var(--primary-purple);
+    border: 2px solid var(--primary-red);
     background: #ffffff;
     box-shadow: var(--shadow-soft);
 }
@@ -87,7 +88,7 @@
 }
 
 .plan-card.active .radio-custom {
-    border-color: var(--primary-purple);
+    border-color: var(--primary-red);
 }
 
 .plan-card.active .radio-custom::after {
@@ -98,7 +99,7 @@
     transform: translate(-50%, -50%);
     width: 10px;
     height: 10px;
-    background: var(--primary-purple);
+    background: var(--primary-red);
     border-radius: 50%;
 }
 
@@ -171,13 +172,14 @@
     width: 100%;
     padding: 12px 14px;
     border: 1px solid var(--text-dark);
-    border-radius: 0; /* Modern square look */
+    border-radius: 0;
+    /* Modern square look */
     font-size: 16px;
     outline: none;
 }
 
 .form-input:focus {
-    border-color: var(--primary-purple);
+    border-color: var(--primary-red);
 }
 
 .input-row {
@@ -234,7 +236,7 @@
 .coupon-toggle {
     background: none;
     border: none;
-    color: var(--primary-purple);
+    color: var(--primary-red);
     font-weight: 700;
     font-size: 14px;
     cursor: pointer;
@@ -250,7 +252,7 @@
 
 .btn-checkout {
     width: 100%;
-    background: var(--primary-purple);
+    background: var(--primary-red);
     color: #ffffff;
     border: none;
     padding: 16px;
@@ -274,9 +276,11 @@
     .checkout-container {
         grid-template-columns: 1fr;
     }
+
     .checkout-main {
         padding: 40px 20px;
     }
+
     .checkout-sidebar {
         border-left: none;
         border-top: 1px solid var(--border-color);

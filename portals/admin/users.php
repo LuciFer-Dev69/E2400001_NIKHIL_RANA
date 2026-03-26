@@ -15,7 +15,7 @@ $offset = ($page - 1) * $limit;
 $search = $_GET['search'] ?? '';
 $role_filter = $_GET['role'] ?? '';
 
-$sql = "SELECT id, full_name, email, role, created_at FROM users WHERE 1=1";
+$sql = "SELECT id, full_name, email, role, created_at, verification_doc FROM users WHERE 1=1";
 $params = [];
 
 if (!empty($search)) {
@@ -65,6 +65,14 @@ $users = $stmt->fetchAll();
     </div>
 </div>
 
+<!-- Role Tabs -->
+<div style="display: flex; gap: 2px; margin-bottom: 25px; border-bottom: 2px solid var(--border-color); padding-bottom: 0;">
+    <a href="users.php" class="tab-btn <?php echo $role_filter === '' ? 'active' : ''; ?>" style="padding: 12px 25px; text-decoration: none; color: <?php echo $role_filter === '' ? 'var(--primary-color)' : 'var(--gray-color)'; ?>; font-weight: 700; border-bottom: 2px solid <?php echo $role_filter === '' ? 'var(--primary-color)' : 'transparent'; ?>; margin-bottom: -2px; transition: 0.2s;">All Users</a>
+    <a href="users.php?role=instructor" class="tab-btn <?php echo $role_filter === 'instructor' ? 'active' : ''; ?>" style="padding: 12px 25px; text-decoration: none; color: <?php echo $role_filter === 'instructor' ? 'var(--primary-color)' : 'var(--gray-color)'; ?>; font-weight: 700; border-bottom: 2px solid <?php echo $role_filter === 'instructor' ? 'var(--primary-color)' : 'transparent'; ?>; margin-bottom: -2px; transition: 0.2s;">Instructors</a>
+    <a href="users.php?role=student" class="tab-btn <?php echo $role_filter === 'student' ? 'active' : ''; ?>" style="padding: 12px 25px; text-decoration: none; color: <?php echo $role_filter === 'student' ? 'var(--primary-color)' : 'var(--gray-color)'; ?>; font-weight: 700; border-bottom: 2px solid <?php echo $role_filter === 'student' ? 'var(--primary-color)' : 'transparent'; ?>; margin-bottom: -2px; transition: 0.2s;">Students</a>
+    <a href="users.php?role=admin" class="tab-btn <?php echo $role_filter === 'admin' ? 'active' : ''; ?>" style="padding: 12px 25px; text-decoration: none; color: <?php echo $role_filter === 'admin' ? 'var(--primary-color)' : 'var(--gray-color)'; ?>; font-weight: 700; border-bottom: 2px solid <?php echo $role_filter === 'admin' ? 'var(--primary-color)' : 'transparent'; ?>; margin-bottom: -2px; transition: 0.2s;">Admins</a>
+</div>
+
 <!-- Filters Bar -->
 <div style="background: var(--bg-card); padding: 20px; border-radius: 8px; border: 1px solid var(--border-color); box-shadow: var(--shadow); margin-bottom: 25px; display: flex; gap: 15px; align-items: center;">
     <form method="GET" style="display: flex; gap: 15px; flex: 1;">
@@ -97,6 +105,10 @@ endif; ?>
                 <th>Name</th>
                 <th>Email</th>
                 <th>Role</th>
+                <?php if ($role_filter === 'instructor'): ?>
+                    <th>Documents</th>
+                <?php
+endif; ?>
                 <th>Joined</th>
                 <th style="width: 150px; text-align: center;">Actions</th>
             </tr>
@@ -121,6 +133,20 @@ else: ?>
             echo '<span class="badge badge-success">Student</span>';
 ?>
                     </td>
+                    <?php if ($role_filter === 'instructor'): ?>
+                        <td>
+                            <?php if (!empty($user['verification_doc'])): ?>
+                                <a href="<?php echo $root . $user['verification_doc']; ?>" target="_blank" class="btn btn-secondary" style="padding: 5px 10px; font-size: 11px;">
+                                    <i class="fa fa-file-alt"></i> View Doc
+                                </a>
+                            <?php
+            else: ?>
+                                <span style="font-size: 11px; color: var(--gray-color);">No Doc</span>
+                            <?php
+            endif; ?>
+                        </td>
+                    <?php
+        endif; ?>
                     <td style="font-size: 13px; color: var(--gray-color);"><?php echo date('M j, Y', strtotime($user['created_at'])); ?></td>
                     <td>
                         <div class="action-btns" style="justify-content: center;">

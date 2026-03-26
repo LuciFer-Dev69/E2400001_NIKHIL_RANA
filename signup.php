@@ -40,10 +40,21 @@ endif; ?>
                 <label for="password">Password</label>
                 <input type="password" id="password" name="password" placeholder="Password" required>
             </div>
-            <div class="form-group" id="instructorDocs" style="display: none;">
-                <label for="verification_doc">Professional Certificate / CV (PDF or Image)</label>
-                <input type="file" id="verification_doc" name="verification_doc" accept=".pdf,image/*">
-                <p style="font-size: 11px; color: var(--gray-color); margin-top: 5px;">Required for instructor verification.</p>
+            <div id="instructorFields" style="display: none;">
+                <div class="form-group">
+                    <label for="expertise">Expertise / Specialty</label>
+                    <input type="text" id="expertise" name="expertise" placeholder="e.g. Full Stack Developer, Yoga Instructor">
+                    <p style="font-size: 11px; color: var(--gray-color); margin-top: 5px;">What is your primary teaching area?</p>
+                </div>
+                <div class="form-group">
+                    <label for="bio">Short Bio</label>
+                    <textarea id="bio" name="bio" placeholder="Tell students about yourself..." rows="3" style="width: 100%; padding: 12px; border: 1px solid var(--border-color); border-radius: 4px; font-family: inherit; font-size: 14px;"></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="verification_doc">Professional Certificate / CV (PDF or Image)</label>
+                    <input type="file" id="verification_doc" name="verification_doc" accept=".pdf,image/*">
+                    <p style="font-size: 11px; color: var(--gray-color); margin-top: 5px;">Required for instructor verification.</p>
+                </div>
             </div>
             <div class="form-group">
                 <label style="font-weight: 400; font-size: 13px;">
@@ -67,23 +78,26 @@ endif; ?>
     const instructorRole = document.getElementById('instructorRole');
     const roleInput = document.getElementById('roleInput');
 
-    const instructorDocs = document.getElementById('instructorDocs');
+    const instructorFields = document.getElementById('instructorFields');
     const verificationInput = document.getElementById('verification_doc');
+    const expertiseInput = document.getElementById('expertise');
 
     studentRole.addEventListener('click', () => {
         studentRole.classList.add('active');
         instructorRole.classList.remove('active');
         roleInput.value = 'student';
-        instructorDocs.style.display = 'none';
+        instructorFields.style.display = 'none';
         verificationInput.required = false;
+        expertiseInput.required = false;
     });
 
     instructorRole.addEventListener('click', () => {
         instructorRole.classList.add('active');
         studentRole.classList.remove('active');
         roleInput.value = 'instructor';
-        instructorDocs.style.display = 'block';
+        instructorFields.style.display = 'block';
         verificationInput.required = true;
+        expertiseInput.required = true;
     });
 </script>
 

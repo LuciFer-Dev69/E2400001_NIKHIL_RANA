@@ -57,9 +57,15 @@ else: ?>
         <div style="width: 90px; height: 65px; border-radius: 8px; overflow: hidden; flex-shrink: 0; background: var(--light-gray);">
             <?php
         $thumb = $course['thumbnail'] ?? 'course_default.png';
-        $thumb_path = file_exists($root . 'assets/images/thumbnails/' . $thumb) ? $root . 'assets/images/thumbnails/' . $thumb : $root . 'assets/images/' . $thumb;
+        $is_external = (strpos($thumb, 'http') === 0);
+        if ($is_external) {
+            $thumb_path = $thumb;
+        }
+        else {
+            $thumb_path = file_exists($root . 'assets/images/thumbnails/' . $thumb) ? $root . 'assets/images/thumbnails/' . $thumb : $root . 'assets/images/' . $thumb;
+        }
 ?>
-            <img src="<?php echo $thumb_path; ?>" alt="Thumbnail" style="width: 100%; height: 100%; object-fit: cover;">
+            <img src="<?php echo $thumb_path; ?>" alt="Thumbnail" style="width: 100%; height: 100%; object-fit: cover;" onerror="this.src='https://images.unsplash.com/photo-1498050108023-c5249f4df085?auto=format&fit=crop&w=200&q=80'">
         </div>
         <!-- Info -->
         <div style="flex: 1; min-width: 0;">

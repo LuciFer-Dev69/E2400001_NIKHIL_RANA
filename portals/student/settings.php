@@ -52,7 +52,7 @@ if (strlen($initials) > 2)
                         <?php echo $initials; ?>
                     </div>
                     <h1 style="font-size: 24px; font-weight: 700; color: var(--dark-color); margin-bottom: 5px;"><?php echo htmlspecialchars($user['full_name']); ?></h1>
-                    <p style="color: var(--gray-color); font-size: 14px; margin-bottom: 25px;"><?php echo htmlspecialchars($user['email']); ?></p>
+                    <p id="student-display-email" style="color: var(--gray-color); font-size: 14px; margin-bottom: 25px;"><?php echo htmlspecialchars($user['email']); ?></p>
 
                     <div style="display: flex; gap: 40px; justify-content: center; background: var(--light-gray); padding: 20px; border-radius: 8px;">
                         <div style="text-align: center;">
@@ -198,6 +198,23 @@ endif; ?>
             msg.style.color = data.success ? '#2ecc71' : '#e74c3c';
             
             if(data.success) {
+                // Broadcast the change to other tabs
+                const fullName = document.getElementById('profile-name').value;
+                const email = document.getElementById('student-display-email').innerText;
+
+                if (window.SkillEduSync) {
+                    window.SkillEduSync.broadcastProfileUpdate({
+                        full_name: fullName,
+                        email: email
+                    });
+                    
+                    // Update current tab navbar
+                    document.getElementById('navbar-user-name').innerText = fullName;
+                    const initials = fullName.split(' ').map(n => n[0]).join('').toUpperCase().substring(0, 2);
+                    document.getElementById('navbar-user-initials').innerText = initials;
+                    document.getElementById('navbar-dropdown-initials').innerText = initials;
+                }
+
                 setTimeout(() => location.reload(), 1000);
             }
         } catch (err) {

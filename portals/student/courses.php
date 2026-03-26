@@ -155,7 +155,7 @@ else: ?>
                             <div class="premium-progress" style="margin: 0 0 20px 0; height: 6px; background: #d1d7dc;">
                                 <div class="premium-progress-bar" style="width: <?php echo $course['progress_percent']; ?>%; height: 100%;"></div>
                             </div>
-                            <a href="../../ai_fundamentals.php" class="btn btn-secondary" style="width: 100%; padding: 12px; font-weight: 800; border-radius: 8px;">View Course</a>
+                            <a href="../../course_details.php?id=<?php echo $course['id']; ?>" class="btn btn-secondary" style="width: 100%; padding: 12px; font-weight: 800; border-radius: 8px;">View Course</a>
                         <?php
         endif; ?>
                     </div>

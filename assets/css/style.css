@@ -1672,7 +1672,7 @@ header {
 }
 
 .bg-purple {
-    background: #a435f0;
+    background: var(--primary-color);
 }
 
 .stat-info h4 {

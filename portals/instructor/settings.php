@@ -43,11 +43,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <?php
 endif; ?>
 
-    <form method="POST">
+    <form method="POST" id="profile-settings-form">
         <div style="background: var(--bg-card); border-radius: 12px; border: 1px solid var(--border-color); padding: 30px; box-shadow: var(--shadow);">
             <div style="margin-bottom: 20px;">
                 <label style="display: block; font-weight: 700; font-size: 14px; color: var(--dark-color); margin-bottom: 8px;">Full Name</label>
-                <input type="text" name="full_name" value="<?php echo htmlspecialchars($user['full_name']); ?>" required style="width: 100%; padding: 12px; border-radius: 8px; border: 1px solid var(--border-color); background: var(--light-gray); color: var(--dark-color); font-family: inherit;">
+                <input type="text" name="full_name" id="full_name_input" value="<?php echo htmlspecialchars($user['full_name']); ?>" required style="width: 100%; padding: 12px; border-radius: 8px; border: 1px solid var(--border-color); background: var(--light-gray); color: var(--dark-color); font-family: inherit;">
             </div>
             <div style="margin-bottom: 20px;">
                 <label style="display: block; font-weight: 700; font-size: 14px; color: var(--dark-color); margin-bottom: 8px;">Expertise / Headline</label>
@@ -59,15 +59,64 @@ endif; ?>
             </div>
             <div style="background: var(--light-gray); border-radius: 8px; padding: 15px; margin-bottom: 25px; border: 1px solid var(--border-color);">
                 <div style="font-size: 13px; color: var(--gray-color);">
-                    <i class="fa fa-envelope" style="margin-right: 6px;"></i><strong>Email:</strong> <?php echo htmlspecialchars($user['email']); ?>
+                    <i class="fa fa-envelope" style="margin-right: 6px;"></i><strong>Email:</strong> <span id="display_email"><?php echo htmlspecialchars($user['email']); ?></span>
                     <span style="margin-left: 15px; color: var(--gray-color); font-size: 11px;">(Contact Admin to change email)</span>
                 </div>
             </div>
-            <button type="submit" class="btn btn-primary" style="width: 100%; padding: 13px; font-size: 16px; font-weight: 800; background: #9b59b6; border-color: #9b59b6;">
+            <button type="submit" id="save_btn" class="btn btn-primary" style="width: 100%; padding: 13px; font-size: 16px; font-weight: 800; background: #9b59b6; border-color: #9b59b6;">
                 <i class="fa fa-save" style="margin-right: 8px;"></i> Save Profile
             </button>
         </div>
     </form>
 </div>
+
+<script>
+    document.getElementById('profile-settings-form').addEventListener('submit', async function(e) {
+        e.preventDefault();
+        const form = this;
+        const btn = document.getElementById('save_btn');
+        const originalBtnHtml = btn.innerHTML;
+        const formData = new FormData(form);
+
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fa fa-spinner fa-spin"></i> Saving...';
+
+        try {
+            const response = await fetch('settings.php', {
+                method: 'POST',
+                body: formData
+            });
+
+            if (response.ok) {
+                // Success! Broadcast the update to other tabs
+                const fullName = document.getElementById('full_name_input').value;
+                const email = document.getElementById('display_email').innerText;
+
+                if (window.SkillEduSync) {
+                    window.SkillEduSync.broadcastProfileUpdate({
+                        full_name: fullName,
+                        email: email
+                    });
+                    
+                    // Also update the current tab's navbar manually for instant feedback
+                    document.getElementById('navbar-user-name').innerText = fullName;
+                    const initials = fullName.split(' ').map(n => n[0]).join('').toUpperCase().substring(0, 2);
+                    document.getElementById('navbar-user-initials').innerText = initials;
+                    document.getElementById('navbar-dropdown-initials').innerText = initials;
+                }
+
+                alert('Profile updated successfully!');
+            } else {
+                alert('Error saving profile. Please try again.');
+            }
+        } catch (error) {
+            console.error('Save failed:', error);
+            alert('Network error. Profile not saved.');
+        } finally {
+            btn.disabled = false;
+            btn.innerHTML = originalBtnHtml;
+        }
+    });
+</script>
 
 <?php include '../../includes/instructor/instructor_footer.php'; ?>

@@ -35,6 +35,30 @@ try {
         $stmt = $pdo->prepare("UPDATE courses SET status = ? WHERE id = ?");
         $stmt->execute([$status, $course_id]);
 
+        // [NOTIFICATION TRIGGER] Notify Instructor
+        require_once '../includes/NotificationManager.php';
+        NotificationManager::init($pdo);
+
+        // Fetch course details for the notification
+        $cStmt = $pdo->prepare("SELECT title, instructor_id FROM courses WHERE id = ?");
+        $cStmt->execute([$course_id]);
+        $courseData = $cStmt->fetch();
+
+        if ($courseData) {
+            $title = $status === 'published' ? 'Course Approved! 🚀' : 'Course Status Updated';
+            $msg = $status === 'published'
+                ? "Congratulations! Your course '{$courseData['title']}' is now live on SkillEdu."
+                : "The status of your course '{$courseData['title']}' has been changed to " . ucfirst($status) . ".";
+
+            NotificationManager::notify(
+                $courseData['instructor_id'],
+                'update',
+                $title,
+                $msg,
+                "portals/instructor/courses.php"
+            );
+        }
+
         echo json_encode(['success' => true, 'message' => "Course status updated to " . ucfirst($status) . "."]);
     }
     elseif ($action === 'delete_course') {

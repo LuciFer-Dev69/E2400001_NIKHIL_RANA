@@ -1,130 +1,130 @@
 <?php
+/**
+ * portals/admin/notifications.php
+ * 
+ * Admin Announcement Center.
+ * Allows administrators to broadcast system-wide alerts to students and instructors.
+ */
 require_once '../../config/db.php';
+require_once '../../includes/NotificationManager.php';
+
 session_start();
+NotificationManager::init($pdo);
 
-$root = "../../";
-$page_title = 'Global Announcements';
-include '../../includes/admin/admin_header.php';
+$success_msg = '';
+$error_msg = '';
 
-$msg = '';
-$msg_type = '';
-
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['send_announcement'])) {
+// Handle Broadcast Request
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['broadcast'])) {
+    $target_role = $_POST['target_role']; // 'student', 'instructor', or 'all'
+    $type = 'announcement';
     $title = trim($_POST['title']);
     $message = trim($_POST['message']);
-    $target_audience = $_POST['target_audience'] ?? 'all';
+    $link = trim($_POST['link']);
 
     if (empty($title) || empty($message)) {
-        $msg = "Title and message are required.";
-        $msg_type = "error";
+        $error_msg = "Title and message are required.";
     }
     else {
-        try {
-            // Determine who gets this
-            $sql = "SELECT id FROM users";
-            if ($target_audience === 'students') {
-                $sql .= " WHERE role = 'student'";
-            }
-            elseif ($target_audience === 'instructors') {
-                $sql .= " WHERE role = 'instructor'";
-            }
-
-            $users = $pdo->query($sql)->fetchAll(PDO::FETCH_COLUMN);
-
-            if (empty($users)) {
-                $msg = "No users found in the selected audience.";
-                $msg_type = "error";
-            }
-            else {
-                // Batch insert into notifications
-                // Standard MySQL has limits, but thousands of rows in one query usually fine.
-                // For safety in shared hosting environments, a prepared statement in loop or chunking is best.
-                $pdo->beginTransaction();
-                $stmt = $pdo->prepare("INSERT INTO notifications (user_id, title, message) VALUES (?, ?, ?)");
-
-                $count = 0;
-                foreach ($users as $uid) {
-                    $stmt->execute([$uid, $title, $message]);
-                    $count++;
-                }
-
-                $pdo->commit();
-                $msg = "Announcement successfully sent to $count user(s)!";
-                $msg_type = "success";
-            }
+        if ($target_role === 'all') {
+            NotificationManager::broadcast('student', $type, $title, $message, $link);
+            NotificationManager::broadcast('instructor', $type, $title, $message, $link);
         }
-        catch (PDOException $e) {
-            if ($pdo->inTransaction()) {
-                $pdo->rollBack();
-            }
-            $msg = "Database Error: " . $e->getMessage();
-            $msg_type = "error";
+        else {
+            NotificationManager::broadcast($target_role, $type, $title, $message, $link);
         }
+        $success_msg = "Announcement broadcasted successfully to all " . ($target_role === 'all' ? 'users' : $target_role . 's') . "!";
+
+        // Log activity
+        NotificationManager::logActivity($_SESSION['user_id'], 'broadcast_announcement', [
+            'target' => $target_role,
+            'title' => $title
+        ]);
     }
 }
+
+$page_title = 'Announcements | SkillEdu Admin';
+include '../../includes/admin/admin_header.php';
 ?>
 
-<div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 25px;">
-    <div>
-        <h1 style="font-size: 28px; font-weight: 800; color: var(--dark-color); margin-bottom: 8px;">Announcements</h1>
-        <p style="color: var(--gray-color); font-size: 15px;">Send global push notifications to users across the platform.</p>
-    </div>
-</div>
-
-<?php if ($msg): ?>
-<div style="background: <?php echo $msg_type === 'error' ? 'rgba(231, 76, 60, 0.1)' : 'rgba(46, 204, 113, 0.1)'; ?>; border: 1px solid <?php echo $msg_type === 'error' ? '#e74c3c' : '#2ecc71'; ?>; color: <?php echo $msg_type === 'error' ? '#e74c3c' : '#2ecc71'; ?>; padding: 15px; border-radius: 8px; margin-bottom: 25px; font-weight: 700;">
-    <?php echo htmlspecialchars($msg); ?>
-</div>
-<?php
-endif; ?>
-
-<div style="display: grid; grid-template-columns: 2fr 1fr; gap: 30px;">
-    
-    <!-- Composer Form -->
-    <div style="background: var(--bg-card); border-radius: 12px; padding: 30px; border: 1px solid var(--border-color); box-shadow: var(--shadow);">
-        <h3 style="font-size: 18px; font-weight: 800; color: var(--dark-color); margin-bottom: 25px;"><i class="fa fa-paper-plane" style="color: var(--primary-color);"></i> Compose New Announcement</h3>
-        
-        <form method="POST">
-            <div style="margin-bottom: 20px;">
-                <label style="display: block; font-weight: 700; color: var(--dark-color); margin-bottom: 8px;">Target Audience</label>
-                <select name="target_audience" style="width: 100%; padding: 12px; border-radius: 6px; border: 1px solid var(--border-color); background: var(--light-gray); color: var(--dark-color); font-size: 15px; cursor: pointer;">
-                    <option value="all">All Registered Users</option>
-                    <option value="students">Students Only</option>
-                    <option value="instructors">Instructors Only</option>
-                </select>
-            </div>
-
-            <div style="margin-bottom: 20px;">
-                <label style="display: block; font-weight: 700; color: var(--dark-color); margin-bottom: 8px;">Notification Title *</label>
-                <input type="text" name="title" required placeholder="e.g. Platform Maintenance Saturday" style="width: 100%; padding: 12px; border-radius: 6px; border: 1px solid var(--border-color); background: var(--light-gray); color: var(--dark-color); font-size: 15px; font-family: inherit;">
-            </div>
-
-            <div style="margin-bottom: 25px;">
-                <label style="display: block; font-weight: 700; color: var(--dark-color); margin-bottom: 8px;">Message Content *</label>
-                <textarea name="message" required rows="5" placeholder="Details of the announcement..." style="width: 100%; padding: 12px; border-radius: 6px; border: 1px solid var(--border-color); background: var(--light-gray); color: var(--dark-color); font-size: 15px; font-family: inherit; resize: vertical;"></textarea>
-                <div style="font-size: 12px; color: var(--gray-color); margin-top: 5px;">This will appear in the user's notification bell menu.</div>
-            </div>
-
-            <button type="submit" name="send_announcement" class="btn btn-primary" style="width: 100%; font-size: 16px; padding: 15px; border-radius: 8px;">
-                <i class="fa fa-paper-plane"></i> Broadcast Message
-            </button>
-        </form>
-    </div>
-
-    <!-- Guidelines / Tips -->
-    <div style="background: var(--light-gray); border-radius: 12px; padding: 30px; border: 1px solid var(--border-color);">
-        <h3 style="font-size: 16px; font-weight: 800; color: var(--dark-color); margin-bottom: 15px;"><i class="fa fa-info-circle"></i> Best Practices</h3>
-        <ul style="color: var(--gray-color); font-size: 14px; line-height: 1.6; padding-left: 20px;">
-            <li style="margin-bottom: 10px;"><strong>Be Concise:</strong> Keep titles short and messages under 200 characters for best display in the dropdown.</li>
-            <li style="margin-bottom: 10px;"><strong>Use Emojis:</strong> A quick emoji (🎉, ⚠️, 🚀) in the title catches attention immediately.</li>
-            <li style="margin-bottom: 10px;"><strong>Target Correctly:</strong> Don't spam instructors with student-only promotions.</li>
-        </ul>
-        <div style="margin-top: 30px; padding: 15px; background: rgba(229, 57, 53, 0.1); border-radius: 8px; border: 1px dashed var(--primary-color);">
-            <strong style="color: var(--primary-color); display: block; margin-bottom: 5px;"><i class="fa fa-exclamation-triangle"></i> Warning</strong>
-            <span style="font-size: 12px; color: var(--dark-color);">Announcements are instantaneous and cannot be unsent. Review carefully before broadcasting.</span>
+<div class="admin-notifications">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px;">
+        <div>
+            <h1 style="font-size: 28px; font-weight: 800; margin-bottom: 5px;">Announcement Center</h1>
+            <p style="color: var(--gray-color);">Broadcasting system-wide alerts and platform updates.</p>
         </div>
     </div>
 
+    <?php if ($success_msg): ?>
+        <div style="background: rgba(46, 204, 113, 0.1); color: #2ecc71; padding: 15px; border-radius: 8px; margin-bottom: 25px; border: 1px solid rgba(46, 204, 113, 0.2); font-weight: 700;">
+            <i class="fa fa-check-circle" style="margin-right: 10px;"></i> <?php echo $success_msg; ?>
+        </div>
+    <?php
+endif; ?>
+
+    <?php if ($error_msg): ?>
+        <div style="background: rgba(231, 76, 60, 0.1); color: #e74c3c; padding: 15px; border-radius: 8px; margin-bottom: 25px; border: 1px solid rgba(231, 76, 60, 0.2); font-weight: 700;">
+            <i class="fa fa-exclamation-circle" style="margin-right: 10px;"></i> <?php echo $error_msg; ?>
+        </div>
+    <?php
+endif; ?>
+
+    <div style="display: grid; grid-template-columns: 1fr 350px; gap: 30px;">
+        <!-- Broadcast Form -->
+        <div style="background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 16px; padding: 30px; box-shadow: var(--shadow);">
+            <h3 style="margin-bottom: 25px; display: flex; align-items: center; gap: 10px;">
+                <i class="fa fa-paper-plane" style="color: var(--primary-color);"></i> New Broadcast
+            </h3>
+            
+            <form action="" method="POST">
+                <div style="margin-bottom: 20px;">
+                    <label style="display: block; margin-bottom: 8px; font-weight: 700; font-size: 14px;">Target Audience</label>
+                    <select name="target_role" style="width: 100%; padding: 12px; border-radius: 8px; border: 1px solid var(--border-color); background: var(--bg-card); color: var(--dark-color);">
+                        <option value="all">All Users (Students & Instructors)</option>
+                        <option value="student">Students Only</option>
+                        <option value="instructor">Instructors Only</option>
+                    </select>
+                </div>
+
+                <div style="margin-bottom: 20px;">
+                    <label style="display: block; margin-bottom: 8px; font-weight: 700; font-size: 14px;">Announcement Title</label>
+                    <input type="text" name="title" placeholder="e.g. Major Platform Update" required style="width: 100%; padding: 12px; border-radius: 8px; border: 1px solid var(--border-color); background: var(--bg-card); color: var(--dark-color);">
+                </div>
+
+                <div style="margin-bottom: 20px;">
+                    <label style="display: block; margin-bottom: 8px; font-weight: 700; font-size: 14px;">Message Content</label>
+                    <textarea name="message" rows="5" placeholder="Detailed announcement text..." required style="width: 100%; padding: 12px; border-radius: 8px; border: 1px solid var(--border-color); background: var(--bg-card); color: var(--dark-color);"></textarea>
+                </div>
+
+                <div style="margin-bottom: 30px;">
+                    <label style="display: block; margin-bottom: 8px; font-weight: 700; font-size: 14px;">Call to Action Link (Optional)</label>
+                    <input type="text" name="link" placeholder="https://..." style="width: 100%; padding: 12px; border-radius: 8px; border: 1px solid var(--border-color); background: var(--bg-card); color: var(--dark-color);">
+                </div>
+
+                <button type="submit" name="broadcast" style="width: 100%; padding: 15px; border-radius: 10px; border: none; background: var(--primary-gradient); color: white; font-weight: 800; cursor: pointer; transition: transform 0.2s;" onmouseover="this.style.transform='scale(1.02)'" onmouseout="this.style.transform='scale(1)'">
+                    <i class="fa fa-broadcast-tower" style="margin-right: 10px;"></i> Broadcast Announcement
+                </button>
+            </form>
+        </div>
+
+        <!-- Sidebar / Recent Alerts -->
+        <div>
+            <div style="background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 16px; padding: 25px; margin-bottom: 20px;">
+                <h4 style="margin-bottom: 15px; font-size: 16px; font-weight: 800;">Announcement Tips</h4>
+                <ul style="padding-left: 20px; font-size: 13px; color: var(--gray-color); line-height: 1.6;">
+                    <li>Keep titles short and punchy.</li>
+                    <li>Use links to direct users to new features.</li>
+                    <li>Broadcasts are real-time via polling.</li>
+                    <li>Announcements are saved for auditing.</li>
+                </ul>
+            </div>
+
+            <div style="background: rgba(155, 89, 182, 0.1); border: 1px solid rgba(155, 89, 182, 0.2); border-radius: 16px; padding: 25px; color: #9b59b6;">
+                <h4 style="margin-bottom: 10px; color: #9b59b6; font-weight: 800;">Real-time Engine</h4>
+                <p style="font-size: 12px; line-height: 1.5;">The system uses a 15-second polling cycle with server-side validation to ensure all active sessions receive alerts without high server load.</p>
+            </div>
+        </div>
+    </div>
 </div>
 
 <?php include '../../includes/admin/admin_footer.php'; ?>

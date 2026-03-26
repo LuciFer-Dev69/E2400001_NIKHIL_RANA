@@ -1,7 +1,13 @@
 <?php
-require_once '../config/db.php';
-session_start();
+/**
+ * api/notifications.php
+ * 
+ * AJAX endpoint for notification interactions.
+ */
+require_once __DIR__ . '/../config/db.php';
+require_once __DIR__ . '/../includes/NotificationManager.php';
 
+session_start();
 header('Content-Type: application/json');
 
 if (!isset($_SESSION['user_id'])) {
@@ -9,36 +15,34 @@ if (!isset($_SESSION['user_id'])) {
     exit();
 }
 
-$user_id = $_SESSION['user_id'];
-$action = $_GET['action'] ?? 'get';
+NotificationManager::init($pdo);
+$userId = $_SESSION['user_id'];
+$action = $_GET['action'] ?? '';
 
-if ($action === 'get') {
-    try {
-        $stmt = $pdo->prepare("SELECT * FROM notifications WHERE user_id = ? ORDER BY created_at DESC LIMIT 10");
-        $stmt->execute([$user_id]);
-        $notifications = $stmt->fetchAll(PDO::FETCH_ASSOC);
+switch ($action) {
+    case 'get_latest':
+        $notifications = NotificationManager::getUnread($userId);
+        echo json_encode(['success' => true, 'notifications' => $notifications]);
+        break;
 
-        $stmt = $pdo->prepare("SELECT COUNT(*) FROM notifications WHERE user_id = ? AND is_read = FALSE");
-        $stmt->execute([$user_id]);
-        $unread_count = $stmt->fetchColumn();
+    case 'mark_read':
+        $data = json_decode(file_get_contents('php://input'), true);
+        $id = $data['id'] ?? null;
+        if ($id) {
+            $success = NotificationManager::markAsRead($id, $userId);
+            echo json_encode(['success' => $success]);
+        }
+        else {
+            echo json_encode(['success' => false, 'message' => 'Missing ID']);
+        }
+        break;
 
-        echo json_encode([
-            'success' => true,
-            'notifications' => $notifications,
-            'unread_count' => $unread_count
-        ]);
-    }
-    catch (PDOException $e) {
-        echo json_encode(['success' => false, 'message' => 'DB error: ' . $e->getMessage()]);
-    }
+    case 'mark_all_read':
+        $success = NotificationManager::markAllAsRead($userId);
+        echo json_encode(['success' => $success]);
+        break;
+
+    default:
+        echo json_encode(['success' => false, 'message' => 'Invalid action']);
+        break;
 }
-elseif ($action === 'mark_read') {
-    try {
-        $pdo->prepare("UPDATE notifications SET is_read = TRUE WHERE user_id = ?")->execute([$user_id]);
-        echo json_encode(['success' => true]);
-    }
-    catch (PDOException $e) {
-        echo json_encode(['success' => false, 'message' => 'DB error']);
-    }
-}
-?>

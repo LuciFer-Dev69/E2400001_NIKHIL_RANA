@@ -75,9 +75,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $verification_doc = $upload_path;
     }
 
+    $expertise = trim($_POST['expertise'] ?? '');
+    $bio = trim($_POST['bio'] ?? '');
+
     try {
-        $stmt = $pdo->prepare("INSERT INTO users (full_name, username, email, password, plain_password, role, verification_doc) VALUES (?, ?, ?, ?, ?, ?, ?)");
-        $stmt->execute([$full_name, $username, $email, $hashed_password, $password, $role, $verification_doc]);
+        $stmt = $pdo->prepare("INSERT INTO users (full_name, username, email, password, plain_password, role, verification_doc, expertise, bio) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)");
+        $stmt->execute([$full_name, $username, $email, $hashed_password, $password, $role, $verification_doc, $expertise, $bio]);
 
         $_SESSION['success'] = "Registration successful! Please log in.";
         header("Location: login.php");

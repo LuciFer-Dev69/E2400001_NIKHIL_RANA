@@ -82,24 +82,24 @@ include 'includes/header.php';
         <aside style="width: 260px; flex-shrink: 0;" class="hide-mobile">
             <div class="filter-section">
                 <h4 style="margin-bottom: 15px; font-size: 16px;">Ratings</h4>
-                <div class="filter-item"><input type="checkbox"> 4.5 & up <span style="color: var(--gray-color); font-size: 12px; margin-left: 5px;">(1,248)</span></div>
-                <div class="filter-item"><input type="checkbox"> 4.0 & up <span style="color: var(--gray-color); font-size: 12px; margin-left: 5px;">(2,500)</span></div>
-                <div class="filter-item"><input type="checkbox"> 3.5 & up <span style="color: var(--gray-color); font-size: 12px; margin-left: 5px;">(450)</span></div>
+                <div class="filter-item"><input type="checkbox" class="filter-checkbox" data-group="rating" value="4.5"> 4.5 & up <span style="color: var(--gray-color); font-size: 12px; margin-left: 5px;">(1,248)</span></div>
+                <div class="filter-item"><input type="checkbox" class="filter-checkbox" data-group="rating" value="4.0"> 4.0 & up <span style="color: var(--gray-color); font-size: 12px; margin-left: 5px;">(2,500)</span></div>
+                <div class="filter-item"><input type="checkbox" class="filter-checkbox" data-group="rating" value="3.5"> 3.5 & up <span style="color: var(--gray-color); font-size: 12px; margin-left: 5px;">(450)</span></div>
             </div>
 
             <div class="filter-section" style="margin-top: 30px; border-top: 1px solid var(--border-color); padding-top: 20px;">
                 <h4 style="margin-bottom: 15px; font-size: 16px;">Video Duration</h4>
-                <div class="filter-item"><input type="checkbox"> 0-1 Hours</div>
-                <div class="filter-item"><input type="checkbox"> 1-3 Hours</div>
-                <div class="filter-item"><input type="checkbox"> 3-6 Hours</div>
-                <div class="filter-item"><input type="checkbox"> 6+ Hours</div>
+                <div class="filter-item"><input type="checkbox" class="filter-checkbox" data-group="duration" value="0-1"> 0-1 Hours</div>
+                <div class="filter-item"><input type="checkbox" class="filter-checkbox" data-group="duration" value="1-3"> 1-3 Hours</div>
+                <div class="filter-item"><input type="checkbox" class="filter-checkbox" data-group="duration" value="3-6"> 3-6 Hours</div>
+                <div class="filter-item"><input type="checkbox" class="filter-checkbox" data-group="duration" value="6+"> 6+ Hours</div>
             </div>
 
             <div class="filter-section" style="margin-top: 30px; border-top: 1px solid var(--border-color); padding-top: 20px;">
                 <h4 style="margin-bottom: 15px; font-size: 16px;">Level</h4>
-                <div class="filter-item"><input type="checkbox"> Beginner</div>
-                <div class="filter-item"><input type="checkbox"> Intermediate</div>
-                <div class="filter-item"><input type="checkbox"> Expert</div>
+                <div class="filter-item"><input type="checkbox" class="filter-checkbox" data-group="level" value="beginner"> Beginner</div>
+                <div class="filter-item"><input type="checkbox" class="filter-checkbox" data-group="level" value="intermediate"> Intermediate</div>
+                <div class="filter-item"><input type="checkbox" class="filter-checkbox" data-group="level" value="advanced"> Expert</div>
             </div>
         </aside>
 
@@ -107,7 +107,7 @@ include 'includes/header.php';
         <div style="flex: 1;">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
                 <button class="btn btn-secondary" style="padding: 10px 20px; font-size: 14px;"><i class="fa fa-filter"></i> Filter</button>
-                <div style="font-weight: 700; font-size: 14px;"><?php echo count($courses); ?> results</div>
+                <div style="font-weight: 700; font-size: 14px;" id="results-count"><?php echo count($courses); ?> results</div>
             </div>
 
             <div class="course-list-stack">
@@ -119,22 +119,31 @@ include 'includes/header.php';
                     </div>
                 <?php
 else: ?>
-                    <?php foreach ($courses as $c): ?>
-                    <div class="course-horizontal-card" style="display: flex; cursor: default; background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 8px; overflow: hidden; margin-bottom: 20px; transition: transform 0.2s, box-shadow 0.2s;">
+                    <?php
+    foreach ($courses as $index => $c):
+        $mock_rating = 4.0 + (($index % 10) / 10); // Generates various ratings 4.0 - 4.9 for demo
+        $duration_hrs = round($c['total_duration'] / 60, 1);
+        $level = strtolower($c['difficulty_level'] ?? 'beginner');
+?>
+                    <div class="course-horizontal-card" 
+                         data-rating="<?php echo $mock_rating; ?>" 
+                         data-duration="<?php echo $duration_hrs; ?>" 
+                         data-level="<?php echo $level; ?>"
+                         style="display: flex; cursor: default; background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 8px; overflow: hidden; margin-bottom: 20px; transition: all 0.3s ease;">
                         <a href="<?php echo $base_url; ?>course_details.php?id=<?php echo $c['id']; ?>" style="display: flex; flex: 1; text-decoration: none; color: inherit;">
-                            <div class="card-thumb" style="width: 260px; flex-shrink: 0; background: url('https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&q=80&w=400') center/cover;" onerror="this.style.backgroundImage='url(https://via.placeholder.com/260x145)'">
+                            <div class="card-thumb" style="width: 260px; flex-shrink: 0; background: url('<?php echo $c['thumbnail'] ?: 'https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&q=80&w=400'; ?>') center/cover;" onerror="this.style.backgroundImage='url(https://via.placeholder.com/260x145)'">
                             </div>
                             <div class="card-info" style="flex: 1; padding: 15px 20px; display: flex; flex-direction: column;">
                                 <h3 style="font-size: 18px; font-weight: 800; margin-bottom: 5px;"><?php echo htmlspecialchars($c['title']); ?></h3>
-                                <p class="desc" style="font-size: 14px; color: #4d5156; margin-bottom: 5px; line-height: 1.4;"><?php echo htmlspecialchars(substr($c['description'], 0, 120)) . '...'; ?></p>
+                                <p class="desc" style="font-size: 14px; color: #4d5156; margin-bottom: 5px; line-height: 1.4;"><?php echo htmlspecialchars(substr($c['description'] ?? '', 0, 120)) . '...'; ?></p>
                                 <p class="instructor" style="font-size: 12px; color: #6a6f73; margin-bottom: 5px; font-weight: 600;">By <?php echo htmlspecialchars($c['instructor_name']); ?></p>
                                 <div class="rating" style="display: flex; align-items: center; gap: 5px;">
-                                    <span style="font-weight: 700; color: #b4690e;">4.8</span>
+                                    <span style="font-weight: 700; color: #b4690e;"><?php echo number_format($mock_rating, 1); ?></span>
                                     <i class="fa fa-star" style="color: #b4690e; font-size: 12px;"></i>
-                                    <span style="color: #6a6f73; font-size: 13px;">(2,105 ratings)</span>
+                                    <span style="color: #6a6f73; font-size: 13px;">(<?php echo number_format(1000 + ($index * 137)); ?> ratings)</span>
                                 </div>
                                 <div style="font-size: 12px; color: #6a6f73; margin-top: auto;">
-                                    <?php echo round($c['total_duration'] / 60, 1); ?> total hours &bull; <?php echo $c['lesson_count']; ?> lectures &bull; All Levels
+                                    <?php echo $duration_hrs; ?> total hours &bull; <?php echo $c['lesson_count']; ?> lectures &bull; <?php echo ucfirst($level); ?>
                                 </div>
                             </div>
                         </a>
@@ -149,6 +158,13 @@ else: ?>
                     </div>
                     <?php
     endforeach; ?>
+                    
+                    <div id="no-filtered-results" style="display: none; text-align: center; padding: 50px; background: #f7f9fa; border-radius: 8px;">
+                        <i class="fa fa-filter" style="font-size: 40px; color: #d1d7dc; margin-bottom: 15px;"></i>
+                        <h3 style="font-size: 20px; margin-bottom: 10px;">No courses match your filters</h3>
+                        <p style="color: #6a6f73;">Try adjusting your filters to find what you're looking for.</p>
+                        <button onclick="clearAllFilters()" class="btn btn-secondary" style="margin-top: 15px;">Clear All Filters</button>
+                    </div>
                 <?php
 endif; ?>
             </div>
@@ -195,5 +211,70 @@ endif; ?>
         </div>
     </div>
 </div>
+
+<script>
+    function applyFilters() {
+        const checkboxes = document.querySelectorAll('.filter-checkbox');
+        const cards = document.querySelectorAll('.course-horizontal-card');
+        const resultsCountLabel = document.getElementById('results-count');
+        
+        // Grouped active filters
+        const active = {
+            rating: [],
+            duration: [],
+            level: []
+        };
+        
+        checkboxes.forEach(cb => {
+            if (cb.checked) {
+                active[cb.dataset.group].push(cb.value);
+            }
+        });
+
+        let visibleCount = 0;
+        
+        cards.forEach(card => {
+            const cardRating = parseFloat(card.dataset.rating);
+            const cardDuration = parseFloat(card.dataset.duration);
+            const cardLevel = card.dataset.level;
+            
+            // Check each filter group
+            const matchRating = active.rating.length === 0 || active.rating.some(val => cardRating >= parseFloat(val));
+            const matchLevel = active.level.length === 0 || active.level.includes(cardLevel);
+            
+            let matchDuration = active.duration.length === 0;
+            if (active.duration.length > 0) {
+                matchDuration = active.duration.some(range => {
+                    if (range === '0-1') return cardDuration <= 1;
+                    if (range === '1-3') return cardDuration > 1 && cardDuration <= 3;
+                    if (range === '3-6') return cardDuration > 3 && cardDuration <= 6;
+                    if (range === '6+') return cardDuration > 6;
+                    return false;
+                });
+            }
+            
+            if (matchRating && matchLevel && matchDuration) {
+                card.style.display = 'flex';
+                visibleCount++;
+            } else {
+                card.style.display = 'none';
+            }
+        });
+        
+        // Update UI
+        resultsCountLabel.innerText = visibleCount + ' results';
+        document.getElementById('no-filtered-results').style.display = visibleCount === 0 ? 'block' : 'none';
+    }
+
+    function clearAllFilters() {
+        document.querySelectorAll('.filter-checkbox').forEach(cb => cb.checked = false);
+        applyFilters();
+    }
+
+    // Attach listeners
+    document.querySelectorAll('.filter-checkbox').forEach(cb => {
+        cb.addEventListener('change', applyFilters);
+    });
+</script>
 
 <?php include 'includes/footer.php'; ?>

@@ -46,6 +46,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['process_checkout'])) 
     try {
         $stmt = $pdo->prepare("INSERT IGNORE INTO enrollments (student_id, course_id, enrolled_at, progress_percent) VALUES (?, ?, NOW(), 0)");
         $stmt->execute([$user_id, $course_id]);
+
+        // [NOTIFICATION TRIGGER] Notify Instructor
+        require_once 'includes/NotificationManager.php';
+        NotificationManager::init($pdo);
+        $studentName = $_SESSION['full_name'] ?? 'A student';
+        $courseTitle = $course['title'];
+        NotificationManager::notify(
+            $course['instructor_id'],
+            'enrollment',
+            'New Student Enrolled!',
+            "$studentName has just enrolled in your course: $courseTitle",
+            "portals/instructor/students.php"
+        );
+
         echo json_encode(['success' => true, 'redirect' => "portals/student/player.php?course_id=$course_id&enrolled=true"]);
     }
     catch (PDOException $e) {

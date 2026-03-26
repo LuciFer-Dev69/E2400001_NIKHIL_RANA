@@ -124,7 +124,12 @@ else: ?>
         <?php foreach ($courses as $course): ?>
         <div id="course-row-<?php echo $course['id']; ?>" style="display: flex; align-items: stretch; background: var(--bg-card); border-radius: 12px; overflow: hidden; border: 1px solid var(--border-color); box-shadow: var(--shadow); transition: transform 0.2s;">
             <div style="width: 200px; flex-shrink: 0; background: var(--light-gray); position: relative;">
-                <img src="../../assets/img/courses/<?php echo $course['thumbnail'] ?: 'default.jpg'; ?>" style="width: 100%; height: 100%; object-fit: cover;" onerror="this.src='https://images.unsplash.com/photo-1498050108023-c5249f4df085?auto=format&fit=crop&w=400&q=80'">
+                <?php
+        $thumb = $course['thumbnail'] ?: 'default.jpg';
+        $is_external = (strpos($thumb, 'http') === 0);
+        $thumb_url = $is_external ? $thumb : "../../assets/img/courses/" . $thumb;
+?>
+                <img src="<?php echo $thumb_url; ?>" style="width: 100%; height: 100%; object-fit: cover;" onerror="this.src='https://images.unsplash.com/photo-1498050108023-c5249f4df085?auto=format&fit=crop&w=400&q=80'">
                 <?php if ($course['price'] == 0): ?>
                     <div style="position: absolute; top: 10px; left: 10px; background: rgba(0,0,0,0.7); color: white; padding: 4px 8px; border-radius: 4px; font-size: 11px; font-weight: 800;">FREE</div>
                 <?php

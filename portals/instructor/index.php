@@ -121,9 +121,12 @@ catch (PDOException $e) {
             </div>
         </div>
 
-        <div style="background: linear-gradient(135deg, #9b59b6, #8e44ad); padding: 25px; border-radius: 12px; color: white; box-shadow: 0 10px 20px rgba(155, 89, 182, 0.3);">
-            <h3 style="font-size: 18px; font-weight: 800; margin-bottom: 10px;"><i class="fa fa-graduation-cap"></i> Instructor Tips</h3>
-            <p style="font-size: 13px; line-height: 1.6; opacity: 0.9;">Courses with high-quality thumbnails and clear Difficulty Levels receive 40% more enrollments. Be sure to completely fill out your Course Details before submitting for approval!</p>
+        <!-- Subscription Promo -->
+        <div style="background: linear-gradient(135deg, #FF4B2B, #FF416C); padding: 25px; border-radius: 12px; color: white; box-shadow: 0 10px 20px rgba(255, 65, 108, 0.3); margin-top: 20px; position: relative; overflow: hidden;">
+            <div style="position: absolute; right: -20px; top: -20px; font-size: 100px; opacity: 0.1; transform: rotate(15deg);"><i class="fa fa-rocket"></i></div>
+            <h3 style="font-size: 20px; font-weight: 800; margin-bottom: 10px;">Upgrade to Pro</h3>
+            <p style="font-size: 14px; opacity: 0.9; margin-bottom: 20px; max-width: 80%;">Unlock unlimited courses, lower platform fees, and advanced student analytics with our Pro and Enterprise plans.</p>
+            <a href="subscription.php" class="btn" style="background: white; color: #FF416C; font-weight: 800; padding: 10px 25px; border-radius: 8px; text-decoration: none; display: inline-block; transition: all 0.3s; box-shadow: 0 5px 15px rgba(0,0,0,0.1);" onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform='translateY(0)'">View Plans</a>
         </div>
     </div>
 </div>
