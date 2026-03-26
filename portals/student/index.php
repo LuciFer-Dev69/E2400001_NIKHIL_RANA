@@ -164,59 +164,52 @@ include '../../includes/portal_header.php';
         <span>3 Day Streak</span>
     </div>
 </div>
+    <!-- STAT CARDS -->
+    <div class="stat-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-bottom: 35px;">
+        <div class="stat-card" style="background: var(--bg-card); padding: 25px; border-radius: 12px; border: 1px solid var(--border-color); box-shadow: var(--shadow);">
+            <div style="font-size: 11px; font-weight: 800; color: var(--gray-color); text-transform: uppercase; margin-bottom: 10px;">Enrolled Courses</div>
+            <div id="total-enrolled-val" style="font-size: 28px; font-weight: 800; color: var(--dark-color);"><?php echo $total_enrolled_count; ?></div>
+        </div>
+        <div class="stat-card" style="background: var(--bg-card); padding: 25px; border-radius: 12px; border: 1px solid var(--border-color); box-shadow: var(--shadow);">
+            <div style="font-size: 11px; font-weight: 800; color: var(--gray-color); text-transform: uppercase; margin-bottom: 10px;">Completed</div>
+            <div id="completed-courses-val" style="font-size: 28px; font-weight: 800; color: #2ecc71;"><?php echo $completed_count; ?></div>
+        </div>
+        <div class="stat-card" style="background: var(--bg-card); padding: 25px; border-radius: 12px; border: 1px solid var(--border-color); box-shadow: var(--shadow);">
+            <div style="font-size: 11px; font-weight: 800; color: var(--gray-color); text-transform: uppercase; margin-bottom: 10px;">Certificates</div>
+            <div id="certificates-val" style="font-size: 28px; font-weight: 800; color: #f1c40f;"><?php echo $completed_count; ?></div>
+        </div>
+        <div class="stat-card" style="background: var(--bg-card); padding: 25px; border-radius: 12px; border: 1px solid var(--border-color); box-shadow: var(--shadow);">
+            <div style="font-size: 11px; font-weight: 800; color: var(--gray-color); text-transform: uppercase; margin-bottom: 10px;">Learning Points</div>
+            <div id="learning-points-val" style="font-size: 28px; font-weight: 800; color: var(--primary-color);">0</div>
+        </div>
+    </div>
 
-<div class="stats-grid" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 25px; margin-bottom: 30px;">
-    <div class="stat-card skeleton" style="padding: 25px; border-radius: 12px; display: flex; align-items: center; gap: 20px; border: 1px solid var(--border-color); background: var(--bg-card);">
-        <div class="stat-icon bg-red" style="animation: none;"><i class="fa fa-book-open"></i></div>
-        <div>
-            <div style="font-size: 13px; font-weight: 700; color: var(--gray-color); text-transform: uppercase;">Enrolled</div>
-            <div style="font-size: 28px; font-weight: 800; color: var(--dark-color);"><?php echo count($courses_enrolled); ?></div>
-        </div>
-    </div>
-    <div class="stat-card skeleton" style="padding: 25px; border-radius: 12px; display: flex; align-items: center; gap: 20px; border: 1px solid var(--border-color); background: var(--bg-card);">
-        <div class="stat-icon bg-green" style="animation: none;"><i class="fa fa-award"></i></div>
-        <div>
-            <div style="font-size: 13px; font-weight: 700; color: var(--gray-color); text-transform: uppercase;">Completed</div>
-            <div style="font-size: 28px; font-weight: 800; color: var(--dark-color);"><?php echo $completed_count; ?></div>
-        </div>
-    </div>
-    <div class="stat-card skeleton" style="padding: 25px; border-radius: 12px; display: flex; align-items: center; gap: 20px; border: 1px solid var(--border-color); background: var(--bg-card);">
-        <div class="stat-icon bg-blue" style="animation: none;"><i class="fa fa-clock"></i></div>
-        <div>
-            <div style="font-size: 13px; font-weight: 700; color: var(--gray-color); text-transform: uppercase;">Learning Hours</div>
-            <div style="font-size: 28px; font-weight: 800; color: var(--dark-color);"><?php echo $learning_hours; ?>h</div>
-        </div>
-    </div>
-</div>
-
-<h2 style="font-size: 22px; margin-bottom: 20px; color: var(--dark-color);">Activity & Goals</h2>
-<div style="display: grid; grid-template-columns: 2fr 1fr; gap: 25px; margin-bottom: 40px;">
-    <!-- Chart: Weekly Learning Time -->
-    <div style="background: var(--white); padding: 25px; border-radius: 12px; border: 1px solid var(--border-color); box-shadow: var(--shadow); transition: transform 0.3s ease;">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
-            <h3 style="font-size: 16px; color: var(--dark-color); font-weight: 700;">Weekly Learning Time</h3>
-            <span style="font-size: 12px; color: var(--gray-color);"><i class="fa fa-arrow-trend-up" style="color: #2ecc71;"></i> +15% from last week</span>
-        </div>
-        <div style="position: relative; height: 180px; width: 100%;">
-            <canvas id="learningChart"></canvas>
-        </div>
-    </div>
-    
-    <!-- Daily Goal Widget -->
-    <div style="background: var(--white); padding: 25px; border-radius: 12px; border: 1px solid var(--border-color); box-shadow: var(--shadow); display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative;">
-        <div style="position: absolute; top: 15px; right: 15px; color: #b4690e;"><i class="fa fa-bullseye"></i></div>
-        <h3 style="font-size: 16px; margin-bottom: 15px; color: var(--dark-color); font-weight: 700;">Daily Goal</h3>
-        <div style="position: relative; width: 120px; height: 120px; filter: drop-shadow(0 4px 6px rgba(0,0,0,0.1));">
-            <canvas id="goalChart" width="120" height="120"></canvas>
-            <div style="position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center;">
-                <span style="font-size: 24px; font-weight: 800; color: var(--dark-color);">1/2</span>
-                <span style="font-size: 10px; color: var(--gray-color); text-transform: uppercase; font-weight: 700; letter-spacing: 0.5px;">Lessons</span>
+    <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 30px; margin-bottom: 40px;">
+        <!-- Activity Chart -->
+        <div style="background: var(--bg-card); padding: 25px; border-radius: 12px; border: 1px solid var(--border-color); box-shadow: var(--shadow);">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                <h3 style="font-size: 16px; font-weight: 800; color: var(--dark-color);">Learning Activity</h3>
+                <div style="text-align: right;">
+                    <span style="font-size: 11px; font-weight: 800; color: var(--gray-color); text-transform: uppercase;">Daily Goal</span>
+                    <div style="height: 120px; width: 120px;">
+                        <canvas id="goalCanvas" width="120" height="120"></canvas>
+                    </div>
+                </div>
+            </div>
+            <div style="height: 200px;">
+                <canvas id="learningActivityChart"></canvas>
             </div>
         </div>
-        <p style="margin-top: 15px; font-size: 14px; color: var(--gray-color); text-align: center;">Complete <b>1 more lesson</b> to reach your daily goal! 🔥</p>
+        
+        <!-- Quick Progress List -->
+        <div style="background: var(--bg-card); padding: 25px; border-radius: 12px; border: 1px solid var(--border-color); box-shadow: var(--shadow);">
+            <h3 style="font-size: 16px; font-weight: 800; color: var(--dark-color); margin-bottom: 20px;">Course Progress</h3>
+            <div id="student-course-list">
+                <!-- Loaded via JS -->
+                <div style="text-align: center; color: var(--gray-color); padding: 40px 0;">Loading progress...</div>
+            </div>
+        </div>
     </div>
-</div>
-
 <?php if ($continue_course): ?>
 <div class="continue-learning" style="background: var(--light-gray); padding: 30px; border-radius: 12px; margin-bottom: 40px; display: flex; align-items: center; gap: 30px;">
     <div class="continue-thumbnail" style="width: 180px; height: 120px; border-radius: 8px; overflow: hidden; flex-shrink: 0;">
@@ -412,7 +405,9 @@ function h($str)
     return htmlspecialchars($str ?? '', ENT_QUOTES, 'UTF-8');
 }
 ?>
-
+</div></main></div>
+<script src="https://cdn.jsdelivr.net/npm/chart.js" defer></script>
+<script src="<?php echo $root; ?>assets/js/student_stats.js" defer></script>
 <?php include '../../includes/portal_footer.php'; ?>
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
